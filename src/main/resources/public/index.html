@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" href="images/title2.ico" type="image/x-icon">
+  <link type="image/x-icon" rel="bookmark" href="images/title2.ico">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script language="javascript" src="js/jquery.js"></script>
+  <style type="text/css">
+    body {
+      margin-left: 0px;
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      /*background-image: url(../images/left.gif);*/
+      font-family: "Microsoft YaHei UI";
+    }
+  </style>
+  <script type="text/javascript">
+    reLogin=function(){
+      window.location = '../login.html';
+    }
+    $(function () {
+      $.ajax({
+        type: "get",
+        url: "/serverestimate/userController/getUserRole",
+        data: null,
+        async: true,
+        success: function (result) {
+          if(!result){
+            window.location = 'login.html';
+          }
+          var roles = eval('(' + result + ')');
+          if(roles){
+            var roleIds="";
+            for (var i = 0; i < roles.length; i++) {
+              var entity = roles[i];
+              if(entity.roleName.indexOf('admin')>=0){
+                $("#leftFrame").attr("src","files/left.html")
+                $("#mainFrame").attr("src","files/topicList.html")
+              }
+            }
+          }else{
+            $("#leftFrame").attr("src","")
+            $("#mainFrame").attr("src","")
+          }
+        },
+        error: function (result) {
+          console.log("failed")
+        }
+      });
+    })
+  </script>
+<title>服务商季度评价系统V1.0</title>
+</head>
+<script type="text/javascript">
+
+</script>
+<frameset rows="59,*" cols="*" frameborder="no" border="0" framespacing="0">
+  <frame src="files/top.html" name="topFrame" scrolling="No" noresize="noresize" id="topFrame" title="topFrame" />
+  <frameset cols="213,*" frameborder="no" border="0" framespacing="0">
+    <frame src="" name="leftFrame" scrolling="No" noresize="noresize" id="leftFrame" title="leftFrame" />
+    <frame src="" name="mainFrame" id="mainFrame" title="mainFrame" />
+  </frameset>
+</frameset>
+<noframes><body>
+</body>
+</noframes></html>

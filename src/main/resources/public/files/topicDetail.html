@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link href="../css/hi-main.css" rel="stylesheet" type="text/css"/>
+    <script language="JavaScript" type="text/javascript">
+        var topicId="";
+        var opera="";
+        $(function () {
+            $( "#dealDate" ).datepicker();
+            $( "#dealDate" ).datepicker( "option", "dateFormat", "yy-mm-dd" )
+            //初始化提报者select,审批者select,终审者select
+            initGroupLists();
+            var request = getRequest();
+            topicId=request["id"];
+            opera=request["opera"];
+            if(topicId){
+                initTopic(topicId);
+                if("view"==opera){
+                    $("h4").text("查看提报主题")
+                }else if("clone"==opera){
+                    $("h4").text("克隆提报主题")
+                }
+            }else{
+                $("#excelFrame").hide();
+                $("h4").text("添加提报主题")
+            }
+            $("#isDual").keyup(function () {
+                if(!isInteger($("#isDual").val())){
+                    alert("输入错误,必须为整数")
+                }else{
+                    initSheets($("#isDual").val());
+                }
+            })
+        })
+        downloadModel=function(){
+            window.location="/serverestimate/taskController/downloadModelAll?topicId="+topicId;
+        }
+        //查看时
+        initTopic=function(topicId){
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/topicController/getTopicById",
+                data: {jsonParam: topicId},
+                async: true,
+                success: function (result) {
+                    if(result){
+                        var topic = eval('(' + result + ')');
+                        console.log(topic)
+                        $("#topicId").val(topic.id);
+                        $("#title").val(topic.title);
+                        $("#isDual").val(topic.isDual);
+                        initSheets(topic.isDual);
+                        initSheetsData(topic.sheetList)
+                        $("#dealDate").val((new Date(topic.dealDate)).Format("yyyy-MM-dd"));
+                        // $("#file").parent().hide();
+                        $("#postDataUser").val(topic.writeGroupSn);
+                        if(!topic.checkGroupSn){
+                            $("#checkDataUser").val(-1);
+                        }else{
+                            $("#checkDataUser").val(topic.checkGroupSn);
+                        }
+                        $("#checkDataUser2").val(topic.check2GroupSn);
+                        $("#content").val(topic.content);
+                        if("view"==opera){
+                            $("#postFileBtn").hide();
+                        }else if("clone"==opera){
+
+                        }
+                        $("#excelFrame").text(topic.fileName);
+                    }
+                },
+                error: function (result) {
+                    showInfoDialog($("#failedDialog"));
+                }
+            });
+        }
+        //提交form
+        postForm=function(){
+            if(!checkForm()){
+                return;
+            }
+            var formData=new FormData($("#mainForm")[0]);
+            console.log(formData)
+            $.ajax({
+                type: "post",
+                url: "/serverestimate/topicController/postTopic",
+                data:formData,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if("success"==data){
+                        window.location = 'topicList.html'
+                    }
+                },
+                error: function (result) {
+                    alert("保存失败")
+                }
+            });
+        }
+        //验证form
+        checkForm=function(){
+            var goodInput=true;
+            $("#errorDiv").empty();
+            if(!$("#title").val()){
+                $("#errorDiv").append("<p>*【标题不能为空】</p>");
+                goodInput=false;
+            }
+            if($("#companyDistribute").val()==1&&!$("#companyColumn").val()){
+                $("#errorDiv").append("<p>*【分公司所在列】不能为空</p>");
+                goodInput=false;
+            }
+            if(!$("#dealDate").val()){
+                $("#errorDiv").append("<p>*【截止日期】不能为空</p>");
+                goodInput=false;
+            }
+            var file = $('#file').get(0).files[0];
+            if(!file&&!topicId){
+                $("#errorDiv").append("<p>*【模板】不能为空</p>");
+                goodInput=false;
+            }
+            if(file){
+                var fileExtension = file.name.substring(file.name.lastIndexOf('.') + 1);
+                if(fileExtension!='xls'){
+                    $("#errorDiv").append("<p>*【模板】必格式错误</p>");
+                    goodInput=false;
+                }else if(file.size>20000000){
+                    $("#errorDiv").append("<p>*【模板】不能超过20M</p>");
+                    goodInput=false;
+                }
+            }
+            var companyColumns=$("#companyColumnDiv input");
+            for(var i= 0;i<companyColumns.length;i++){
+                if(!($(companyColumns[i]).val())){
+                    $("#errorDiv").append("<p>*【分公司所在列】不能为空</p>");
+                    goodInput=false;
+                    break;
+                }
+                if(!isInteger($(companyColumns[i]).val())){
+                    $("#errorDiv").append("<p>*【分公司所在列】必须为整数</p>");
+                    goodInput=false;
+                    break;
+                }
+            }
+            var startRows=$("#startRowDiv input");
+            for(var i= 0;i<startRows.length;i++){
+                if(!($(startRows[i]).val())){
+                    $("#errorDiv").append("<p>*【数据起始行】不能为空</p>");
+                    goodInput=false;
+                    break;
+                }
+                if(!isInteger($(startRows[i]).val())){
+                    $("#errorDiv").append("<p>*【数据起始行】必须为整数</p>");
+                    goodInput=false;
+                    break;
+                }
+            }
+            var startColumns=$("#startColumnDiv input");
+            for(var i= 0;i<startColumns.length;i++){
+                if(!($(startColumns[i]).val())){
+                    $("#errorDiv").append("<p>*【数据起始列】不能为空</p>");
+                    goodInput=false;
+                    break;
+                }
+                if(!isInteger($(startColumns[i]).val())){
+                    $("#errorDiv").append("<p>*【数据起始列】必须为整数</p>");
+                    goodInput=false;
+                    break;
+                }
+            }
+            return goodInput;
+        }
+        initGroupLists=function () {
+            $("#checkDataUser").append("<option value='-1'>无</option>");
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/groupController/getAllGroupList",
+                async: true,
+                success: function (data) {
+                    if(data){
+                        var groupList = eval('(' + data + ')');
+                        for (var i = 0; i < groupList.length; i++) {
+                            var group=groupList[i];
+                            $("#postDataUser").append("<option value='"+group.groupSn+"'>"+group.groupName+"</option>");
+                            $("#checkDataUser").append("<option value='"+group.groupSn+"'>"+group.groupName+"</option>");
+                            $("#checkDataUser2").append("<option value='"+group.groupSn+"'>"+group.groupName+"</option>");
+                        }
+                    }
+
+                },
+                error: function (result) {
+                    console.log("failed")
+                }
+            });
+        }
+        initSheets=function (num) {
+            $("#companyDistributeDiv").empty();
+            var html="<label>模板数据分派：</label>";
+            for (var i=0;i<num;i++){
+                if(num>1){
+                    html+=(i+1)+":";
+                }
+                html+="<select id='companyDistribute"+i+"' name='companyDistribute' style='width:39px;'>";
+                html+="<option value=0 selected='selected'>否</option>";
+                html+="<option value=1  >是</option>";
+                html+="</select>　";
+            }
+            $("#companyDistributeDiv").append(html);
+
+            $("#companyColumnDiv").empty();
+            html="<label>分公司所在列：</label>";
+            for (var i=0;i<num;i++){
+                if(num>1){
+                    html+=(i+1)+":";
+                }
+                html+="<input  id='companyColumn"+i+"' name='companyColumn' value='0' type='text'  style='width:35px;' />　";
+            }
+            $("#companyColumnDiv").append(html);
+
+            $("#startRowDiv").empty();
+            html="<label>数据起始行：</label>";
+            for (var i=0;i<num;i++){
+                if(num>1){
+                    html+=(i+1)+":";
+                }
+                html+="<input  id='startRow"+i+"' name='startRow' type='text'  style='width:35px;' />　";
+                $("#startRow1").append(html);
+            }
+            $("#startRowDiv").append(html);
+
+            $("#startColumnDiv").empty();
+            html="<label>数据起始列：</label>";
+            for (var i=0;i<num;i++){
+                if(num>1){
+                    html+=(i+1)+":";
+                }
+                html+="<input  id='startColumn"+i+"' name='startColumn' type='text' value='1'  style='width:35px;' />　";
+            }
+            $("#startColumnDiv").append(html);
+        }
+        initSheetsData=function (sheetList) {
+            var companyColumns=$("#companyColumnDiv input");
+            var startRows=$("#startRowDiv input");
+            var startColumns=$("#startColumnDiv input");
+
+            var num=sheetList.length>companyColumns.length?companyColumns.length:sheetList.length;
+
+            for(var i= 0;i<num;i++){
+                $(companyColumns[i]).val(sheetList[i].companyColumn);
+                $(startRows[i]).val(sheetList[i].startRow);
+                $(startColumns[i]).val(sheetList[i].startColumn);
+            }
+        }
+    </script>
+    <style type="text/css">
+        input{
+            width:200px;
+        }
+    </style>
+</head>
+
+<body style="color:#4B4967">
+    <div align="center" class="toolbar">
+        <span><h4>提报主题管理</h4></span>
+    </div>
+    <div style="padding:10px 20px">
+        <fieldset class="scheduler-border">
+            <legend>提报主题详情</legend>
+
+            <div class="errorDiv" id="errorDiv">
+
+            </div>
+            <div class="form">
+                <form action="/serverestimate/topicController/postTopic" method="post" enctype="multipart/form-data" id="mainForm">
+                    <input type="hidden" id="topicId" value="" name="id">
+                    <div >
+                        <label>标题：</label>
+                        <input id="title" name='title' type="text" width="40px"/>
+                    </div>
+                    <div >
+                        <label>Sheet数量：</label>
+                        <input id="isDual" value="1" type="text" name='isDual' />
+                    </div>
+                    <div id="companyDistributeDiv">
+                        <label>模板数据分派：</label>
+                        <select id="companyDistribute" name="companyDistribute">
+                            <option value=0 selected="selected">否</option>
+                            <option value=1  >是</option>
+                        </select>
+                    </div>
+                    <div id="companyColumnDiv">
+                        <label>分公司所在列：</label>
+                        <input  id="companyColumn" name='companyColumn' type="text"/>
+                    </div>
+                    <div id="startRowDiv">
+                        <label>数据起始行：</label>
+                        <input id="startRow"  name='startRow' type="text"/>
+                    </div>
+                    <div id="startColumnDiv">
+                        <label>数据起始列：</label>
+                        <input id="startColumn" value="1" type="text" name='startColumn' />
+                    </div>
+                    <div >
+                        <label>截止日期：</label>
+                        <input type="text" name="dealDate" id="dealDate" readonly="readonly">
+                    </div>
+                    <div >
+                        <label>模板：</label>
+                        <a id="excelFrame" onclick="downloadModel()" href="#" ></a>
+                        <input id="file" type="file" name="file">
+                    </div>
+
+                    <div >
+                        <label>提报者：</label>
+                        <select id="postDataUser" style="width: 200px;" name="writeGroupSn">
+                        </select>
+                    </div>
+                    <div >
+                        <label>审批者：</label>
+                        <select id="checkDataUser" style="width: 200px;"  name="checkGroupSn">
+                        </select>
+                    </div>
+                    <div >
+                        <label>终审者：</label>
+                        <select id="checkDataUser2" style="width: 200px;"  name="check2GroupSn">
+                        </select>
+                    </div>
+                    <div >
+                        <label>备注：</label>
+<!--                        <input type="text" id="content" name="content">-->
+                        <textarea id="content" name="content" cols="50" rows="5"></textarea>
+                    </div>
+                    <div style="margin-left: 100px;">
+                        <span class="addBtn" id="postFileBtn" onclick="postForm()">保存</span>
+                        <span class="addBtn" id="returnBtn" onclick="window.location = 'topicList.html'">返回</span>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+    </div>
+
+    <div id="successDialog" style="display:none;" title="系统提示">
+        <p align="center">操作成功！</p>
+    </div>
+    <div id="failedDialog" style="display:none;" title="系统提示">
+        <p align="center">操作失败，请联系管理员</p>
+    </div>
+</body>
+</html>

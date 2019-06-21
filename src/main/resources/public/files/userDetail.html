@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>用户详情</title>
+
+    <!--    <link href="../css/css.css" rel="stylesheet" type="text/css"/>-->
+    <!--    <link href="../css/style.css" rel="stylesheet" type="text/css"/>-->
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link href="../css/hi-main.css" rel="stylesheet" type="text/css"/>
+
+    <script language="JavaScript" type="text/javascript">
+        var usernameExist=false;
+        var userId;
+        $(function () {
+            var request = getRequest();
+            userId=request["id"];
+            initEditForm();
+            initCompanyLists();
+            initRoleLists();
+
+            $("#username").blur(function () {
+               checkUsernameExist();
+            })
+        })
+    initEditForm=function(){
+        if(userId){
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/userController/getUserById",
+                data: {jsonParam: userId},
+                async: true,
+                success: function (result) {
+                    if(result){
+                        var user = eval('(' + result + ')');
+                        $("#username").val(user.username);
+                        $("#trueName").val(user.trueName);
+                        $("#email").val(user.email);
+                        $("#company").val(user.company);
+
+                    }else{
+
+                    }
+                },
+                error: function (result) {
+                    showInfoDialog($("#failedDialog"));
+                }
+            });
+        }
+    }
+    batchSave=function () {
+        var jsonParam=$("#batchDataTextarea").val();
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/batchAddUsers",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (result) {
+                if('success'==result){
+                    showInfoDialog($("#successDialog"));
+                }else{
+                    showInfoDialog($("#failedDialog"));
+                }
+
+            },
+            error: function (result) {
+                showInfoDialog($("#failedDialog"));
+            }
+        });
+    }
+    saveUser=function(){
+        if(!checkForm()){
+            return;
+        }
+        var username= $("#username").val();
+        var trueName= $("#trueName").val();
+
+        var email= $("#email").val();
+        var company= $("#company").val();
+        var role= $("#role").val();
+        var json="{id:'"+userId+"',username:'"+username+"',trueName:'"+trueName+"',email:'"+email+"',company:'"+company+"',role:'"+role+"'}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/saveUser",
+            data:{jsonParam: json},
+            async: true,
+            success: function (data) {
+                if(data=='success'){
+                    window.location = 'userList.html'
+                }else{
+                    showInfoDialog($("#failedDialog"));
+                }
+            },
+            error: function (result) {
+                showInfoDialog($("#failedDialog"));
+            }
+        });
+    }
+
+    initRoleLists=function () {
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/roleController/getAllRoleList",
+            async: true,
+            success: function (data) {
+                if(data){
+                    var roleList = eval('(' + data + ')');
+                    for (var i = 0; i < roleList.length; i++) {
+                        var role=roleList[i];
+                        $("#role").append("<option value='"+role.id+"'>"+role.name+"</option>");
+                    }
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    initCompanyLists=function () {
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/companyController/getAllCompanyList",
+            async: true,
+            success: function (data) {
+                if(data){
+                    var companyList = eval('(' + data + ')');
+                    for (var i = 0; i < companyList.length; i++) {
+                        var company=companyList[i];
+                        $("#company").append("<option value='"+company.id+"'>"+company.name+"</option>");
+                    }
+                }
+
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    //验证form
+    checkForm=function(){
+        var goodInput=true;
+        $("#errorDiv").empty();
+
+        if(!$("#username").val()){
+            $("#errorDiv").append("<p>*【用户名不能为空】</p>");
+            goodInput=false;
+        }
+        if(usernameExist){
+            $("#errorDiv").append("<p>*【该用户名已存在】</p>");
+            goodInput=false;
+        }
+        if(!$("#trueName").val()){
+            $("#errorDiv").append("<p>*【真实姓名不能为空】</p>");
+            goodInput=false;
+        }
+        if(!$("#email").val()){
+            $("#errorDiv").append("<p>*【邮箱不能为空】</p>");
+            goodInput=false;
+        }
+        return goodInput;
+    }
+    checkUsernameExist=function(){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/getUserByUsername",
+            data: {jsonParam: $("#username").val()},
+            async: true,
+            success: function (result) {
+                if(result){
+                    var user = eval('(' + result + ')');
+                    if(userId&&user.id==userId){
+                        usernameExist=false;
+                    }else{
+                        usernameExist=true;
+                        $("#errorDiv").append("<p>*【该用户名已存在】</p>");
+                    }
+                }else{
+                    usernameExist=false
+                }
+            },
+            error: function (result) {
+                showInfoDialog($("#failedDialog"));
+            }
+        });
+
+    }
+    </script>
+
+</head>
+
+<body style="color:#4B4967">
+    <div align="center" class="toolbar">
+        <span><h4>用户管理</h4></span>
+    </div>
+    <div style="padding:10px 20px">
+        <fieldset class="scheduler-border">
+            <legend>用户详情</legend>
+            <div class="errorDiv" id="errorDiv">
+
+            </div>
+            <div class="form">
+                <div class="div-a">
+                    <label>用户名</label>
+                    <input id='username' type="text" class="text"style="width:200px" value=""/>
+                </div>
+                <div class="div-b">
+                    <label>所属公司</label>
+                    <select style="width:200px;height: 22px" id="company" name="company">
+
+                    </select>
+                </div>
+
+                <div class="div-a">
+                    <label>邮箱</label>
+                    <input id='email' type="text" class="text" style="width:200px" value=""/>
+                </div>
+                <div class="div-b">
+                    <label>真实姓名</label>
+                    <input id='trueName' type="text" class="text" style="width:200px" value=""/>
+                </div>
+
+                <div style="margin-top: 10px;margin-left: 100px;">
+                    <span class="addBtn" id="saveBtn" onclick="saveUser()">保存</span>
+                    <span class="addBtn" id="returnBtn" onclick="window.location = 'userList.html'">返回</span>
+                </div>
+
+            </div>
+        </fieldset>
+        <fieldset style="display: none" class="scheduler-border" >
+            <legend>批量添加</legend>
+            <div>例如：[{username:'zhangsan',trueName:'张三',email:'zhangsan@hisense.com',company:'青岛分公司'},{username:'xx',trueName:'习',email:'xi@hisense.com',company:'北京分公司'}]</div>
+            <div>
+                <textarea id="batchDataTextarea"  rows="10" cols="100"></textarea>
+            </div>
+            <div style="margin-top: 170px;margin-left: 100px;"><span class="addBtn" id="batchSaveBtn" onclick="batchSave()">保存</span>
+                <span class="addBtn" onclick="window.location = 'userList.html'">返回</span>
+            </div>
+        </fieldset>
+    </div>
+    <div id="successDialog" style="display:none;" title="系统提示">
+        <p align="center">操作成功！</p>
+    </div>
+    <div id="failedDialog" style="display:none;" title="系统提示">
+        <p align="center">操作失败，请联系管理员</p>
+    </div>
+</body>
+</html>

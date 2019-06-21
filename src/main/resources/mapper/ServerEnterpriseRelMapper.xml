@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.ServerEnterpriseRelMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.ServerEnterpriseRel" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+    <result column="enterprise_cis" property="enterpriseCis" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from server_enterprise_rel
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.ServerEnterpriseRel" >
+    insert into server_enterprise_rel (id, server_code, enterprise_cis
+      )
+    values (#{id,jdbcType=VARCHAR}, #{serverCode,jdbcType=VARCHAR}, #{enterpriseCis,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.ServerEnterpriseRel" >
+    update server_enterprise_rel
+    set server_code = #{serverCode,jdbcType=VARCHAR},
+      enterprise_cis = #{enterpriseCis,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select id, server_code, enterprise_cis
+    from server_enterprise_rel
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, server_code, enterprise_cis
+    from server_enterprise_rel
+  </select>
+  <delete id="deleteAll">
+    delete from server_enterprise_rel
+  </delete>
+  <insert id="insertAll" parameterType="com.hisense.serverestimate.entity.ServerEnterpriseRel">
+    insert into server_enterprise_rel (id, server_code, enterprise_cis)values
+    <foreach collection="collection" item="listEntity" separator=",">
+      (#{listEntity.id},#{listEntity.serverCode},#{listEntity.enterpriseCis})
+    </foreach>
+  </insert>
+</mapper>

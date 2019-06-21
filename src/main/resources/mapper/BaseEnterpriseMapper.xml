@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.BaseEnterpriseMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.BaseEnterprise" >
+    <id column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR" />
+    <result column="cis" property="cis" jdbcType="VARCHAR" />
+    <result column="enterprise_name" property="enterpriseName" jdbcType="VARCHAR" />
+    <result column="office" property="office" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from base_enterprise
+    where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.BaseEnterprise" >
+    insert into base_enterprise (enterprise_id, cis, enterprise_name, 
+      office, company_id, company_name
+      )
+    values (#{enterpriseId,jdbcType=VARCHAR}, #{cis,jdbcType=VARCHAR}, #{enterpriseName,jdbcType=VARCHAR}, 
+      #{office,jdbcType=VARCHAR}, #{companyId,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseEnterprise" >
+    update base_enterprise
+    set cis = #{cis,jdbcType=VARCHAR},
+      enterprise_name = #{enterpriseName,jdbcType=VARCHAR},
+      office = #{office,jdbcType=VARCHAR},
+      company_id = #{companyId,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR}
+    where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select enterprise_id, cis, enterprise_name, office, company_id, company_name
+    from base_enterprise
+    where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select enterprise_id, cis, enterprise_name, office, company_id, company_name
+    from base_enterprise
+  </select>
+  <delete id="deleteAll">
+    delete from base_enterprise
+  </delete>
+  <insert id="insertAll" parameterType="com.hisense.serverestimate.entity.BaseEnterprise">
+    insert into base_enterprise (enterprise_id, cis, enterprise_name, office, company_id, company_name)values
+    <foreach collection="collection" item="listEntity" separator=",">
+      (#{listEntity.enterpriseId},#{listEntity.cis},#{listEntity.enterpriseName},#{listEntity.office},#{listEntity.companyId},#{listEntity.companyName})
+    </foreach>
+  </insert>
+</mapper>

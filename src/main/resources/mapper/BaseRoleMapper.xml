@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.BaseRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.BaseRole" >
+    <id column="role_id" property="roleId" jdbcType="VARCHAR" />
+    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from base_role
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.BaseRole" >
+    insert into base_role (role_id, role_name, content
+      )
+    values (#{roleId,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseRole" >
+    update base_role
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR}
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select role_id, role_name, content
+    from base_role
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select role_id, role_name, content
+    from base_role
+  </select>
+  <select id="getRoleByUserId" resultMap="BaseResultMap">
+    SELECT
+      r.*
+    FROM
+      base_role r
+      LEFT JOIN base_user u
+        ON u.`role_id` = r.`role_id`
+    WHERE u.user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+</mapper>

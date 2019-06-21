@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <style type="text/css">
+        .mouse_color{
+            background-color: #fffede;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+    $(function () {
+        $( "#datepicker" ).datepicker();
+        $( "#datepicker" ).datepicker( "option", "dateFormat", "yy-mm-dd" )
+        $("#dialogBtn").click(function () {
+            $("#dialog").dialog();
+        })
+        /**
+         * 鼠标移到的颜色
+         */
+        $("#tab tr").mouseover(function(){
+            $(this).addClass("mouse_color");
+        });
+        /**
+         * 鼠标移出的颜色
+         */
+        $("#tab tr").mouseout(function(){
+            $(this).removeClass("mouse_color");
+        });
+    });
+</script>
+<input type="button" id="dialogBtn" value="弹框"/>
+<p>日期：<input type="text" id="datepicker" readonly="readonly"></p>
+
+<div id="dialog" title="">
+    <p>这是一个默认的对话框，用于显示信息。对话框窗口可以移动，调整尺寸，默认可通过 'x' 图标关闭。</p>
+</div>
+<div class="body_div">
+    <table id="tab" >
+        <tr style="background: #000000;color: #FFFFFF;font-weight: bolder;">
+            <th>工号</th>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>性别</th>
+        </tr>
+        <tr>
+            <td>2014010110</td>
+            <td>科宇</td>
+            <td>45</td>
+            <td>女</td>
+        </tr>
+        <tr>
+            <td>2014010110</td>
+            <td>科宇</td>
+            <td>45</td>
+            <td>女</td>
+        </tr>
+    </table>
+    <div class="article-start-box">
+        <span class="categery">分类栏目</span>
+        <select style="position: absolute;z-index: 1;margin-left: 40px;"  class="choose"
+                onmousedown="if(this.options.length>6){this.size=7}" onblur="this.size=0" onchange="this.size=0">
+            <option value="volvo">文学集</option>
+            <option value="saab">哲学</option>
+            <option value="opel">雅思</option>
+            <option value="audi">大学网奥数大学网奥数</option>
+            <option value="volvo">文学集</option>
+            <option value="saab">哲学</option>
+            <option value="opel">雅思</option>
+            <option value="audi">大学网奥数</option>
+        </select>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>角色详情</title>
+    <style type="text/css">
+
+    </style>
+    <link href="../css/hi-main.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <script language="JavaScript" type="text/javascript">
+        var globalRoleId;
+        var globalRole=null;
+        var roleNameExist;
+        getAllUsers = function (checkedUsers) {
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/userController/getAllUsers",
+                data: null,
+                async: true,
+                success: function (data) {
+                    var userList = eval('(' + data + ')');
+                    for (var i = 0; i < userList.length; i++) {
+                        user = userList[i];
+                        if(checkedUsers&&checkedUsers.length>0){
+                            var flag=true;
+                            for (var j = 0; j <checkedUsers.length ; j++) {
+                                if(user.id==checkedUsers[j].id){
+                                    flag=false;
+                                }
+                            }
+                            if(flag){
+                                $("#allUsers").append("<option value='" + user.id + "'>" + formatUserName(user.trueName) + "[" + user.companyName + "]" + "</option>");
+                            }
+                        }else{
+                            $("#allUsers").append("<option value='" + user.id + "'>" + formatUserName(user.trueName) + "[" + user.companyName + "]" + "</option>");
+                        }
+
+                    }
+
+                },
+                error: function (result) {
+                    alert("保存失败");
+                }
+            });
+        }
+
+        $(function () {
+            var request = new Object();
+            request = getRequest();
+
+            globalRoleId = request["roleId"];
+            if (globalRoleId) {
+                initEditForm()
+            }else{
+                getAllUsers();
+            }
+            $("#roleName").blur(function () {
+                checkRoleNameExist();
+            })
+            $("#allUsers ").dblclick(function () {
+                var vSelect = $("#allUsers option:selected");
+                //克隆数据添加到 rightSelector 中
+                vSelect.clone().appendTo("#checkedUsers");
+                //同时移除 leftSelector 中的 option
+                vSelect.remove();
+            })
+            $("#checkedUsers ").dblclick(function () {
+                var vSelect = $("#checkedUsers option:selected");
+                //克隆数据添加到 rightSelector 中
+                vSelect.clone().appendTo("#allUsers");
+                //同时移除 leftSelector 中的 option
+                vSelect.remove();
+            })
+            $("#saveBtn").click(function () {
+                if(!checkForm()){
+                    return;
+                }
+                var roleName = $("#roleName").val();
+                var content = $("#content").val();
+                var users = new Array();
+                $("#checkedUsers option").each(function () {
+                    users.push($(this).val());
+                })
+                var json = "{roleName:'" + roleName + "',roleId:'" + globalRoleId + "',content:'" + content + "',users:'" + users + "'}";
+                $.ajax({
+                    type: "get",
+                    url: "/serverestimate/roleController/addRole",
+                    data: {jsonParam: json},
+                    async: true,
+                    success: function (data) {
+                        if(data=='success'){
+                            window.location = 'roleList.html'
+                        }else{
+                            showInfoDialog($("#failedDialog"));
+                        }
+                    },
+                    error: function (result) {
+                        showInfoDialog($("#failedDialog"));
+                    }
+                });
+            })
+        })
+    formatUserName=function(username){
+        var maxLength=4;
+        var result=username;
+        var space="　";
+        if(username.length<maxLength){
+            for(var i=username.length;i<maxLength;i++){
+                result+=space;
+            }
+        }
+        return result;
+    }
+    initEditForm=function(){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/roleController/getRoleById",
+            data: {jsonParam: globalRoleId},
+            async: true,
+            success: function (data) {
+                var sourceData = eval('(' + data + ')');
+                var userList = sourceData.userList;
+                globalRole = sourceData.role;
+                for (var i = 0; i < userList.length; i++) {
+                    user = userList[i];
+                    $("#checkedUsers").append("<option value='" + user.id + "'>" + formatUserName(user.trueName) + "[" + user.companyName + "]" + "</option>");
+                }
+                getAllUsers(userList);
+                $("#roleName").val(globalRole.name);
+                $("#content").val(globalRole.content);
+            },
+            error: function (result) {
+                alert("保存失败");
+            }
+        });
+    }
+        //验证form
+        checkForm=function(){
+            var goodInput=true;
+            $("#errorDiv").empty();
+
+            if(!$("#roleName").val()){
+                $("#errorDiv").append("<p>*【角色名不能为空】</p>");
+                goodInput=false;
+            }
+            if(roleNameExist){
+                $("#errorDiv").append("<p>*【该角色名已存在】</p>");
+                goodInput=false;
+            }
+            var users = new Array();
+            $("#checkedUsers option").each(function () {
+                users.push($(this).val());
+            })
+            if(users.length<=0){
+                $("#errorDiv").append("<p>*【组员不能为空】</p>");
+                goodInput=false;
+            }
+            return goodInput;
+        }
+        checkRoleNameExist=function(){
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/roleController/getRoleByRoleName",
+                data: {jsonParam: $("#roleName").val()},
+                async: true,
+                success: function (result) {
+                    if(result){
+                        var role = eval('(' + result + ')');
+                        if(globalRole&&role.id==globalRole.id){
+                            roleNameExist=false;
+                        }else{
+                            roleNameExist=true;
+                            $("#errorDiv").append("<p>*【该角色名已存在】</p>");
+                        }
+                    }else{
+                        roleNameExist=false
+                    }
+                },
+                error: function (result) {
+                    showInfoDialog($("#failedDialog"));
+                }
+            });
+
+        }
+
+    </script>
+
+</head>
+
+<body style="color:#4B4967">
+    <div align="center" class="toolbar">
+        <span><h4>角色管理</h4></span>
+    </div>
+    <div style="padding:10px 20px">
+        <fieldset class="scheduler-border">
+            <legend>角色详情</legend>
+            <div class="errorDiv" id="errorDiv">
+
+            </div>
+            <div class="form">
+                <div >
+                    <label>角色名</label>
+                    <input id="roleName" type="text" class="text" style="width:200px" value=""/>
+                </div>
+                <div >
+                    <label>备注说明</label>
+                    <input id="content" type="text" class="text"style="width:200px" value=""/>
+                </div>
+                <div style="float:left;width: 50%">
+                    <label>成员<br>(双击取消)</label>
+                    <select id="checkedUsers" multiple="multiple"
+                            style="width:60%;height:150px">
+                    </select>
+                </div>
+                <div style="float:left;width: 50%">
+                    <label>所有人员<br>(双击选择)</label>
+                    <select id="allUsers" multiple="multiple"
+                            style="width:60%;height:150px">
+                    </select>
+                </div>
+                <div  style="margin-top: 170px;margin-left: 100px;">
+                    <span class="addBtn" id="saveBtn">保存</span>
+                    <span class="addBtn" id="returnBtn" onclick="window.location = 'roleList.html'">返回</span>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div id="failedDialog" style="display:none;" title="系统提示">
+        <p align="center">操作失败，请联系管理员！</p>
+    </div>
+</body>
+</html>

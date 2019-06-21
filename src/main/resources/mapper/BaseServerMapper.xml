@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.BaseServerMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.BaseServer" >
+    <id column="server_id" property="serverId" jdbcType="VARCHAR" />
+    <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+    <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="server_type" property="serverType" jdbcType="VARCHAR" />
+    <result column="manager" property="manager" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="district" property="district" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from base_server
+    where server_id = #{serverId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.BaseServer" >
+    insert into base_server (server_id, server_code, `server_name`, 
+      company_name, server_type, manager, 
+      province, city, district
+      )
+    values (#{serverId,jdbcType=VARCHAR}, #{serverCode,jdbcType=VARCHAR}, #{serverName,jdbcType=VARCHAR}, 
+      #{companyName,jdbcType=VARCHAR}, #{serverType,jdbcType=VARCHAR}, #{manager,jdbcType=VARCHAR}, 
+      #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{district,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseServer" >
+    update base_server
+    set server_code = #{serverCode,jdbcType=VARCHAR},
+      `server_name` = #{serverName,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      server_type = #{serverType,jdbcType=VARCHAR},
+      manager = #{manager,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      district = #{district,jdbcType=VARCHAR}
+    where server_id = #{serverId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select server_id, server_code, `server_name`, company_name, server_type, manager, 
+    province, city, district
+    from base_server
+    where server_id = #{serverId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    SELECT
+      s.*
+    FROM
+      base_server s
+    ORDER BY s.server_code
+  </select>
+  <select id="getServerList" resultMap="BaseResultMap" parameterType="map" >
+    SELECT
+      s.*
+    FROM
+      base_server s
+    ORDER BY s.server_code
+    LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+  </select>
+  <select id="getServerListNum" parameterType="map" resultType="Integer">
+    SELECT count(1) from base_server
+  </select>
+  <delete id="deleteAll">
+    delete from base_server
+  </delete>
+  <insert id="insertAll" parameterType="com.hisense.serverestimate.entity.BaseServer">
+    insert into base_server (server_id, server_code, `server_name`, company_name, server_type, manager,
+    province, city, district)values
+    <foreach collection="collection" item="listEntity" separator=",">
+      (
+        #{listEntity.serverId,jdbcType=VARCHAR},
+        #{listEntity.serverCode,jdbcType=VARCHAR},
+        #{listEntity.serverName,jdbcType=VARCHAR},
+        #{listEntity.companyName,jdbcType=VARCHAR},
+        #{listEntity.serverType,jdbcType=VARCHAR},
+        #{listEntity.manager,jdbcType=VARCHAR},
+        #{listEntity.province,jdbcType=VARCHAR},
+        #{listEntity.city,jdbcType=VARCHAR},
+        #{listEntity.district,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <select id="getServerByServerCode" parameterType="string" resultMap="BaseResultMap" >
+    select * from base_server where server_code =#{serverCode,jdbcType=VARCHAR}
+  </select>
+</mapper>

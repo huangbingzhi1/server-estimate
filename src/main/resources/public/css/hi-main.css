@@ -1,0 +1,148 @@
+body{
+	margin:0px;
+	font-size: 12px;
+}
+h4{
+	font-size: 15px;
+}
+.mouse-over-row-color{
+	background: #bac8d8;
+	color:white;
+}
+/* 添加按钮*/
+.addBtn:hover{
+	text-decoration: none;  font-size: 12px; font-family: 微软雅黑;
+	padding: 4px 10px;
+	margin-left: 2px;
+	cursor: pointer;
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+	background: linear-gradient(to bottom, #586178, #313542);
+}
+.addBtn{
+	text-decoration: none;  font-size: 12px; font-family: 微软雅黑;
+	padding: 4px 10px;
+	margin-left: 2px;
+	cursor: pointer;
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	border-radius: 4px;
+	background: linear-gradient(to bottom, #6c7994, #414959);
+
+}
+.toolbar{
+	font-family: "Microsoft YaHei UI";
+	text-align: center;
+	height: 30px;
+	color: #13225b;
+	margin-top: 16px;
+	background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #cedeee), color-stop(1, #ffffff));
+}
+/*超链接*/
+a:visited,a:link{
+	text-decoration: none;  font-size: 12px; font-family: 微软雅黑;
+	padding: 4px 10px;
+	margin-left: 2px;
+	cursor: pointer;
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	border-radius: 4px;
+	background: linear-gradient(to bottom, #6c7994, #414959);
+
+}
+
+a:hover{
+	text-decoration: none;  font-size: 12px; font-family: 微软雅黑;
+	padding: 4px 10px;
+	margin-left: 2px;
+	cursor: pointer;
+	color: #ffffff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+	background: linear-gradient(to bottom, #586178, #313542);
+}
+.pageClass{
+	padding: 4px 12px;
+	font-family: 微软雅黑;
+	color: white;
+	border-radius: 22px;
+	background-color: #829ab2;
+}
+.list-button{
+	padding-top: 5px;
+}
+.list-table{
+	padding-top: 45px;
+}
+.list-table table{
+	font-family: "微软雅黑";
+}
+.pagebutton
+{
+	float:left;
+	padding-left: 60px;
+	padding-top: 20px;
+	/*height:90px;*/
+	margin:5px;
+}
+/*表格开始*/
+table {
+	border-collapse: collapse;
+	font-family: 微软雅黑;
+	font-size:12px;
+}
+
+caption {
+	margin: 1em auto;
+}
+
+th,td {
+	padding: .65em;
+}
+
+th,td {
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+	text-align: center;
+}
+/*表格结束*/
+
+fieldset.scheduler-border
+{
+	border: 1px solid #b8b8b8;
+	margin: 0 0 1.5em 0 !important;
+	font-size: 12px;
+	background: white;
+}
+fieldset.scheduler-border legend
+{
+	width: inherit;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: 800;
+	color: #a9a9a9;
+}
+fieldset.scheduler-border .errorDiv{
+	font-family: 微软雅黑;
+	font-size: 11px;
+	color:red;
+}
+fieldset.scheduler-border label{
+	font-size: 12px;
+}
+.errorDiv{
+	font-family: 微软雅黑;
+	font-size: 11px;
+	color:red;
+}
+/*表单内的label*/
+.form label{
+	width:100px;
+	display:inline-block;
+	text-align:right;
+	height:30px;
+}
+/*表单分两列*/
+/*.div-a,.div-b{width:100%;}*/
+/*.div-b{ float:left;width:45%;height: 36px;}*/

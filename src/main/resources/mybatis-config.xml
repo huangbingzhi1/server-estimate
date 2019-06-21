@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <typeAliases>
+        <package name="com.hisense.serverestimate.entity"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="mapper/BaseCompanyMapper.xml"/>
+        <mapper resource="mapper/BaseEnterpriseMapper.xml"/>
+        <mapper resource="mapper/BaseRoleMapper.xml"/>
+        <mapper resource="mapper/BaseServerMapper.xml"/>
+        <mapper resource="mapper/BaseUserMapper.xml"/>
+        <mapper resource="mapper/EstimateMainMapper.xml"/>
+        <mapper resource="mapper/EstimateResultMapper.xml"/>
+        <mapper resource="mapper/ServerEnterpriseRelMapper.xml"/>
+    </mappers>
+</configuration>

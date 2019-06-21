@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>用户列表</title>
+    <!--    <link href="../css/css.css" rel="stylesheet" type="text/css"/>-->
+    <!--    <link href="../css/style.css" rel="stylesheet" type="text/css"/>-->
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/hi-main.css"/>
+</head>
+<SCRIPT language=JavaScript>
+    $(function () {
+        freshList(1, 4);
+        $("#addNew").click(function () {
+            window.location = "userDetail.html?opera=add"
+        })
+        $("#prePage").click(function () {
+            if($("#currentPage").html()>1){
+                freshList(parseInt($("#currentPage").html())-1, 4);
+            }
+        })
+        $("#firstPage").click(function () {
+            if($("#currentPage").html()>1){
+                freshList(1, 4);
+            }
+        })
+        $("#lastPage").click(function () {
+            freshList($("#totalPage").html(), 4);
+        })
+        $("#nextPage").click(function () {
+            if($("#currentPage").html()<$("#totalPage").html()){
+                freshList(parseInt($("#currentPage").html())+1, 4);
+            }
+        })
+
+    })
+
+    resetPassword=function(id){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/resetPassword",
+            data: {jsonParam: id},
+            async: true,
+            success: function (data) {
+                if(data=="success"){
+                    alert("重置成功")
+                }else{
+                    alert("重置失败")
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    deleteUserBtn=function(id){
+        $("#confirmDialog").show();
+        $("#confirmDialog").dialog({
+            height:200,
+            width:400,
+            resizable: false,
+            buttons: {
+                "确定": function() {
+                    deleteUserById(id);
+                    $("#confirmDialog").hide();
+                    $( this ).dialog( "close" );
+                },
+                "取消": function() {
+                    $("#confirmDialog").hide();
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
+    }
+    deleteUserById=function(id){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/deleteUserById",
+            data: {jsonParam: id},
+            async: true,
+            success: function (data) {
+                if(data=="success"){
+                    freshList(1, 4);
+                }else{
+                    alert("删除失败")
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    freshList = function (page, status) {
+        var jsonParam = "{page:" + page + ",status:" + status + "}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/userController/getUserList",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (data) {
+                if(data){
+                    var sourceData = eval('(' + data + ')');
+                    $("#totalPage").html(sourceData.totalPage)
+                    $("#currentPage").html(sourceData.currentPage)
+                    if (sourceData.list && sourceData.list.length > 0) {
+                        addRows(sourceData.list);
+                    }
+                }else {
+                    $("#totalPage").html(0);
+                    $("#tbMain").html("");
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    addRows = function (userList) {
+        var html = "";
+        for (var i = 0; i < userList.length; i++) {
+            var user = userList[i];
+            html += "<tr onmouseover='addclass(this)' onmouseout='removeclass(this)'>";
+            html += "<td>" + (i + 1) + "</td>";
+            html += "<td>" + user.username + "</td>";
+            html += "<td>" + user.trueName + "</td>";
+            html += "<td>" + user.email + "</td>";
+            html += "<td>" + user.companyName + "</td>";
+            html += "<td>" + '<a href="userDetail.html?type=edit&&id=' + user.id + '">修改</a><a  onclick="resetPassword('+"'"+user.id+"'"+')" href="#">重置密码</a><a onclick="deleteUserBtn('+"'"+user.id+"'"+')" href="#">删除</a>' + "</td>";
+            html += "</tr>";
+        }
+        $("#tbMain").html(html);
+    }
+
+</SCRIPT>
+
+<body>
+    <div class="toolbar">
+       <span><h4>用户管理</h4></span>
+    </div>
+    <div class="list-button"><span class="addBtn" id="addNew">添加用户</span></div>
+    <div class="list-table">
+        <table width="95%" align="center" >
+            <tr >
+                <th width="5%">序号</th>
+                <th width="10%">用户名</th>
+                <th width="10%">真实姓名</th>
+                <th width="15%">邮箱</th>
+                <th width="15%">所属公司</th>
+                <th width="45%">操作</th>
+            </tr>
+            <tbody id="tbMain">
+            </tbody>
+        </table>
+    </div>
+    <div class="pagebutton">
+        <span class="pageClass"><span id="currentPage">1</span>/<span id="totalPage">5</span></span>
+        <a href="#" id="firstPage">首页</a>  <a href="#" id="prePage">上一页</a>
+         <a id="nextPage" href="#">下一页</a>  <a id="lastPage" href="#" >末页</a>
+
+    </div>
+    <div id="confirmDialog" style="display:none;" title="系统提示">
+        <p align="center">删除后无法恢复，确定删除吗？</p>
+    </div>
+</body>
+</html>
