@@ -150,5 +150,18 @@ public class ServerController extends BaseController{
         return "";
     }
 
+    @RequestMapping(value = "getServerById", method = RequestMethod.GET)
+    @ResponseBody
+    public String getServerById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            BaseServer u=serverMapper.selectByPrimaryKey(jsonParam);
+            if(null!=u){
+                return JSON.toJSONString(u);
+            }
 
+        }catch (Exception e){
+
+        }
+        return "";
+    }
 }

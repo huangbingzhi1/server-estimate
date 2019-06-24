@@ -145,7 +145,7 @@
             html += "<td>" + entity.province+ "</td>";
             html += "<td>" + entity.city+ "</td>";
             html += "<td>" + entity.district+ "</td>";
-            html += "<td>" + '<a href="userDetail.html?type=edit&&id=' + entity.id + '">修改</a><a  onclick="resetPassword('+"'"+entity.id+"'"+')" href="#">重置密码</a><a onclick="deleteServerBtn('+"'"+entity.serverId+"'"+')" href="#">删除</a>' + "</td>";
+            html += "<td>" + '<a href="serverDetail.html?type=edit&&id=' + entity.serverId + '">修改</a><a onclick="deleteServerBtn('+"'"+entity.serverId+"'"+')" href="#">删除</a>' + "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);

@@ -35,10 +35,15 @@ public class EnterpriseController extends BaseController{
     public String getEnterpriseList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         JSONObject parseObject = JSON.parseObject(jsonParam);
         int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
+        int numberPerPage=5;
         Map<String,Object> param=new HashMap<>();
         param.put("startIndex",(page-1)*numberPerPage);
         param.put("pCount",numberPerPage);
-        param.put("keyword",HiStringUtil.getJsonStringByKey(parseObject,"keyword"));
+        String keyword=HiStringUtil.getJsonStringByKey(parseObject,"keyword");
+        if(!StringUtils.isEmpty(keyword)){
+            keyword="%"+keyword+"%";
+            param.put("keyword",keyword);
+        }
         List<BaseEnterprise> serverList= enterpriseMapper.getEnterpriseList(param);
         if(!CollectionUtils.isEmpty(serverList)) {
             double listNum = enterpriseMapper.getEnterpriseListNum(param);
@@ -104,7 +109,7 @@ public class EnterpriseController extends BaseController{
         }
         return FAILED;
     }
-    @RequestMapping(value = "getEnterpriseByCis", method = RequestMethod.GET)
+    /*@RequestMapping(value = "getEnterpriseByCis", method = RequestMethod.GET)
     @ResponseBody
     public String getEnterpriseByCis(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
@@ -117,7 +122,7 @@ public class EnterpriseController extends BaseController{
 
         }
         return "";
-    }
+    }*/
 
 
 }

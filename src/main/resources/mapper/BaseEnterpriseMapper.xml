@@ -48,4 +48,29 @@
       (#{listEntity.enterpriseId},#{listEntity.cis},#{listEntity.enterpriseName},#{listEntity.office},#{listEntity.companyId},#{listEntity.companyName})
     </foreach>
   </insert>
+  <select id="getEnterpriseList" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    e.*
+    FROM
+    base_enterprise e
+    WHERE 1=1
+    <if test="keyword != null and keyword !=''" >
+      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+        OR cis LIKE #{keyword,jdbcType=VARCHAR}
+        OR office LIKE #{keyword,jdbcType=VARCHAR}
+        OR company_name LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
+    ORDER BY e.cis
+    LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+  </select>
+  <select id="getEnterpriseListNum" parameterType="map" resultType="Integer">
+    SELECT count(1) from base_enterprise e
+    WHERE 1=1
+    <if test="keyword != null and keyword !=''" >
+      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR cis LIKE #{keyword,jdbcType=VARCHAR}
+      OR office LIKE #{keyword,jdbcType=VARCHAR}
+      OR company_name LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
+  </select>
 </mapper>

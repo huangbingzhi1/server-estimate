@@ -12,6 +12,25 @@
     <result column="city" property="city" jdbcType="VARCHAR" />
     <result column="district" property="district" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="ServerEnterpriseMap" type="com.hisense.serverestimate.entity.BaseServer" >
+    <id column="server_id" property="serverId" jdbcType="VARCHAR" />
+    <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+    <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="server_type" property="serverType" jdbcType="VARCHAR" />
+    <result column="manager" property="manager" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="district" property="district" jdbcType="VARCHAR" />
+    <collection property="enterprises" ofType="com.hisense.serverestimate.entity.BaseEnterprise">
+      <id column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR" />
+      <result column="cis" property="cis" jdbcType="VARCHAR" />
+      <result column="enterprise_name" property="enterpriseName" jdbcType="VARCHAR" />
+      <result column="office" property="office" jdbcType="VARCHAR" />
+      <result column="company_id" property="companyId" jdbcType="VARCHAR" />
+      <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from base_server
     where server_id = #{serverId,jdbcType=VARCHAR}
@@ -38,10 +57,14 @@
       district = #{district,jdbcType=VARCHAR}
     where server_id = #{serverId,jdbcType=VARCHAR}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select server_id, server_code, `server_name`, company_name, server_type, manager, 
-    province, city, district
-    from base_server
+  <select id="selectByPrimaryKey" resultMap="ServerEnterpriseMap" parameterType="java.lang.String" >
+    select se.server_id, se.server_code, se.`server_name`, se.company_name, se.server_type, se.manager,
+    se.province, se.city, se.district,en.enterprise_id, en.cis, en.enterprise_name, en.office, en.company_id, en.company_name
+    from base_server se
+    left join server_enterprise_rel r
+      on se.server_code = r.server_code
+    left join base_enterprise en
+      on en.cis = r.enterprise_cis
     where server_id = #{serverId,jdbcType=VARCHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap" >

@@ -11,34 +11,171 @@
     <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link href="../css/hi-main.css" rel="stylesheet" type="text/css"/>
-
     <script language="JavaScript" type="text/javascript">
         var serverCodeExist=false;
         var serverId;
+        var dialogEnterpriseArray=new Array();
         $(function () {
             var request = getRequest();
             serverId=request["id"];
             initEditForm();
             initEnterpriseList();
+            $("#prePage").click(function () {
+                if($("#currentPage").html()>1){
+                    freshList(parseInt($("#currentPage").html())-1);
+                }
+            })
+            $("#firstPage").click(function () {
+                if($("#currentPage").html()>1){
+                    freshList(1);
+                }
+            })
+            $("#lastPage").click(function () {
+                freshList($("#totalPage").html());
+            })
+            $("#nextPage").click(function () {
+                if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
+                    var page=parseInt($("#currentPage").html())+1
+                    freshList(page);
+                }
+            })
             $("#serverCode").blur(function () {
                checkServerCodeExist();
             })
+            $("#checkNewBtn").click(function () {
+                freshList(1);
+                $("#enterpriseDialog").dialog({
+                    height:430,
+                    width:700,
+                    resizable: false,
+                    buttons: {
+                        "确定": function() {
+                            $( this ).dialog( "close" );
+                            refreshEnterpriseList();
+                        }
+                    }
+                });
+            });
+            $("#unCheckBtn").click(function () {
+                var vSelect = $("#allEnterprise option:selected");
+
+                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
+                    var enterprise=JSON.parse(dialogEnterpriseArray[i]);
+                    if(enterprise.cis==vSelect.val()){
+                        dialogEnterpriseArray.splice(i, 1);
+                    }
+                }
+                vSelect.remove();
+            })
+            // $("#allEnterprise ").dblclick(function () {
+            //     var vSelect = $("#allEnterprise option:selected");
+            //     vSelect.remove();
+            // })
+            $("#searchBtn").click(function () {
+                freshList(1);
+            })
         })
+        refreshEnterpriseList=function(){
+            for (var i = 0; i < dialogEnterpriseArray.length; i++) {
+                var enterprise=JSON.parse(dialogEnterpriseArray[i]);
+                $("#allEnterprise").append("<option value='" + enterprise.cis + "'>"  + enterprise.enterpriseName  + "</option>");
+            }
+        }
+        toggerEnterprise=function(line){
+            var lineEntity=$(line);
+            if(lineEntity.is(':checked')){
+                entity=lineEntity.attr("value");
+                if (dialogEnterpriseArray[i]!= lineEntity.attr("value")) {
+                    dialogEnterpriseArray.push(entity);
+                }
+            }else{
+                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
+                    if (dialogEnterpriseArray[i]== lineEntity.attr("value")) {
+                        dialogEnterpriseArray.splice(i, 1);
+                    }
+                }
+            }
+            console.log(dialogEnterpriseArray)
+        }
+    freshList=function(page){
+        var jsonParam="{page:"+page+"}";
+        var keyword=$("#keywordText").val();
+        var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/enterpriseController/getEnterpriseList",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (data) {
+                if(data){
+                    var sourceData = eval('(' + data + ')');
+                    $("#totalPage").html(sourceData.totalPage)
+                    $("#currentPage").html(sourceData.currentPage)
+                    if (sourceData.list && sourceData.list.length > 0) {
+                        addRows(sourceData.list)
+                    }
+                }else{
+                    $("#totalPage").html(0);
+                    $("#tbMain").html("");
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    addRows=function(enterpriseList){
+        var html  ="";
+        for(var i=0;i<enterpriseList.length;i++){
+            var entity=enterpriseList[i];
+            var entityStr=JSON.stringify(entity);
+            var flag=false;
+            html +=     "<tr name='dataRow'>";//onchange='toggerEnterprise(this)'
+            if(dialogEnterpriseArray.length>0){
+                for (var j = 0; j < dialogEnterpriseArray.length; j++) {
+                    if (dialogEnterpriseArray[j]== entityStr) {
+                        flag=true;
+                    }
+                }
+            }
+            if(flag){
+                html+="<td>"+"<input type='checkbox' name='lineCheck' checked='checked' onchange='toggerEnterprise(this)'   value='"+entityStr+"'/>"+"</td>";
+            }else{
+                html+="<td>"+"<input type='checkbox' name='lineCheck' onchange='toggerEnterprise(this)'   value='"+entityStr+"'/>"+"</td>";
+            }
+            // html+="<td>"+"<input type='checkbox' name='lineCheck'   value='"+JSON.stringify(entity)+"'/>"+"</td>";
+            html +=     "<td>" +(i+1)+ "</td>";
+            html +=     "<td>" + entity.cis+ "</td>";
+            html +=     "<td>" + entity.enterpriseName + "</td>";
+            html +=     "<td>" + entity.office + "</td>";
+            html +=     "<td>" + entity.companyName + "</td>";
+            html += "</tr>";
+        }
+        $("#tbMain").html(html);
+        // $("input[name='lineCheck']").unbind('change').bind("change",function () {
+        //     toggerEnterprise($(this));
+        // })
+    }
     initEditForm=function(){
         if(serverId){
             $.ajax({
                 type: "get",
-                url: "/serverestimate/userController/getUserById",
+                url: "/serverestimate/serverController/getServerById",
                 data: {jsonParam: serverId},
                 async: true,
                 success: function (result) {
+                    // console.log(result)
                     if(result){
-                        var user = eval('(' + result + ')');
-                        $("#username").val(user.username);
-                        $("#trueName").val(user.trueName);
-                        $("#email").val(user.email);
-                        $("#company").val(user.company);
-
+                        var server = eval('(' + result + ')');
+                        $("#serverCode").val(server.serverCode);
+                        $("#serverName").val(server.serverName);
+                        $("#companyName").val(server.companyName);
+                        $("#serverType").val(server.serverType);
+                        $("#manager").val(server.manager);
+                        $("#province").val(server.province);
+                        $("#city").val(server.city);
+                        $("#district").val(server.district);
+                        console.log(server.enterprises)
                     }else{
 
                     }
@@ -214,29 +351,53 @@
                     <label>办公-区</label>
                     <input id='district' type="text" class="text" style="width:200px" value=""/>
                 </div>
-                <div style="margin-top: 10px;margin-left: 100px;">
-                    <span class="addBtn" id="saveBtn" onclick="saveServer()">保存</span>
-                    <span class="addBtn" id="returnBtn" onclick="window.location = 'userList.html'">返回</span>
+                <div>
+                    <label>服务的商家</label>
+                    <select id="allEnterprise" multiple="multiple"
+                            style="width:30%;height:128px">
+                    </select>
                 </div>
+                <div  style="align-self:center;align-content:center;align-content:center;child-align: middle;padding-left:100px">
+                    <span class="addBtn" id="checkNewBtn">新增</span>
+                    <span class="addBtn" id="unCheckBtn">删除</span>
+                </div>
+                <div style="margin-top: 10px; padding-top: 20px;margin-left: 100px;">
+                    <span class="addBtn" id="saveBtn" onclick="saveServer()">保存</span>
+                    <span class="addBtn" id="returnBtn" onclick="window.location = 'serverList.html'">返回</span>
+                </div>
+            </div>
+        </fieldset>
 
-            </div>
-        </fieldset>
-        <fieldset style="display: none" class="scheduler-border" >
-            <legend>批量添加</legend>
-            <div>例如：[{username:'zhangsan',trueName:'张三',email:'zhangsan@hisense.com',company:'青岛分公司'},{username:'xx',trueName:'习',email:'xi@hisense.com',company:'北京分公司'}]</div>
-            <div>
-                <textarea id="batchDataTextarea"  rows="10" cols="100"></textarea>
-            </div>
-            <div style="margin-top: 170px;margin-left: 100px;"><span class="addBtn" id="batchSaveBtn" onclick="batchSave()">保存</span>
-                <span class="addBtn" onclick="window.location = 'userList.html'">返回</span>
-            </div>
-        </fieldset>
     </div>
     <div id="successDialog" style="display:none;" title="系统提示">
         <p align="center">操作成功！</p>
     </div>
     <div id="failedDialog" style="display:none;" title="系统提示">
         <p align="center">操作失败，请联系管理员</p>
+    </div>
+    <div id="enterpriseDialog" style="display:none;" title="选择商家">
+        <p><input id="keywordText" type="text"/><input type="button" id="searchBtn" value="查询"></p>
+        <p style="width: 100%">
+            <div>
+                <table>
+                    <tr>
+                        <th width="7%">选择</th>
+                        <th width="8%">序号</th>
+                        <th width="10%">CIS编码</th>
+                        <th width="45%">商家名称</th>
+                        <th width="15%">商贸分公司</th>
+                        <th width="15%">办事处</th>
+                    </tr>
+                    <tbody id="tbMain">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagebutton">
+                <span class="pageClass"><span id="currentPage">1</span>/<span id="totalPage">5</span></span>
+                <a href="#" id="firstPage">首页</a>  <a href="#" id="prePage">上一页</a>
+                <a id="nextPage" href="#">下一页</a>  <a id="lastPage" href="#" >末页</a>
+            </div>
+        </p>
     </div>
 </body>
 </html>
