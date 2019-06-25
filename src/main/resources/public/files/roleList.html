@@ -23,26 +23,26 @@
         $("#tbMain tr td").mouseout(function(){
             $(this).removeClass("mouse_color");
         });
-        freshList(1, 4);
+        loadEnterpriseList(1, 4);
         $("#addNew").click(function () {
             window.location = "roleDetail.html?opera=add"
         })
         $("#prePage").click(function () {
             if($("#currentPage").html()>1){
-                freshList(parseInt($("#currentPage").html())-1, 4);
+                loadEnterpriseList(parseInt($("#currentPage").html())-1, 4);
             }
         })
         $("#firstPage").click(function () {
             if($("#currentPage").html()>1){
-                freshList(1, 4);
+                loadEnterpriseList(1, 4);
             }
         })
         $("#lastPage").click(function () {
-            freshList($("#totalPage").html(), 4);
+            loadEnterpriseList($("#totalPage").html(), 4);
         })
         $("#nextPage").click(function () {
             if($("#currentPage").html()<$("#totalPage").html()){
-                freshList(parseInt($("#currentPage").html())+1, 4);
+                loadEnterpriseList(parseInt($("#currentPage").html())+1, 4);
             }
         })
 
@@ -75,7 +75,7 @@
             async: true,
             success: function (data) {
                 if(data=="success"){
-                    freshList(1, 4);
+                    loadEnterpriseList(1, 4);
                 }else{
                     alert("删除失败")
                 }
@@ -85,7 +85,7 @@
             }
         });
     }
-    freshList = function (page, status) {
+    loadEnterpriseList = function (page, status) {
         var jsonParam = "{page:" + page + ",status:" + status + "}";
         $.ajax({
             type: "get",

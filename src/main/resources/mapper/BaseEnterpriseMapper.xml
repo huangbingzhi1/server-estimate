@@ -73,4 +73,17 @@
       OR company_name LIKE #{keyword,jdbcType=VARCHAR})
     </if>
   </select>
+  <delete id="deleteEnterpriseByServerCode" parameterType="string">
+    DELETE FROM server_enterprise_rel  WHERE server_code=#{serverCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="addEnterpriseByServerCode">
+    insert into server_enterprise_rel(id,server_code,enterprise_cis) values
+    <foreach collection="cisArray" item="cis" separator=",">
+      (
+      UUID(),
+      #{serverCode,jdbcType=VARCHAR},
+      #{cis,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
 </mapper>

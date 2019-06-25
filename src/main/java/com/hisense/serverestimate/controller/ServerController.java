@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hisense.serverestimate.entity.BaseRole;
 import com.hisense.serverestimate.entity.BaseServer;
 import com.hisense.serverestimate.entity.BaseUser;
+import com.hisense.serverestimate.mapper.BaseEnterpriseMapper;
 import com.hisense.serverestimate.mapper.BaseRoleMapper;
 import com.hisense.serverestimate.mapper.BaseServerMapper;
 import com.hisense.serverestimate.mapper.BaseUserMapper;
@@ -37,6 +38,9 @@ import java.util.Map;
 public class ServerController extends BaseController{
     @Autowired
     private BaseServerMapper serverMapper;
+
+    @Autowired
+    private BaseEnterpriseMapper enterpriseMapper;
 
     @Autowired
     private ServerService serverService;
@@ -90,6 +94,7 @@ public class ServerController extends BaseController{
     @ResponseBody
     public String deleteServerById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
+            serverMapper.deleteEnterpriseByServerId(jsonParam);
             serverMapper.deleteByPrimaryKey(jsonParam);
             return SUCCESS;
         }catch (Exception e){
@@ -120,6 +125,7 @@ public class ServerController extends BaseController{
             String province = HiStringUtil.getJsonStringByKey(parseObject, "province");
             String city = HiStringUtil.getJsonStringByKey(parseObject, "city");
             String district = HiStringUtil.getJsonStringByKey(parseObject, "district");
+            String cisArray= HiStringUtil.getJsonStringByKey(parseObject, "cisArray");
             BaseServer entity=new BaseServer(serverId,serverCode,serverName,companyName,serverType,manager,province,city,district);
             if(StringUtils.isEmpty(serverId)){
                 //新增
@@ -128,6 +134,13 @@ public class ServerController extends BaseController{
             }else{
                 //修改
                 serverMapper.updateByPrimaryKey(entity);
+            }
+            //修改关联的商家
+            //1.删除关联的商家
+            enterpriseMapper.deleteEnterpriseByServerCode(serverCode);
+            //2.添加关联的商家
+            if(!StringUtils.isEmpty(cisArray)){
+                enterpriseMapper.addEnterpriseByServerCode(serverCode,cisArray.split(","));
             }
             return SUCCESS;
         } catch (Exception e) {

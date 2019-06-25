@@ -17,7 +17,7 @@
         $(function () {
             request = getRequest();
             currentType=request["type"];
-            freshList(1);
+            loadEnterpriseList(1);
             // console.log(currentType)
             if(currentType=="mypost"){
                 $("#pageTitle").html("待我提报任务列表");
@@ -31,21 +31,21 @@
             }
             $("#prePage").click(function () {
                 if($("#currentPage").html()>1){
-                    freshList(parseInt($("#currentPage").html())-1);
+                    loadEnterpriseList(parseInt($("#currentPage").html())-1);
                 }
             })
             $("#firstPage").click(function () {
                 if($("#currentPage").html()>1){
-                    freshList(1);
+                    loadEnterpriseList(1);
                 }
             })
             $("#lastPage").click(function () {
-                freshList($("#totalPage").html());
+                loadEnterpriseList($("#totalPage").html());
             })
             $("#nextPage").click(function () {
                 console.log($("#currentPage").html())
                 if($("#currentPage").html()<$("#totalPage").html()){
-                    freshList(parseInt($("#currentPage").html())+1);
+                    loadEnterpriseList(parseInt($("#currentPage").html())+1);
                 }
             })
             $("#batchCheck").click(function () {
@@ -73,7 +73,7 @@
             })
         })
 
-        freshList= function(page) {
+        loadEnterpriseList= function(page) {
             var jsonParam="{page:"+page+",operateType:'"+currentType+"'}";
 
             $.ajax({
@@ -115,7 +115,7 @@
                 buttons: {
                     "提交": function() {
                         if(uploadDataFormFunction()){
-                            freshList($("#currentPage").html());
+                            loadEnterpriseList($("#currentPage").html());
                             $( this ).dialog( "close" );
                         }
                     },
@@ -135,7 +135,7 @@
                 buttons: {
                     "提交": function() {
                         checkDataFunction(taskSn)
-                        freshList($("#currentPage").html());
+                        loadEnterpriseList($("#currentPage").html());
                         $( this ).dialog( "close" );
                     },
                     "取消": function() {
@@ -161,7 +161,7 @@
                 processData: false,
                 success: function (data) {
                     if("success"==data){
-                        freshList($("#currentPage").html());
+                        loadEnterpriseList($("#currentPage").html());
                     }
 
                 },
@@ -188,7 +188,7 @@
                 success: function (data) {
                     if("success"==data){
                         $("#batchCheck").show();
-                        freshList($("#currentPage").html());
+                        loadEnterpriseList($("#currentPage").html());
                     }
 
                 },

@@ -28,4 +28,6 @@ public interface BaseServerMapper {
     void insertAll(Collection<BaseServer> values);
 
     BaseServer getServerByServerCode(String serverCode);
+
+    void deleteEnterpriseByServerId(String jsonParam);
 }

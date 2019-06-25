@@ -28,7 +28,7 @@
       <result column="enterprise_name" property="enterpriseName" jdbcType="VARCHAR" />
       <result column="office" property="office" jdbcType="VARCHAR" />
       <result column="company_id" property="companyId" jdbcType="VARCHAR" />
-      <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+      <result column="company_name2" property="companyName" jdbcType="VARCHAR" />
     </collection>
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
@@ -59,7 +59,7 @@
   </update>
   <select id="selectByPrimaryKey" resultMap="ServerEnterpriseMap" parameterType="java.lang.String" >
     select se.server_id, se.server_code, se.`server_name`, se.company_name, se.server_type, se.manager,
-    se.province, se.city, se.district,en.enterprise_id, en.cis, en.enterprise_name, en.office, en.company_id, en.company_name
+    se.province, se.city, se.district,en.enterprise_id, en.cis, en.enterprise_name, en.office, en.company_id, en.company_name company_name2
     from base_server se
     left join server_enterprise_rel r
       on se.server_code = r.server_code
@@ -108,4 +108,15 @@
   <select id="getServerByServerCode" parameterType="string" resultMap="BaseResultMap" >
     select * from base_server where server_code =#{serverCode,jdbcType=VARCHAR}
   </select>
+  <delete id="deleteEnterpriseByServerId" parameterType="string">
+    delete
+    from
+      server_enterprise_rel
+    where server_code IN
+      (select
+        server_code
+      from
+        base_server
+      where server_id = #{serverId,jdbcType=VARCHAR})
+  </delete>
 </mapper>

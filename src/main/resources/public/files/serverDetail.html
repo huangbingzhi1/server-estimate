@@ -15,35 +15,35 @@
         var serverCodeExist=false;
         var serverId;
         var dialogEnterpriseArray=new Array();
+        var enterpriseArray=new Array();
         $(function () {
             var request = getRequest();
             serverId=request["id"];
             initEditForm();
-            initEnterpriseList();
             $("#prePage").click(function () {
                 if($("#currentPage").html()>1){
-                    freshList(parseInt($("#currentPage").html())-1);
+                    loadEnterpriseList(parseInt($("#currentPage").html())-1);
                 }
             })
             $("#firstPage").click(function () {
                 if($("#currentPage").html()>1){
-                    freshList(1);
+                    loadEnterpriseList(1);
                 }
             })
             $("#lastPage").click(function () {
-                freshList($("#totalPage").html());
+                loadEnterpriseList($("#totalPage").html());
             })
             $("#nextPage").click(function () {
                 if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
                     var page=parseInt($("#currentPage").html())+1
-                    freshList(page);
+                    loadEnterpriseList(page);
                 }
             })
             $("#serverCode").blur(function () {
                checkServerCodeExist();
             })
             $("#checkNewBtn").click(function () {
-                freshList(1);
+                loadEnterpriseList(1);
                 $("#enterpriseDialog").dialog({
                     height:430,
                     width:700,
@@ -58,46 +58,50 @@
             });
             $("#unCheckBtn").click(function () {
                 var vSelect = $("#allEnterprise option:selected");
-
-                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
-                    var enterprise=JSON.parse(dialogEnterpriseArray[i]);
-                    if(enterprise.cis==vSelect.val()){
-                        dialogEnterpriseArray.splice(i, 1);
+                for(var j=0;j<vSelect.length;j++){
+                    for (var i = 0; i < enterpriseArray.length; i++) {
+                        if(enterpriseArray[i].cis==$(vSelect[j]).val()){
+                            enterpriseArray.splice(i, 1);
+                        }
                     }
                 }
                 vSelect.remove();
             })
-            // $("#allEnterprise ").dblclick(function () {
-            //     var vSelect = $("#allEnterprise option:selected");
-            //     vSelect.remove();
-            // })
             $("#searchBtn").click(function () {
-                freshList(1);
+                loadEnterpriseList(1);
             })
         })
         refreshEnterpriseList=function(){
-            for (var i = 0; i < dialogEnterpriseArray.length; i++) {
-                var enterprise=JSON.parse(dialogEnterpriseArray[i]);
+            enterpriseArray= JSON.parse(JSON.stringify(dialogEnterpriseArray));
+            console.log(enterpriseArray)
+            $("#allEnterprise").empty();
+            for (var i = 0; i < enterpriseArray.length; i++) {
+                var enterprise=enterpriseArray[i];
                 $("#allEnterprise").append("<option value='" + enterprise.cis + "'>"  + enterprise.enterpriseName  + "</option>");
             }
         }
         toggerEnterprise=function(line){
             var lineEntity=$(line);
+            var entity=JSON.parse(lineEntity.attr("value"));
             if(lineEntity.is(':checked')){
-                entity=lineEntity.attr("value");
-                if (dialogEnterpriseArray[i]!= lineEntity.attr("value")) {
+                var flag=true;
+                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
+                    if (dialogEnterpriseArray[i].cis == entity.cis) {
+                        flag=false;
+                    }
+                }
+                if(flag){
                     dialogEnterpriseArray.push(entity);
                 }
             }else{
                 for (var i = 0; i < dialogEnterpriseArray.length; i++) {
-                    if (dialogEnterpriseArray[i]== lineEntity.attr("value")) {
+                    if (dialogEnterpriseArray[i].cis== entity.cis) {
                         dialogEnterpriseArray.splice(i, 1);
                     }
                 }
             }
-            console.log(dialogEnterpriseArray)
         }
-    freshList=function(page){
+    loadEnterpriseList=function(page){
         var jsonParam="{page:"+page+"}";
         var keyword=$("#keywordText").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
@@ -107,6 +111,7 @@
             data: {jsonParam: jsonParam},
             async: true,
             success: function (data) {
+                dialogEnterpriseArray=JSON.parse(JSON.stringify(enterpriseArray));
                 if(data){
                     var sourceData = eval('(' + data + ')');
                     $("#totalPage").html(sourceData.totalPage)
@@ -131,9 +136,9 @@
             var entityStr=JSON.stringify(entity);
             var flag=false;
             html +=     "<tr name='dataRow'>";//onchange='toggerEnterprise(this)'
-            if(dialogEnterpriseArray.length>0){
-                for (var j = 0; j < dialogEnterpriseArray.length; j++) {
-                    if (dialogEnterpriseArray[j]== entityStr) {
+            if(enterpriseArray.length>0){
+                for (var j = 0; j < enterpriseArray.length; j++) {
+                    if (enterpriseArray[j].cis== entity.cis) {
                         flag=true;
                     }
                 }
@@ -152,9 +157,6 @@
             html += "</tr>";
         }
         $("#tbMain").html(html);
-        // $("input[name='lineCheck']").unbind('change').bind("change",function () {
-        //     toggerEnterprise($(this));
-        // })
     }
     initEditForm=function(){
         if(serverId){
@@ -176,6 +178,13 @@
                         $("#city").val(server.city);
                         $("#district").val(server.district);
                         console.log(server.enterprises)
+                        if(server.enterprises){
+                            for(var i=0;i<server.enterprises.length;i++){
+                                var enterprise=server.enterprises[i];
+                                enterpriseArray.push(enterprise);
+                                $("#allEnterprise").append("<option value='" + enterprise.cis + "'>"  + enterprise.enterpriseName  + "</option>");
+                            }
+                        }
                     }else{
 
                     }
@@ -218,10 +227,15 @@
         var province= $("#province").val();
         var city= $("#city").val();
         var district= $("#district").val();
+        var cisArray=new Array();
+        for(var i=0;i<enterpriseArray.length;i++){
+            cisArray.push(enterpriseArray[i].cis);
+        }
         var json="{serverId:'"+serverId+"',serverCode:'"+serverCode+"',serverName:'"+serverName
             +"',companyName:'"+companyName+"',serverType:'"+serverType
             +"',manager:'"+manager+"',province:'"+province
-            +"',city:'"+city+"',district:'"+district+"'}";
+            +"',city:'"+city+"',district:'"+district +"',cisArray:'"+cisArray.join(',')
+            +"'}";
         $.ajax({
             type: "get",
             url: "/serverestimate/serverController/saveServer",
@@ -229,7 +243,7 @@
             async: true,
             success: function (data) {
                 if(data=='success'){
-                    window.location = 'userList.html'
+                    window.location = 'serverList.html'
                 }else{
                     showInfoDialog($("#failedDialog"));
                 }
@@ -241,26 +255,7 @@
     }
 
 
-    initEnterpriseList=function () {
-        $.ajax({
-            type: "get",
-            url: "/serverestimate/enterpriseController/getAllEnterpriseList",
-            async: true,
-            success: function (data) {
-                if(data){
-                    var companyList = eval('(' + data + ')');
-                    for (var i = 0; i < companyList.length; i++) {
-                        var company=companyList[i];
-                        $("#company").append("<option value='"+company.id+"'>"+company.name+"</option>");
-                    }
-                }
 
-            },
-            error: function (result) {
-                console.log("failed")
-            }
-        });
-    }
     //验证form
     checkForm=function(){
         var goodInput=true;
@@ -354,7 +349,7 @@
                 <div>
                     <label>服务的商家</label>
                     <select id="allEnterprise" multiple="multiple"
-                            style="width:30%;height:128px">
+                            style="width:30%;height:120px">
                     </select>
                 </div>
                 <div  style="align-self:center;align-content:center;align-content:center;child-align: middle;padding-left:100px">
@@ -375,7 +370,7 @@
     <div id="failedDialog" style="display:none;" title="系统提示">
         <p align="center">操作失败，请联系管理员</p>
     </div>
-    <div id="enterpriseDialog" style="display:none;" title="选择商家">
+    <div id="enterpriseDialog" style="display:none;" title="关联的商家">
         <p><input id="keywordText" type="text"/><input type="button" id="searchBtn" value="查询"></p>
         <p style="width: 100%">
             <div>
@@ -399,5 +394,6 @@
             </div>
         </p>
     </div>
+
 </body>
 </html>

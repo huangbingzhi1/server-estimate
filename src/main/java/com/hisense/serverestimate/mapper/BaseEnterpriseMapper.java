@@ -2,6 +2,7 @@ package com.hisense.serverestimate.mapper;
 
 import com.hisense.serverestimate.entity.BaseEnterprise;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,4 +27,8 @@ public interface BaseEnterpriseMapper {
     List<BaseEnterprise> getEnterpriseList(Map<String, Object> param);
 
     int getEnterpriseListNum(Map<String, Object> param);
+
+    void addEnterpriseByServerCode(@Param("serverCode")String serverCode, @Param("cisArray")String[] cisArray);
+
+    void deleteEnterpriseByServerCode(String serverCode);
 }
