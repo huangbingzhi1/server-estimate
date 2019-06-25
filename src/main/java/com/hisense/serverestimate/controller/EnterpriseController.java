@@ -35,7 +35,6 @@ public class EnterpriseController extends BaseController{
     public String getEnterpriseList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         JSONObject parseObject = JSON.parseObject(jsonParam);
         int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
-        int numberPerPage=5;
         Map<String,Object> param=new HashMap<>();
         param.put("startIndex",(page-1)*numberPerPage);
         param.put("pCount",numberPerPage);
@@ -66,6 +65,7 @@ public class EnterpriseController extends BaseController{
     @ResponseBody
     public String deleteEnterpriseById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
+            enterpriseMapper.deleteServerByEnterpriseId(jsonParam);
             enterpriseMapper.deleteByPrimaryKey(jsonParam);
             return SUCCESS;
         }catch (Exception e){
@@ -93,7 +93,7 @@ public class EnterpriseController extends BaseController{
             String office=HiStringUtil.getJsonStringByKey(parseObject,"office");
             String companyId=HiStringUtil.getJsonStringByKey(parseObject,"companyId");
             String companyName=HiStringUtil.getJsonStringByKey(parseObject,"companyName");
-
+            String serverCodeArray= HiStringUtil.getJsonStringByKey(parseObject, "serverCodeArray");
             BaseEnterprise entity=new BaseEnterprise(enterpriseId, cis, enterpriseName, office, companyId, companyName);
             if(StringUtils.isEmpty(enterpriseId)){
                 //新增
@@ -103,26 +103,49 @@ public class EnterpriseController extends BaseController{
                 //修改
                 enterpriseMapper.updateByPrimaryKey(entity);
             }
+            //修改关联的商家
+            if(!StringUtils.isEmpty(enterpriseId)) {
+                //1.删除关联的商家
+                enterpriseMapper.deleteServerByEnterpriseId(enterpriseId);
+            }
+            //2.添加关联的商家
+            if(!StringUtils.isEmpty(serverCodeArray)){
+                enterpriseMapper.addServerRelByEnterpriseCis(cis,serverCodeArray.split(","));
+            }
             return SUCCESS;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return FAILED;
     }
-    /*@RequestMapping(value = "getEnterpriseByCis", method = RequestMethod.GET)
+    @RequestMapping(value = "getEnterpriseById", method = RequestMethod.GET)
     @ResponseBody
-    public String getEnterpriseByCis(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+    public String getEnterpriseById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
-            BaseServer u= enterpriseMapper.getEnterpriseByCis(jsonParam);
-            if(null!=u){
-                return JSON.toJSONString(u);
+            BaseEnterprise enterprise= enterpriseMapper.selectByPrimaryKey(jsonParam);
+            if(null!=enterprise){
+                return JSON.toJSONString(enterprise);
             }
 
         }catch (Exception e){
 
         }
         return "";
-    }*/
+    }
 
+    @RequestMapping(value = "getEnterpriseByCis", method = RequestMethod.GET)
+    @ResponseBody
+    public String getEnterpriseByCis(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            BaseEnterprise en=enterpriseMapper.getEnterpriseByCis(jsonParam);
+            if(null!=en){
+                return JSON.toJSONString(en);
+            }
+
+        }catch (Exception e){
+
+        }
+        return "";
+    }
 
 }

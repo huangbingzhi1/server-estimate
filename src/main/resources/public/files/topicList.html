@@ -11,7 +11,7 @@
 </head>
 <script language=JavaScript>
 $(function () {
-    loadEnterpriseList(1,4);
+    loadServerList(1,4);
     $("#searchBtn").click(function () {
         $
         console.log($("#startDate").val())
@@ -22,24 +22,24 @@ $(function () {
     })
     $("#prePage").click(function () {
         if($("#currentPage").html()>1){
-            loadEnterpriseList(parseInt($("#currentPage").html())-1, 4);
+            loadServerList(parseInt($("#currentPage").html())-1, 4);
         }
     })
     $("#firstPage").click(function () {
         if($("#currentPage").html()>1){
-            loadEnterpriseList(1, 4);
+            loadServerList(1, 4);
         }
     })
     $("#lastPage").click(function () {
-        loadEnterpriseList($("#totalPage").html(), 4);
+        loadServerList($("#totalPage").html(), 4);
     })
     $("#nextPage").click(function () {
         if($("#currentPage").html()<$("#totalPage").html()){
-            loadEnterpriseList(parseInt($("#currentPage").html())+1, 4);
+            loadServerList(parseInt($("#currentPage").html())+1, 4);
         }
     })
 })
-loadEnterpriseList= function(page, status) {
+loadServerList= function(page, status) {
     var jsonParam="{page:"+page+",status:"+status+"}";
     $.ajax({
         type: "get",
@@ -110,7 +110,7 @@ deleteTopic=function(topicId){
         async: true,
         success: function (data) {
             if(data=="success"){
-                loadEnterpriseList(1, 4);
+                loadServerList(1, 4);
             }else{
                 alert("删除失败")
             }

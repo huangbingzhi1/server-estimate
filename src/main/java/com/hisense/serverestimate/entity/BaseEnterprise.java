@@ -1,6 +1,7 @@
 package com.hisense.serverestimate.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class BaseEnterprise implements Serializable {
     private String enterpriseId;
@@ -14,6 +15,8 @@ public class BaseEnterprise implements Serializable {
     private String companyId;
 
     private String companyName;
+
+    private List<BaseServer> servers;
 
     private static final long serialVersionUID = 1L;
 
@@ -63,6 +66,14 @@ public class BaseEnterprise implements Serializable {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName == null ? null : companyName.trim();
+    }
+
+    public List<BaseServer> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<BaseServer> servers) {
+        this.servers = servers;
     }
 
     @Override

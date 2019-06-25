@@ -15,29 +15,29 @@
         $(function () {
             var request = getRequest();
             topicId=request["id"];
-             loadEnterpriseList(1);
+             loadServerList(1);
             $("#prePage").click(function () {
                 if ($("#currentPage").html() > 1) {
-                    loadEnterpriseList(parseInt($("#currentPage").html()) - 1);
+                    loadServerList(parseInt($("#currentPage").html()) - 1);
                 }
             })
             $("#firstPage").click(function () {
                 if ($("#currentPage").html() > 1) {
-                     loadEnterpriseList(1);
+                     loadServerList(1);
                 }
             })
             $("#lastPage").click(function () {
-                loadEnterpriseList($("#totalPage").html(), 4);
+                loadServerList($("#totalPage").html(), 4);
             })
             $("#nextPage").click(function () {
                 if ($("#currentPage").html() < $("#totalPage").html()) {
-                    loadEnterpriseList(parseInt($("#currentPage").html()) + 1);
+                    loadServerList(parseInt($("#currentPage").html()) + 1);
                 }
             })
 
         });
 
-        loadEnterpriseList = function (page) {
+        loadServerList = function (page) {
             // var jsonParam = "{page:" + page + ",topicId:'"+topicId+"'}";
             $.ajax({
                 type: "get",
@@ -192,7 +192,7 @@
                             async: true,
                             success: function (data) {
                                 if(data=='success'){
-                                    loadEnterpriseList($("#currentPage").html());
+                                    loadServerList($("#currentPage").html());
                                     $("#userDialog").dialog( "close" );
                                 }else{
                                     showInfoDialog($("#failedDialog"));

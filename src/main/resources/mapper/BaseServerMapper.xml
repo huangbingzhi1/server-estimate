@@ -79,11 +79,33 @@
       s.*
     FROM
       base_server s
+    WHERE 1=1
+    <if test="keyword != null and keyword !=''" >
+      AND (server_code LIKE #{keyword,jdbcType=VARCHAR}
+      OR server_name   LIKE #{keyword,jdbcType=VARCHAR}
+      OR company_name  LIKE #{keyword,jdbcType=VARCHAR}
+      OR server_type   LIKE #{keyword,jdbcType=VARCHAR}
+      OR manager       LIKE #{keyword,jdbcType=VARCHAR}
+      OR province      LIKE #{keyword,jdbcType=VARCHAR}
+      OR city          LIKE #{keyword,jdbcType=VARCHAR}
+      OR district      LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
     ORDER BY s.server_code
     LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
   </select>
   <select id="getServerListNum" parameterType="map" resultType="Integer">
     SELECT count(1) from base_server
+    WHERE 1=1
+    <if test="keyword != null and keyword !=''" >
+      AND (server_code LIKE #{keyword,jdbcType=VARCHAR}
+      OR server_name   LIKE #{keyword,jdbcType=VARCHAR}
+      OR company_name  LIKE #{keyword,jdbcType=VARCHAR}
+      OR server_type   LIKE #{keyword,jdbcType=VARCHAR}
+      OR manager       LIKE #{keyword,jdbcType=VARCHAR}
+      OR province      LIKE #{keyword,jdbcType=VARCHAR}
+      OR city          LIKE #{keyword,jdbcType=VARCHAR}
+      OR district      LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
   </select>
   <delete id="deleteAll">
     delete from base_server

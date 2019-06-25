@@ -53,7 +53,11 @@ public class ServerController extends BaseController{
         Map<String,Object> param=new HashMap<>();
         param.put("startIndex",(page-1)*numberPerPage);
         param.put("pCount",numberPerPage);
-        param.put("keyword",HiStringUtil.getJsonStringByKey(parseObject,"keyword"));
+        String keyword=HiStringUtil.getJsonStringByKey(parseObject,"keyword");
+        if(!StringUtils.isEmpty(keyword)){
+            keyword="%"+keyword+"%";
+            param.put("keyword",keyword);
+        }
         List<BaseServer> serverList=serverMapper.getServerList(param);
         if(!CollectionUtils.isEmpty(serverList)) {
             double listNum = serverMapper.getServerListNum(param);

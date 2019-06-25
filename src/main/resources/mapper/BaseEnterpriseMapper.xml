@@ -9,6 +9,26 @@
     <result column="company_id" property="companyId" jdbcType="VARCHAR" />
     <result column="company_name" property="companyName" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="EnterpriseServerMap" type="com.hisense.serverestimate.entity.BaseEnterprise" >
+    <id column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR" />
+    <result column="cis" property="cis" jdbcType="VARCHAR" />
+    <result column="enterprise_name" property="enterpriseName" jdbcType="VARCHAR" />
+    <result column="office" property="office" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <collection property="servers" ofType="com.hisense.serverestimate.entity.BaseServer">
+      <id column="server_id" property="serverId" jdbcType="VARCHAR" />
+      <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+      <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+      <result column="company_name2" property="companyName" jdbcType="VARCHAR" />
+      <result column="server_type" property="serverType" jdbcType="VARCHAR" />
+      <result column="manager" property="manager" jdbcType="VARCHAR" />
+      <result column="province" property="province" jdbcType="VARCHAR" />
+      <result column="city" property="city" jdbcType="VARCHAR" />
+      <result column="district" property="district" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from base_enterprise
     where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
@@ -30,9 +50,14 @@
       company_name = #{companyName,jdbcType=VARCHAR}
     where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
   </update>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select enterprise_id, cis, enterprise_name, office, company_id, company_name
-    from base_enterprise
+  <select id="selectByPrimaryKey" resultMap="EnterpriseServerMap" parameterType="java.lang.String" >
+    select en.enterprise_id, en.cis, en.enterprise_name, en.office, en.company_id, en.company_name ,se.server_id, se.server_code, se.server_name, se.company_name company_name2, se.server_type, se.manager,
+    se.province, se.city, se.district
+    from base_enterprise en
+    left join server_enterprise_rel r
+      ON en.cis = r.enterprise_cis
+    left join base_server se
+      on se.server_code = r.server_code
     where enterprise_id = #{enterpriseId,jdbcType=VARCHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap" >
@@ -86,4 +111,29 @@
       )
     </foreach>
   </insert>
+  <insert id="addServerRelByEnterpriseCis">
+    insert into server_enterprise_rel(id,server_code,enterprise_cis) values
+    <foreach collection="serverCodeArray" item="serverCode" separator=",">
+      (
+      UUID(),
+      #{serverCode,jdbcType=VARCHAR},
+      #{cis,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <delete id="deleteServerByEnterpriseId" parameterType="string">
+    delete
+    from
+      server_enterprise_rel
+    where enterprise_cis IN
+      (select
+        cis
+      from
+        base_enterprise
+      where enterprise_id = #{enterpriseId,jdbcType=VARCHAR})
+  </delete>
+  <select id="getEnterpriseByCis" parameterType="string" resultMap="BaseResultMap">
+    select * from base_enterprise where cis =#{cis,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

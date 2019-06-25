@@ -13,26 +13,26 @@
 </head>
 <SCRIPT language=JavaScript>
     $(function () {
-        loadEnterpriseList(1, 4);
+        loadServerList(1, 4);
         $("#addNew").click(function () {
             window.location = "userDetail.html?opera=add"
         })
         $("#prePage").click(function () {
             if($("#currentPage").html()>1){
-                loadEnterpriseList(parseInt($("#currentPage").html())-1, 4);
+                loadServerList(parseInt($("#currentPage").html())-1, 4);
             }
         })
         $("#firstPage").click(function () {
             if($("#currentPage").html()>1){
-                loadEnterpriseList(1, 4);
+                loadServerList(1, 4);
             }
         })
         $("#lastPage").click(function () {
-            loadEnterpriseList($("#totalPage").html(), 4);
+            loadServerList($("#totalPage").html(), 4);
         })
         $("#nextPage").click(function () {
             if($("#currentPage").html()<$("#totalPage").html()){
-                loadEnterpriseList(parseInt($("#currentPage").html())+1, 4);
+                loadServerList(parseInt($("#currentPage").html())+1, 4);
             }
         })
 
@@ -84,7 +84,7 @@
             async: true,
             success: function (data) {
                 if(data=="success"){
-                    loadEnterpriseList(1, 4);
+                    loadServerList(1, 4);
                 }else{
                     alert("删除失败")
                 }
@@ -94,7 +94,7 @@
             }
         });
     }
-    loadEnterpriseList = function (page, status) {
+    loadServerList = function (page, status) {
         var jsonParam = "{page:" + page + ",status:" + status + "}";
         $.ajax({
             type: "get",

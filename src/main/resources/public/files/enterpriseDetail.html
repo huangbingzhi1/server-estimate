@@ -2,23 +2,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>服务商详情</title>
-
-    <!--    <link href="../css/css.css" rel="stylesheet" type="text/css"/>-->
-    <!--    <link href="../css/style.css" rel="stylesheet" type="text/css"/>-->
+    <title>商家详情</title>
     <script type="text/javascript" src="../js/jquery.js"></script>
     <script type="text/javascript" src="../js/hi-utils.js"></script>
     <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link href="../css/hi-main.css" rel="stylesheet" type="text/css"/>
     <script language="JavaScript" type="text/javascript">
-        var serverCodeExist=false;
-        var serverId;
-        var dialogEnterpriseArray=new Array();
-        var enterpriseArray=new Array();
+        var cisExist=false;
+        var enterpriseId;
+        var dialogServerArray=new Array();
+        var serverArray=new Array();
         $(function () {
             var request = getRequest();
-            serverId=request["id"];
+            enterpriseId=request["id"];
             initEditForm();
             $("#prePage").click(function () {
                 if($("#currentPage").html()>1){
@@ -39,12 +36,12 @@
                     loadServerList(page);
                 }
             })
-            $("#serverCode").blur(function () {
-               checkServerCodeExist();
+            $("#cis").blur(function () {
+               checkCisExist();
             })
             $("#checkNewBtn").click(function () {
+                dialogServerArray=JSON.parse(JSON.stringify(serverArray));
                 loadServerList(1);
-                dialogEnterpriseArray=JSON.parse(JSON.stringify(enterpriseArray));
                 $("#enterpriseDialog").dialog({
                     height:500,
                     width:700,
@@ -52,17 +49,17 @@
                     buttons: {
                         "确定": function() {
                             $( this ).dialog( "close" );
-                            refreshEnterpriseList();
+                            refreshServerList();
                         }
                     }
                 });
             });
             $("#unCheckBtn").click(function () {
-                var vSelect = $("#allEnterprise option:selected");
+                var vSelect = $("#allServer option:selected");
                 for(var j=0;j<vSelect.length;j++){
-                    for (var i = 0; i < enterpriseArray.length; i++) {
-                        if(enterpriseArray[i].cis==$(vSelect[j]).val()){
-                            enterpriseArray.splice(i, 1);
+                    for (var i = 0; i < serverArray.length; i++) {
+                        if(serverArray[i].serverCode==$(vSelect[j]).val()){
+                            serverArray.splice(i, 1);
                         }
                     }
                 }
@@ -72,31 +69,32 @@
                 loadServerList(1);
             })
         })
-        refreshEnterpriseList=function(){
-            enterpriseArray= JSON.parse(JSON.stringify(dialogEnterpriseArray));
-            $("#allEnterprise").empty();
-            for (var i = 0; i < enterpriseArray.length; i++) {
-                var enterprise=enterpriseArray[i];
-                $("#allEnterprise").append("<option value='" + enterprise.cis + "'>"  + enterprise.enterpriseName  + "</option>");
+        refreshServerList=function(){
+            serverArray= JSON.parse(JSON.stringify(dialogServerArray));
+            console.log(serverArray)
+            $("#allServer").empty();
+            for (var i = 0; i < serverArray.length; i++) {
+                var server=serverArray[i];
+                $("#allServer").append("<option value='" + server.serverCode + "'>"  + server.serverName  + "</option>");
             }
         }
-        toggerEnterprise=function(line){
+        toggerServer=function(line){
             var lineEntity=$(line);
             var entity=JSON.parse(lineEntity.attr("value"));
             if(lineEntity.is(':checked')){
                 var flag=true;
-                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
-                    if (dialogEnterpriseArray[i].cis == entity.cis) {
+                for (var i = 0; i < dialogServerArray.length; i++) {
+                    if (dialogServerArray[i].serverCode == entity.serverCode) {
                         flag=false;
                     }
                 }
                 if(flag){
-                    dialogEnterpriseArray.push(entity);
+                    dialogServerArray.push(entity);
                 }
             }else{
-                for (var i = 0; i < dialogEnterpriseArray.length; i++) {
-                    if (dialogEnterpriseArray[i].cis== entity.cis) {
-                        dialogEnterpriseArray.splice(i, 1);
+                for (var i = 0; i < dialogServerArray.length; i++) {
+                    if (dialogServerArray[i].serverCode== entity.serverCode) {
+                        dialogServerArray.splice(i, 1);
                     }
                 }
             }
@@ -107,7 +105,7 @@
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
         $.ajax({
             type: "get",
-            url: "/serverestimate/enterpriseController/getEnterpriseList",
+            url: "/serverestimate/serverController/getServerList",
             data: {jsonParam: jsonParam},
             async: true,
             success: function (data) {
@@ -128,60 +126,56 @@
             }
         });
     }
-    addRows=function(enterpriseList){
+    addRows=function(serverList){
         var html  ="";
-        for(var i=0;i<enterpriseList.length;i++){
-            var entity=enterpriseList[i];
+        for(var i=0;i<serverList.length;i++){
+            var entity=serverList[i];
             var entityStr=JSON.stringify(entity);
             var flag=false;
-            html +=     "<tr name='dataRow'>";//onchange='toggerEnterprise(this)'
-            if(dialogEnterpriseArray.length>0){
-                for (var j = 0; j < dialogEnterpriseArray.length; j++) {
-                    if (dialogEnterpriseArray[j].cis== entity.cis) {
+            html +=     "<tr name='dataRow'>";
+            if(dialogServerArray.length>0){
+                for (var j = 0; j < dialogServerArray.length; j++) {
+                    if (dialogServerArray[j].serverCode== entity.serverCode) {
                         flag=true;
                     }
                 }
             }
             if(flag){
-                html+="<td style='height: 8px;'>"+"<input type='checkbox' name='lineCheck' checked='checked' onchange='toggerEnterprise(this)'   value='"+entityStr+"'/>"+"</td>";
+                html+="<td style='height: 8px;'>"+"<input type='checkbox' name='lineCheck' checked='checked' onchange='toggerServer(this)'   value='"+entityStr+"'/>"+"</td>";
             }else{
-                html+="<td style='height: 8px;'>"+"<input type='checkbox' name='lineCheck' onchange='toggerEnterprise(this)'   value='"+entityStr+"'/>"+"</td>";
+                html+="<td style='height: 8px;'>"+"<input type='checkbox' name='lineCheck' onchange='toggerServer(this)'   value='"+entityStr+"'/>"+"</td>";
             }
             // html+="<td>"+"<input type='checkbox' name='lineCheck'   value='"+JSON.stringify(entity)+"'/>"+"</td>";
             html +=     "<td style='height: 8px;'>" +(i+1)+ "</td>";
-            html +=     "<td style='height: 8px;'>" + entity.cis+ "</td>";
-            html +=     "<td style='height: 8px;'>" + entity.enterpriseName + "</td>";
+            html +=     "<td style='height: 8px;'>" + entity.serverCode+ "</td>";
+            html +=     "<td style='height: 8px;'>" + entity.serverName + "</td>";
             html +=     "<td style='height: 8px;'>" + entity.companyName + "</td>";
-            html +=     "<td style='height: 8px;'>" + entity.office + "</td>";
+            html +=     "<td style='height: 8px;'>" + entity.serverType + "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);
     }
     initEditForm=function(){
-        if(serverId){
+        if(enterpriseId){
             $.ajax({
                 type: "get",
-                url: "/serverestimate/serverController/getServerById",
-                data: {jsonParam: serverId},
+                url: "/serverestimate/enterpriseController/getEnterpriseById",
+                data: {jsonParam: enterpriseId},
                 async: true,
                 success: function (result) {
                     // console.log(result)
                     if(result){
-                        var server = eval('(' + result + ')');
-                        $("#serverCode").val(server.serverCode);
-                        $("#serverName").val(server.serverName);
-                        $("#companyName").val(server.companyName);
-                        $("#serverType").val(server.serverType);
-                        $("#manager").val(server.manager);
-                        $("#province").val(server.province);
-                        $("#city").val(server.city);
-                        $("#district").val(server.district);
-                        console.log(server.enterprises)
-                        if(server.enterprises){
-                            for(var i=0;i<server.enterprises.length;i++){
-                                var enterprise=server.enterprises[i];
-                                enterpriseArray.push(enterprise);
-                                $("#allEnterprise").append("<option value='" + enterprise.cis + "'>"  + enterprise.enterpriseName  + "</option>");
+                        var enterprise = eval('(' + result + ')');
+                        $("#cis").val(enterprise.cis);
+                        $("#enterpriseName").val(enterprise.enterpriseName);
+                        $("#companyName").val(enterprise.companyName);
+                        $("#office").val(enterprise.office);
+                        console.log(enterprise.servers)
+                        if(enterprise.servers){
+                            for(var i=0;i<enterprise.servers.length;i++){
+                                var server=enterprise.servers[i];
+                                serverArray.push(server);
+                                $("#allServer").append("<option value='" + server.cis + "'>"  + server.serverName  + "</option>");
                             }
                         }
                     }else{
@@ -194,55 +188,30 @@
             });
         }
     }
-    batchSave=function () {
-        var jsonParam=$("#batchDataTextarea").val();
-        $.ajax({
-            type: "get",
-            url: "/serverestimate/userController/batchAddUsers",
-            data: {jsonParam: jsonParam},
-            async: true,
-            success: function (result) {
-                if('success'==result){
-                    showInfoDialog($("#successDialog"));
-                }else{
-                    showInfoDialog($("#failedDialog"));
-                }
-
-            },
-            error: function (result) {
-                showInfoDialog($("#failedDialog"));
-            }
-        });
-    }
-    saveServer=function(){
+    saveEnterprise=function(){
         if(!checkForm()){
             return;
         }
-        var serverCode= $("#serverCode").val();
-        var serverName= $("#serverName").val();
+        var cis= $("#cis").val();
+        var enterpriseName= $("#enterpriseName").val();
         var companyName= $("#companyName").val();
-        var serverType= $("#serverType").val();
-        var manager= $("#manager").val();
-        var province= $("#province").val();
-        var city= $("#city").val();
-        var district= $("#district").val();
-        var cisArray=new Array();
-        for(var i=0;i<enterpriseArray.length;i++){
-            cisArray.push(enterpriseArray[i].cis);
+        var office= $("#office").val();
+        var serverCodeArray=new Array();
+        for(var i=0;i<serverArray.length;i++){
+            serverCodeArray.push(serverArray[i].serverCode);
         }
-        var json="{serverId:'"+serverId+"',serverCode:'"+serverCode+"',serverName:'"+serverName
-            +"',companyName:'"+companyName+"',serverType:'"+serverType
-            +"',manager:'"+manager+"',province:'"+province
-            +"',city:'"+city+"',district:'"+district +"',cisArray:'"+cisArray.join(',')
+        var json="{enterpriseId:'"+enterpriseId+"',cis:'"+cis+"',enterpriseName:'"+enterpriseName
+            +"',companyName:'"+companyName+"',office:'"+office
+            +"',serverCodeArray:'"+serverCodeArray.join(',')
             +"'}";
         $.ajax({
             type: "get",
-            url: "/serverestimate/serverController/saveServer",
+            url: "/serverestimate/enterpriseController/saveEnterprise",
             data:{jsonParam: json},
             async: true,
             success: function (data) {
                 if(data=='success'){
-                    window.location = 'serverList.html'
+                    window.location = 'enterpriseList.html'
                 }else{
                     showInfoDialog($("#failedDialog"));
                 }
@@ -259,37 +228,37 @@
     checkForm=function(){
         var goodInput=true;
         $("#errorDiv").empty();
-        if(!$("#serverCode").val()){
-            $("#errorDiv").append("<p>*【服务商编号不能为空】</p>");
+        if(!$("#cis").val()){
+            $("#errorDiv").append("<p>*【商家编号不能为空】</p>");
             goodInput=false;
         }
-        if(serverCodeExist){
-            $("#errorDiv").append("<p>*【该服务商编号已存在】</p>");
+        if(cisExist){
+            $("#errorDiv").append("<p>*【该商家编号已存在】</p>");
             goodInput=false;
         }
-        if(!$("#serverName").val()){
-            $("#errorDiv").append("<p>*【服务商名称不能为空】</p>");
+        if(!$("#enterpriseName").val()){
+            $("#errorDiv").append("<p>*【商家名称不能为空】</p>");
             goodInput=false;
         }
         return goodInput;
     }
-    checkServerCodeExist=function(){
+    checkCisExist=function(){
         $.ajax({
             type: "get",
-            url: "/serverestimate/serverController/getServerByServerCode",
-            data: {jsonParam: $("#serverCode").val()},
+            url: "/serverestimate/enterpriseController/getEnterpriseByCis",
+            data: {jsonParam: $("#cis").val()},
             async: true,
             success: function (result) {
                 if(result){
                     var entity = eval('(' + result + ')');
-                    if(entity&&entity.serverId==serverId){
-                        serverCodeExist=false;
+                    if(entity&&entity.enterpriseId==enterpriseId){
+                        cisExist=false;
                     }else{
-                        serverCodeExist=true;
-                        $("#errorDiv").append("<p>*【该服务商编号已存在】</p>");
+                        cisExist=true;
+                        $("#errorDiv").append("<p>*【该商家编号已存在】</p>");
                     }
                 }else{
-                    serverCodeExist=false
+                    cisExist=false
                     $("#errorDiv").empty();
                 }
             },
@@ -305,51 +274,35 @@
 
 <body style="color:#4B4967">
     <div align="center" class="toolbar">
-        <span><h4>服务商管理</h4></span>
+        <span><h4>商家管理</h4></span>
     </div>
     <div style="padding:10px 20px">
         <fieldset class="scheduler-border">
-            <legend>服务商详情</legend>
+            <legend>商家详情</legend>
             <div class="errorDiv" id="errorDiv">
 
             </div>
             <div class="form">
                 <div class="div-a">
-                    <label>服务商编号</label>
-                    <input id='serverCode' type="text" class="text"style="width:200px" value=""/>
+                    <label>CIS编号</label>
+                    <input id='cis' type="text" class="text"style="width:200px" value=""/>
                 </div>
                 <div class="div-b">
-                    <label>服务商名称</label>
-                    <input id='serverName' type="text" class="text"style="width:200px" value=""/>
+                    <label>商家名称</label>
+                    <input id='enterpriseName' type="text" class="text"style="width:200px" value=""/>
                 </div>
                 <div class="div-a">
-                    <label>分公司</label>
+                    <label>商贸分公司</label>
                     <input id='companyName' type="text" class="text" style="width:200px" value=""/>
                 </div>
                 <div class="div-b">
-                    <label>服务商性质备注</label>
-                    <input id='serverType' type="text" class="text" style="width:200px" value=""/>
-                </div>
-                <div class="div-a">
-                    <label>服务商经理</label>
-                    <input id='manager' type="text" class="text" style="width:200px" value=""/>
-                </div>
-                <div class="div-b">
-                    <label>办公-省</label>
-                    <input id='province' type="text" class="text" style="width:200px" value=""/>
-                </div>
-                <div class="div-a">
-                    <label>办公-市</label>
-                    <input id='city' type="text" class="text" style="width:200px" value=""/>
-                </div>
-                <div class="div-b">
-                    <label>办公-区</label>
-                    <input id='district' type="text" class="text" style="width:200px" value=""/>
+                    <label>办事处</label>
+                    <input id='office' type="text" class="text" style="width:200px" value=""/>
                 </div>
                 <div>
-                    <label>服务的商家</label>
-                    <select id="allEnterprise" multiple="multiple"
-                            style="width:30%;height:120px">
+                    <label>关联的服务商</label>
+                    <select id="allServer" multiple="multiple"
+                            style="width:30%;height:80px">
                     </select>
                 </div>
                 <div  style="align-self:center;align-content:center;align-content:center;child-align: middle;padding-left:100px">
@@ -357,8 +310,8 @@
                     <span class="addBtn" id="unCheckBtn">删除</span>
                 </div>
                 <div style="margin-top: 10px; padding-top: 20px;margin-left: 100px;">
-                    <span class="addBtn" id="saveBtn" onclick="saveServer()">保存</span>
-                    <span class="addBtn" id="returnBtn" onclick="window.location = 'serverList.html'">返回</span>
+                    <span class="addBtn" id="saveBtn" onclick="saveEnterprise()">保存</span>
+                    <span class="addBtn" id="returnBtn" onclick="window.location = 'enterpriseList.html'">返回</span>
                 </div>
             </div>
         </fieldset>
@@ -378,10 +331,10 @@
                     <tr>
                         <th width="7%">选择</th>
                         <th width="8%">序号</th>
-                        <th width="10%">CIS编码</th>
-                        <th width="45%">商家名称</th>
-                        <th width="15%">商贸分公司</th>
-                        <th width="15%">办事处</th>
+                        <th width="10%">服务商编号</th>
+                        <th width="45%">服务商名称</th>
+                        <th width="15%">分公司</th>
+                        <th width="15%">服务商性质备注</th>
                     </tr>
                     <tbody id="tbMain">
                     </tbody>
