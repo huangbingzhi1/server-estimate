@@ -11,12 +11,12 @@
 </head>
 <SCRIPT language=JavaScript>
     $(function () {
-        loadServerList(1, 4);
+        loadServerList(1);
         $("#addNew").click(function () {
             window.location = "serverDetail.html?opera=add"
         })
         $("#searchBtn").click(function () {
-            loadServerList(1,$("#keyword").val());
+            loadServerList(1);
         })
 
         $("#importServerEnterprise").click(function () {
@@ -54,21 +54,21 @@
             });
         })
         $("#prePage").click(function () {
-            if($("#currentPage").html()>1){
-                loadServerList(parseInt($("#currentPage").html())-1, 4);
+            if(parseInt($("#currentPage").html())>1){
+                loadServerList(parseInt($("#currentPage").html())-1);
             }
         })
         $("#firstPage").click(function () {
-            if($("#currentPage").html()>1){
-                loadServerList(1, 4);
+            if(parseInt($("#currentPage").html())>1){
+                loadServerList(1);
             }
         })
         $("#lastPage").click(function () {
-            loadServerList($("#totalPage").html(), 4);
+            loadServerList($("#totalPage").html());
         })
         $("#nextPage").click(function () {
-            if($("#currentPage").html()<$("#totalPage").html()){
-                loadServerList(parseInt($("#currentPage").html())+1, 4);
+            if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
+                loadServerList(parseInt($("#currentPage").html())+1);
             }
         })
 
@@ -100,7 +100,7 @@
             async: true,
             success: function (data) {
                 if(data=="success"){
-                    loadServerList(1, 4);
+                    loadServerList(1);
                 }else{
                     alert("删除失败")
                 }
@@ -110,7 +110,8 @@
             }
         });
     }
-    loadServerList = function (page, keyword) {
+    loadServerList = function (page) {
+        var keyword=$("#keyword").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
         $.ajax({
             type: "get",

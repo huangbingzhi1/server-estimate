@@ -97,39 +97,12 @@ public class UserController extends BaseController {
         }
         return "";
     }
-
-    /*
-
-
-    */
-/**
-     * 批量新增用户
-     * @param jsonParam
-     * @param request
-     * @return
-     *//*
-
-    @RequestMapping(value = "batchAddUsers", method = RequestMethod.GET)
-    @ResponseBody
-    public String batchAddUsers(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        List<BaseUser> users = JSON.parseArray(jsonParam, BaseUser.class);
-        for (int i = 0; i <users.size(); i++) {
-            users.get(i).setPassword(Encryption.encrypByMD5(users.get(i).getUsername()));
-        }
-        int num=userMapper.batchAddUsers(users);
-        if(num==users.size()){
-            return SUCCESS;
-        }
-        return FAILED;
-    }
-
-    */
-/**
+    /**
      * 获取用户列表
      * @param jsonParam
      * @param request
      * @return
-     *//*
+     */
 
     @RequestMapping(value = "getUserList", method = RequestMethod.GET)
     @ResponseBody
@@ -152,8 +125,146 @@ public class UserController extends BaseController {
         }
         return "";
     }
+    @RequestMapping(value = "changePassword", method = RequestMethod.GET)
+    @ResponseBody
+    @Transactional
+    public String changePassword(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try {
+            JSONObject parseObject = JSON.parseObject(jsonParam);
+            String oldPassword = HiStringUtil.getJsonStringByKey(parseObject, "oldPassword");
+            String newPassword = HiStringUtil.getJsonStringByKey(parseObject, "newPassword");
+            String newPassword2 = HiStringUtil.getJsonStringByKey(parseObject, "newPassword2");
+            BaseUser loginUser = SessionUtil.getLoginUser();
+            if(null!=loginUser&&!StringUtils.isEmpty(oldPassword)&&
+                    !StringUtils.isEmpty(newPassword)&&!StringUtils.isEmpty(newPassword2)){
+                Map<String, String> param = new HashMap<>();
+                if(loginUser.getPassword().equals(Encryption.encrypByMD5(oldPassword))){
+                    userMapper.resetPassword(loginUser.getUserId(), Encryption.encrypByMD5(newPassword));
+                }else{
+                    return FAILED;
+                }
+            }else{
+                return FAILED;
+            }
+            return SUCCESS;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return FAILED;
+    }
+    /**
+     * 根据id删除用户
+     * @param jsonParam
+     * @param request
+     * @return
+     */
+
+    @RequestMapping(value = "deleteUserById", method = RequestMethod.GET)
+    @ResponseBody
+    public String deleteUserById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            userMapper.deleteByPrimaryKey(jsonParam);
+            return SUCCESS;
+        }catch (Exception e){
+
+        }
+        return FAILED;
+    }
+    /**
+     * 根据重置密码
+     * @param jsonParam
+     * @param request
+     * @return
+     */
+
+    @RequestMapping(value = "resetPassword", method = RequestMethod.GET)
+    @ResponseBody
+    public String resetPassword(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            BaseUser userById = userMapper.selectByPrimaryKey(jsonParam);
+            userById.setPassword(Encryption.encrypByMD5("1"));
+            userMapper.updateByPrimaryKey(userById);
+            return SUCCESS;
+        }catch (Exception e){
+
+        }
+        return FAILED;
+    }
+    @RequestMapping(value = "getUserById", method = RequestMethod.GET)
+    @ResponseBody
+    public String getUserById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            BaseUser user=userMapper.selectByPrimaryKey(jsonParam);
+            if(null!=user){
+                return JSON.toJSONString(user);
+            }
+
+        }catch (Exception e){
+
+        }
+        return "";
+    }
+    @RequestMapping(value = "getUserByUsername", method = RequestMethod.GET)
+    @ResponseBody
+    public String getUserByUsername(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try{
+            BaseUser user=userMapper.getUserByUsername(jsonParam);
+            if(null!=user){
+                return JSON.toJSONString(user);
+            }
+
+        }catch (Exception e){
+
+        }
+        return "";
+    }
+    /**
+     * 新增或者修改用户
+     * 根据id是否为空来判断新增或者修改
+     * @param jsonParam
+     * @param request
+     * @return
+     */
+
+    @RequestMapping(value = "saveUser", method = RequestMethod.GET)
+    @ResponseBody
+    @Transactional
+    public String saveUser(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        try {
+            JSONObject parseObject = JSON.parseObject(jsonParam);
+            String id = HiStringUtil.getJsonStringByKey(parseObject, "id");
+            String username = HiStringUtil.getJsonStringByKey(parseObject, "username");
+            String truename = HiStringUtil.getJsonStringByKey(parseObject, "truename");
+            String company = HiStringUtil.getJsonStringByKey(parseObject, "company");
+            String roleId = HiStringUtil.getJsonStringByKey(parseObject, "roleId");
+            BaseUser entity=new BaseUser(id,username,truename,null,company,roleId);
+            if(StringUtils.isEmpty(id)){
+                //新增
+                entity.setUserId(HiStringUtil.getRandomUUID());
+                entity.setPassword(Encryption.encrypByMD5("1"));
+                userMapper.insert(entity);
+            }else{
+                //修改
+                userMapper.updateByPrimaryKey(entity);
+            }
+            return SUCCESS;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return FAILED;
+    }
+
+    /*
+
 
     */
+
+/**
+     * 获取用户列表
+     * @param jsonParam
+     * @param request
+     * @return
+     */
 /**
      * 获取所有用户
      * @return
@@ -207,32 +318,7 @@ public class UserController extends BaseController {
         return FAILED;
     }
 
-    @RequestMapping(value = "changePassword", method = RequestMethod.GET)
-    @ResponseBody
-    @Transactional
-    public String changePassword(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try {
-            JSONObject parseObject = JSON.parseObject(jsonParam);
-            String oldPassword = HiStringUtil.getJsonStringByKey(parseObject, "oldPassword");
-            String newPassword = HiStringUtil.getJsonStringByKey(parseObject, "newPassword");
-            String newPassword2 = HiStringUtil.getJsonStringByKey(parseObject, "newPassword2");
-            BaseUser loginUser = SessionUtil.getLoginUser();
-            if(null!=loginUser&&!StringUtils.isEmpty(oldPassword)&&
-                    !StringUtils.isEmpty(newPassword)&&!StringUtils.isEmpty(newPassword2)){
-                Map<String, String> param = new HashMap<>();
-                param.put("username", loginUser.getUsername());
-                param.put("password", Encryption.encrypByMD5(oldPassword));
-                BaseUser user = userMapper.getUserByNamePassword(param);
-                if (null != user) {
-                    userMapper.resetPassword(loginUser.getId(), Encryption.encrypByMD5(newPassword));
-                }
-            }
-            return SUCCESS;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return FAILED;
-    }
+
 
 
     @RequestMapping(value = "getUserByUsername", method = RequestMethod.GET)
@@ -264,25 +350,6 @@ public class UserController extends BaseController {
         return "";
     }
 
-    */
-/**
-     * 根据id删除用户
-     * @param jsonParam
-     * @param request
-     * @return
-     *//*
-
-    @RequestMapping(value = "deleteUserById", method = RequestMethod.GET)
-    @ResponseBody
-    public String deleteUserById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try{
-            userMapper.deleteUserById(jsonParam);
-            return SUCCESS;
-        }catch (Exception e){
-
-        }
-        return FAILED;
-    }
     */
 /**
      * 根据重置密码
@@ -319,19 +386,6 @@ public class UserController extends BaseController {
         return null;
     }
 
-    @RequestMapping("mail")
-    public String mail(Model model) {
-        System.out.println("sdfsdfsdfsd");
-        MailBean mail;
-        mail = new MailBean();
-        mail.setContent("内容");
-        mail.setRecipient("huangbingzhi@hisense.com");
-        mail.setSubject("zhuti");
-//        mailUtil.sendSimpleMail(mail);
-//        mailUtil.sendHTMLMail(mail);
-//        mailUtil.sendAttachmentMail(mail);
-        return "/index";
-    }
 */
 
 

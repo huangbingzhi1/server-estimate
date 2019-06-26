@@ -13,8 +13,6 @@
             border-right-style: solid;
             border-right-color: #dddcdc;
         }
-
-
         -->
     </style>
     <script type="text/javascript" src="../js/jquery.js"></script>
@@ -29,7 +27,6 @@
     $(function () {
         list(1);
         list(8);
-        list(7);
         $("#logout").click(function () {
             $.ajax({
                 type: "get",
@@ -145,11 +142,11 @@
             <td width="91%"><a href="enterpriseList.html" target="mainFrame" class="left-font03"
                                onClick="tupian('3');">商家管理</a></td>
         </tr>
-        <tr>
+        <!--<tr>
             <td width="9%" height="20"><img id="xiaotu4" src="../images/ico06.gif" width="8" height="12"/></td>
             <td width="91%"><a href="roleList.html" target="mainFrame" class="left-font03"
                                onClick="tupian('4');">角色管理</a></td>
-        </tr>
+        </tr>-->
         <!--<tr>
             <td width="9%" height="20"><img id="xiaotu5" src="../images/ico06.gif" width="8" height="12"/></td>
             <td width="91%"><a href="menuAuthorityList.html" target="mainFrame" class="left-font03"
@@ -166,7 +163,7 @@
                         <td width="8%"><img name="img8" id="img8" src="../images/ico04.gif" width="8"
                                             height="11"/></td>
                         <td width="92%">
-                            <a href="javascript:" target="mainFrame" class="left-font03" onClick="list('8');">提报主题管理</a>
+                            <a href="javascript:" target="mainFrame" class="left-font03" onClick="list('8');">问卷管理</a>
                         </td>
                     </tr>
                 </table>
@@ -178,59 +175,15 @@
         <tr id="topicListTR">
             <td width="9%" height="21"><img id="xiaotu21" src="../images/ico06.gif" width="8" height="12"/></td>
             <td width="91%"><a href="topicList.html" target="mainFrame" class="left-font03"
-                               onClick="tupian('21');">提报主题列表</a></td>
+                               onClick="tupian('21');">问卷列表</a></td>
         </tr>
         <tr>
             <td width="9%" height="20"><img id="xiaotu20" src="../images/ico06.gif" width="8" height="12"/></td>
             <td width="91%"><a href="topicDetail.html" target="mainFrame" class="left-font03"
-                               onClick="tupian('20');">添加提报主题</a></td>
+                               onClick="tupian('20');">添加问卷</a></td>
         </tr>
     </table>
     <!--  主题管理结束    -->
-    <!--  任务管理开始    -->
-    <TABLE width="100%"  class="left-table03">
-        <tr>
-            <td height="29">
-                <table width="85%" border="0" align="center" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td width="8%"><img name="img7" id="img7" src="../images/ico04.gif" width="8"
-                                            height="11"/></td>
-                        <td width="92%">
-                            <a href="javascript:" target="mainFrame" class="left-font03" onClick="list('7');">任务管理</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </TABLE>
-    <table id="subtree7" style="DISPLAY: none" width="80%" border="0" align="center" cellpadding="0"
-           cellspacing="0" class="left-table02">
-        <tr>
-            <td width="9%" height="20"><img id="xiaotu18" src="../images/ico06.gif" width="8" height="12"/></td>
-            <td width="91%">
-                <a href="taskList.html?type=mypost" target="mainFrame" class="left-font03"
-                   onClick="tupian('18');">待我提报任务</a></td>
-        </tr>
-        <tr>
-            <td width="9%" height="20"><img id="xiaotu23" src="../images/ico06.gif" width="8" height="12"/></td>
-            <td width="91%">
-                <a href="11.html?type=myposted" target="mainFrame" class="left-font03"
-                   onClick="tupian('23');">我提报过的任务</a></td>
-        </tr>
-        <tr>
-            <td width="9%" height="20"><img id="xiaotu19" src="../images/ico06.gif" width="8" height="12"/></td>
-            <td width="91%">
-                <a href="taskList.html?type=mycheck" target="mainFrame" class="left-font03" onClick="tupian('19');">待我审批任务
-                </a></td>
-        </tr>
-        <tr>
-            <td width="9%" height="20"><img id="xiaotu22" src="../images/ico06.gif" width="8" height="12"/></td>
-            <td width="91%">
-                <a href="taskList.html?type=mychecked" target="mainFrame" class="left-font03"
-                   onClick="tupian('22');">我审批过的提报任务</a></td>
-        </tr>
-    </table>
-    <!--  任务管理结束    -->
 </div>
 </body>
 </html>

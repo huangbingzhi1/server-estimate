@@ -2,6 +2,7 @@ package com.hisense.serverestimate.mapper;
 
 import com.hisense.serverestimate.entity.BaseUser;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -19,4 +20,12 @@ public interface BaseUserMapper {
     int updateByPrimaryKey(BaseUser record);
 
     BaseUser getUserByNamePassword(Map<String, String> param);
+
+    List<BaseUser> getUserList(Map<String, Object> param);
+
+    int getUserListNum();
+
+    void resetPassword(@Param("userId")String userId, @Param("newPassword")String newPassword);
+
+    BaseUser getUserByUsername(String jsonParam);
 }

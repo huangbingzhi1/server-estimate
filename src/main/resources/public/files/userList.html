@@ -18,12 +18,12 @@
             window.location = "userDetail.html?opera=add"
         })
         $("#prePage").click(function () {
-            if($("#currentPage").html()>1){
+            if(parseInt($("#currentPage").html())>1){
                 loadServerList(parseInt($("#currentPage").html())-1, 4);
             }
         })
         $("#firstPage").click(function () {
-            if($("#currentPage").html()>1){
+            if(parseInt($("#currentPage").html())>1){
                 loadServerList(1, 4);
             }
         })
@@ -31,7 +31,7 @@
             loadServerList($("#totalPage").html(), 4);
         })
         $("#nextPage").click(function () {
-            if($("#currentPage").html()<$("#totalPage").html()){
+            if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
                 loadServerList(parseInt($("#currentPage").html())+1, 4);
             }
         })
@@ -126,10 +126,10 @@
             html += "<tr onmouseover='addclass(this)' onmouseout='removeclass(this)'>";
             html += "<td>" + (i + 1) + "</td>";
             html += "<td>" + user.username + "</td>";
-            html += "<td>" + user.trueName + "</td>";
-            html += "<td>" + user.email + "</td>";
-            html += "<td>" + user.companyName + "</td>";
-            html += "<td>" + '<a href="userDetail.html?type=edit&&id=' + user.id + '">修改</a><a  onclick="resetPassword('+"'"+user.id+"'"+')" href="#">重置密码</a><a onclick="deleteUserBtn('+"'"+user.id+"'"+')" href="#">删除</a>' + "</td>";
+            html += "<td>" + user.truename + "</td>";
+            html += "<td>" + user.company + "</td>";
+            html += "<td>" + user.roleId + "</td>";
+            html += "<td>" + '<a href="userDetail.html?type=edit&&id=' + user.userId + '">修改</a><a  onclick="resetPassword('+"'"+user.userId+"'"+')" href="#">重置密码</a><a onclick="deleteUserBtn('+"'"+user.userId+"'"+')" href="#">删除</a>' + "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);
@@ -146,11 +146,11 @@
         <table width="95%" align="center" >
             <tr >
                 <th width="5%">序号</th>
-                <th width="10%">用户名</th>
-                <th width="10%">真实姓名</th>
-                <th width="15%">邮箱</th>
-                <th width="15%">所属公司</th>
-                <th width="45%">操作</th>
+                <th width="20%">用户名</th>
+                <th width="20%">真实姓名</th>
+                <th width="20%">所属公司</th>
+                <th width="15%">角色</th>
+                <th width="20%">操作</th>
             </tr>
             <tbody id="tbMain">
             </tbody>

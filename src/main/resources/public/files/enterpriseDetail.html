@@ -18,12 +18,12 @@
             enterpriseId=request["id"];
             initEditForm();
             $("#prePage").click(function () {
-                if($("#currentPage").html()>1){
+                if(parseInt($("#currentPage").html())>1){
                     loadServerList(parseInt($("#currentPage").html())-1);
                 }
             })
             $("#firstPage").click(function () {
-                if($("#currentPage").html()>1){
+                if(parseInt($("#currentPage").html())>1){
                     loadServerList(1);
                 }
             })
@@ -100,7 +100,6 @@
             }
         }
     loadServerList=function(page){
-        var jsonParam="{page:"+page+"}";
         var keyword=$("#keywordText").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
         $.ajax({

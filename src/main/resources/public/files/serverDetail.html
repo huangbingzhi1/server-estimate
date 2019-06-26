@@ -21,29 +21,29 @@
             serverId=request["id"];
             initEditForm();
             $("#prePage").click(function () {
-                if($("#currentPage").html()>1){
-                    loadServerList(parseInt($("#currentPage").html())-1);
+                if(parseInt($("#currentPage").html())>1){
+                    loadEnterpriseList(parseInt($("#currentPage").html())-1);
                 }
             })
             $("#firstPage").click(function () {
-                if($("#currentPage").html()>1){
-                    loadServerList(1);
+                if(parseInt($("#currentPage").html())>1){
+                    loadEnterpriseList(1);
                 }
             })
             $("#lastPage").click(function () {
-                loadServerList($("#totalPage").html());
+                loadEnterpriseList($("#totalPage").html());
             })
             $("#nextPage").click(function () {
                 if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
                     var page=parseInt($("#currentPage").html())+1
-                    loadServerList(page);
+                    loadEnterpriseList(page);
                 }
             })
             $("#serverCode").blur(function () {
                checkServerCodeExist();
             })
             $("#checkNewBtn").click(function () {
-                loadServerList(1);
+                loadEnterpriseList(1);
                 dialogEnterpriseArray=JSON.parse(JSON.stringify(enterpriseArray));
                 $("#enterpriseDialog").dialog({
                     height:500,
@@ -69,7 +69,7 @@
                 vSelect.remove();
             })
             $("#searchBtn").click(function () {
-                loadServerList(1);
+                loadEnterpriseList(1);
             })
         })
         refreshEnterpriseList=function(){
@@ -101,8 +101,7 @@
                 }
             }
         }
-    loadServerList=function(page){
-        var jsonParam="{page:"+page+"}";
+    loadEnterpriseList=function(page){
         var keyword=$("#keywordText").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
         $.ajax({

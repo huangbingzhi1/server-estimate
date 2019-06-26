@@ -6,8 +6,7 @@
     <result column="username" property="username" jdbcType="VARCHAR" />
     <result column="truename" property="truename" jdbcType="VARCHAR" />
     <result column="password" property="password" jdbcType="VARCHAR" />
-    <result column="company_id" property="companyId" jdbcType="VARCHAR" />
-    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="company" property="company" jdbcType="VARCHAR" />
     <result column="role_name" property="roleName" jdbcType="VARCHAR" />
     <result column="role_id" property="roleId" jdbcType="VARCHAR" />
   </resultMap>
@@ -16,40 +15,64 @@
     where user_id = #{userId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.hisense.serverestimate.entity.BaseUser" >
-    insert into base_user (user_id, username, password, 
-      company_id, role_id)
-    values (#{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{companyId,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR})
+    insert into base_user (user_id, username, password,truename,
+      company, role_id)
+    values (#{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{truename,jdbcType=VARCHAR},
+      #{company,jdbcType=VARCHAR}, #{roleId,jdbcType=VARCHAR})
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseUser" >
     update base_user
     set username = #{username,jdbcType=VARCHAR},
+    <if test="password != null and password !=''" >
       password = #{password,jdbcType=VARCHAR},
-      company_id = #{companyId,jdbcType=VARCHAR},
+    </if>
+      truename=#{truename,jdbcType=VARCHAR},
+      company = #{company,jdbcType=VARCHAR},
       role_id = #{roleId,jdbcType=VARCHAR}
     where user_id = #{userId,jdbcType=VARCHAR}
   </update>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select user_id, username, password, company_id, role_id
+    select user_id, username,truename, password, company, role_id
     from base_user
     where user_id = #{userId,jdbcType=VARCHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap" >
-    select user_id, username, password, company_id, role_id
+    select user_id, username, password, company, role_id
     from base_user
   </select>
   <select id="getUserByNamePassword" resultMap="BaseResultMap" parameterType="map">
     SELECT
       u.*,
-      r.role_name,
-      c.company_name
+      r.role_name
     FROM
       base_user u
       LEFT JOIN base_role r
         ON u.role_id = r.role_id
-      LEFT JOIN base_company c
-        ON c.company_id = u.company_id
     WHERE u.username = #{username,jdbcType=VARCHAR}
       AND u.password = #{password,jdbcType=VARCHAR}
     </select>
+  <select id="getUserList" parameterType="map" resultMap="BaseResultMap" >
+        SELECT
+          t.*,r.role_name
+        FROM
+           base_user t
+        LEFT JOIN base_role r
+        ON t.role_id=r.role_id
+        ORDER BY t.username
+          LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+    </select>
+  <select id="getUserListNum" parameterType="map" resultType="Integer">
+       SELECT
+          count(1)
+        FROM
+          base_user t
+    </select>
+  <update id="resetPassword" parameterType="string">
+        update base_user set password=#{newPassword,jdbcType = VARCHAR} where user_id=#{userId,jdbcType = VARCHAR}
+    </update>
+  <select id="getUserByUsername" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select user_id, username,truename, password, company, role_id
+    from base_user
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
 </mapper>

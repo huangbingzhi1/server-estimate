@@ -34,9 +34,13 @@
             var roleIds="";
             for (var i = 0; i < roles.length; i++) {
               var entity = roles[i];
+              console.log(entity)
               if(entity.roleName.indexOf('admin')>=0){
                 $("#leftFrame").attr("src","files/left.html")
-                $("#mainFrame").attr("src","files/topicList.html")
+                // $("#mainFrame").attr("src","files/topicList.html")
+                break;
+              }else if(entity.roleName.indexOf('guest')>=0){
+                $("#leftFrame").attr("src","files/left-guest.html")
               }
             }
           }else{

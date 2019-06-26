@@ -11,23 +11,13 @@ public class BaseUser implements Serializable {
 
     private String password;
 
-    private String companyId;
+    private String company;
 
     private String roleId;
-
-    private String companyName;
 
     private String roleName;
 
     private static final long serialVersionUID = 1L;
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
 
     public String getRoleName() {
         return roleName;
@@ -61,12 +51,12 @@ public class BaseUser implements Serializable {
         this.password = password == null ? null : password.trim();
     }
 
-    public String getCompanyId() {
-        return companyId;
+    public String getCompany() {
+        return company;
     }
 
-    public void setCompanyId(String companyId) {
-        this.companyId = companyId == null ? null : companyId.trim();
+    public void setCompany(String company) {
+        this.company = company == null ? null : company.trim();
     }
 
     public String getRoleId() {
@@ -77,6 +67,13 @@ public class BaseUser implements Serializable {
         this.roleId = roleId == null ? null : roleId.trim();
     }
 
+    public String getTruename() {
+        return truename;
+    }
+
+    public void setTruename(String truename) {
+        this.truename = truename;
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -86,18 +83,22 @@ public class BaseUser implements Serializable {
         sb.append(", userId=").append(userId);
         sb.append(", username=").append(username);
         sb.append(", password=").append(password);
-        sb.append(", companyId=").append(companyId);
+        sb.append(", company=").append(company);
         sb.append(", roleId=").append(roleId);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
     }
 
-    public String getTruename() {
-        return truename;
+    public BaseUser() {
     }
 
-    public void setTruename(String truename) {
+    public BaseUser(String userId, String username, String truename, String password, String company, String roleId) {
+        this.userId = userId;
+        this.username = username;
         this.truename = truename;
+        this.password = password;
+        this.company = company;
+        this.roleId = roleId;
     }
 }

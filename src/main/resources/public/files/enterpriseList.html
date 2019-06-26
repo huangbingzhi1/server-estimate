@@ -11,7 +11,7 @@
 </head>
 <SCRIPT language=JavaScript>
     $(function () {
-        loadEnterpriseList(1, 4);
+        loadEnterpriseList(1);
         $("#searchBtn").click(function () {
             console.log($("#keyword").val())
             loadEnterpriseList(1,$("#keyword").val());
@@ -21,21 +21,21 @@
         })
 
         $("#prePage").click(function () {
-            if($("#currentPage").html()>1){
-                loadEnterpriseList(parseInt($("#currentPage").html())-1, 4);
+            if(parseInt($("#currentPage").html())>1){
+                loadEnterpriseList(parseInt($("#currentPage").html())-1);
             }
         })
         $("#firstPage").click(function () {
-            if($("#currentPage").html()>1){
-                loadEnterpriseList(1, 4);
+            if(parseInt($("#currentPage").html())>1){
+                loadEnterpriseList(1);
             }
         })
         $("#lastPage").click(function () {
             loadEnterpriseList($("#totalPage").html(), 4);
         })
         $("#nextPage").click(function () {
-            if($("#currentPage").html()<$("#totalPage").html()){
-                loadEnterpriseList(parseInt($("#currentPage").html())+1, 4);
+            if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
+                loadEnterpriseList(parseInt($("#currentPage").html())+1);
             }
         })
 
@@ -67,7 +67,7 @@
             async: true,
             success: function (data) {
                 if(data=="success"){
-                    loadEnterpriseList(1, 4);
+                    loadEnterpriseList(1);
                 }else{
                     alert("删除失败")
                 }
@@ -77,7 +77,8 @@
             }
         });
     }
-    loadEnterpriseList = function (page, keyword) {
+    loadEnterpriseList = function (page) {
+        var keyword=$("#keyword").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
         $.ajax({
             type: "get",

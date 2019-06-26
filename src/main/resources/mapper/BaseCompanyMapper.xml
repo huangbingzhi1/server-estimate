@@ -8,24 +8,24 @@
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from base_company
-    where company_id = #{companyId,jdbcType=VARCHAR}
+    where company_id = #{company,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.hisense.serverestimate.entity.BaseCompany" >
     insert into base_company (company_id, company_code, company_name
       )
-    values (#{companyId,jdbcType=VARCHAR}, #{companyCode,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}
+    values (#{company,jdbcType=VARCHAR}, #{companyCode,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseCompany" >
     update base_company
     set company_code = #{companyCode,jdbcType=VARCHAR},
       company_name = #{companyName,jdbcType=VARCHAR}
-    where company_id = #{companyId,jdbcType=VARCHAR}
+    where company_id = #{company,jdbcType=VARCHAR}
   </update>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select company_id, company_code, company_name
     from base_company
-    where company_id = #{companyId,jdbcType=VARCHAR}
+    where company_id = #{company,jdbcType=VARCHAR}
   </select>
   <select id="selectAll" resultMap="BaseResultMap" >
     select company_id, company_code, company_name
