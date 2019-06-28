@@ -44,6 +44,8 @@ public class EnterpriseController extends BaseController{
             keyword="%"+keyword+"%";
             param.put("keyword",keyword);
         }
+        param.put("startIndex",(page-1)*numberPerPage);
+        param.put("pCount",numberPerPage);
         List<BaseEnterprise> serverList= enterpriseMapper.getEnterpriseList(param);
         if(!CollectionUtils.isEmpty(serverList)) {
             double listNum = enterpriseMapper.getEnterpriseListNum(param);

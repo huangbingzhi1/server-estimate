@@ -24,5 +24,9 @@ public interface ExamDetailMapper {
 
     void updateMeanScoreByQidCis(Map<String, String> param);
 
-    List<Map<String, Object>> getAllExamResult(Map<String, String> param);
+    List<Map<String, Object>> getAllExamResult(Map<String, Object> param);
+
+    List<Map<String, Object>> getEnterpriseExamResult(Map<String, Object> param);
+
+    int getEnterpriseExamResultNum(Map<String, Object> param);
 }

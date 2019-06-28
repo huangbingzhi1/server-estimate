@@ -58,7 +58,9 @@
       or exam_name like  #{keyword,jdbcType=VARCHAR})
     </if>
     order by e.begindate desc
+    <if test="startIndex != null and startIndex !=''" >
     LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+    </if>
   </select>
   <select id="getExamListNum" parameterType="map" resultType="Integer">
     select count(1)

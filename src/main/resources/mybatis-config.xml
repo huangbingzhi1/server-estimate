@@ -16,6 +16,7 @@
         <mapper resource="mapper/BaseServerMapper.xml"/>
         <mapper resource="mapper/BaseUserMapper.xml"/>
         <mapper resource="mapper/ExamMainMapper.xml"/>
+        <mapper resource="mapper/ExamTitleMapper.xml"/>
         <mapper resource="mapper/ExamDetailMapper.xml"/>
         <mapper resource="mapper/ServerEnterpriseRelMapper.xml"/>
     </mappers>

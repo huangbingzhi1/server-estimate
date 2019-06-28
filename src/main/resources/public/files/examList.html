@@ -194,7 +194,7 @@
             // html += "<td>" + entity.textTypeIndexs+ "</td>";
             html += "<td>" + new Date(entity.begindate).Format("yyyy-MM-dd")+ "</td>";
             html += "<td>" + entity.status+ "</td>";
-            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看数据</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.mainId+"'"+')" href="#">删除</a>' + "</td>";
+            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看结果</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.mainId+"'"+')" href="#">删除</a>' + "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);

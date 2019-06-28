@@ -2,12 +2,10 @@ package com.hisense.serverestimate.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.hisense.serverestimate.entity.BaseUser;
-import com.hisense.serverestimate.entity.ExamDetail;
-import com.hisense.serverestimate.entity.ExamMain;
-import com.hisense.serverestimate.entity.WjxExam;
+import com.hisense.serverestimate.entity.*;
 import com.hisense.serverestimate.mapper.ExamDetailMapper;
 import com.hisense.serverestimate.mapper.ExamMainMapper;
+import com.hisense.serverestimate.mapper.ExamTitleMapper;
 import com.hisense.serverestimate.service.ExamService;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,8 +31,10 @@ import java.util.*;
 @RestController
 @RequestMapping("examController")
 public class ExamController extends BaseController {
-    @Value("${wjx.examList}")
-    public String wjxExamList;
+    @Value("${wjx.examListUrl}")
+    public String wjxExamListUrl;
+    @Value("${wjx.examTitleListUrl}")
+    public String wjxExamTitleListUrl;
     @Value("${scoreTypeIndexs}")
     public String scoreTypeIndexs;
     @Value("${textTypeIndexs}")
@@ -43,6 +43,8 @@ public class ExamController extends BaseController {
     public String wjxDomain;
     @Autowired
     private ExamMainMapper examMainMapper;
+    @Autowired
+    private ExamTitleMapper examTitleMapper;
     @Autowired
     private ExamDetailMapper examDetailMapper;
     @Autowired
@@ -110,9 +112,8 @@ public class ExamController extends BaseController {
     @ResponseBody
     @Transactional
     public String synchronizeExam() {
-        String url = wjxExamList;
-        String result = restTemplate.getForObject(url, String.class);
-        List<WjxExam> exams = JSON.parseArray(result, WjxExam.class);
+        String wjxExamList = restTemplate.getForObject(wjxExamListUrl, String.class);
+        List<WjxExam> exams = JSON.parseArray(wjxExamList, WjxExam.class);
         List<ExamMain> examMains = examMainMapper.selectAll();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (WjxExam entity : exams) {
@@ -147,6 +148,23 @@ public class ExamController extends BaseController {
                 main.setAnswercount(Integer.parseInt(entity.getAnswercount()));
                 examMainMapper.insert(main);
                 examDetailMapper.addExamDetail(entity.getQid());
+                String wjxExamTitleList = restTemplate.getForObject(wjxExamTitleListUrl.concat(entity.getQid()), String.class);
+                String[] titleLine = wjxExamTitleList.split("<br/>");
+                examTitleMapper.deleteByQid(entity.getQid());
+                for (int i = 0; i < titleLine.length; i++) {
+                    if(!StringUtils.isEmpty(titleLine[i])&&titleLine[i].contains(":")){
+                        String[] lineEntity = titleLine[i].split(":");
+                        if(2==lineEntity.length){
+                            ExamTitle examTitle=new ExamTitle();
+                            examTitle.setTitleId(HiStringUtil.getRandomUUID());
+                            examTitle.setQid(entity.getQid());
+                            examTitle.setTitleNo(lineEntity[0]);
+                            examTitle.setTitleName(lineEntity[1]);
+                            examTitleMapper.insert(examTitle);
+                        }
+                    }
+                }
+                System.out.println(wjxExamTitleList);
             }
         }
         return SUCCESS;
@@ -282,14 +300,48 @@ public class ExamController extends BaseController {
      */
     @RequestMapping(value = "downloadExamResultData", method = RequestMethod.GET)
     @ResponseBody
-    public void downloadExamResultData(@RequestParam("qid") String qid, HttpServletRequest request) {
+    public void downloadExamResultData(@RequestParam("qid") String qid, HttpServletRequest request, HttpServletResponse response) {
         BaseUser loginUser = SessionUtil.getLoginUser();
-        Map<String,String> param=new HashMap<>(2);
+        Map<String,Object> param=new HashMap<>(2);
         param.put("qid",qid);
         if(loginUser.getRoleId().equals("guest")){
-            param.put("company",loginUser.getCompany());
+            param.put("companpy",loginUser.getCompany());
         }
         List<Map<String,Object>> examResult= examDetailMapper.getAllExamResult(param);
+        ExamMain main=examMainMapper.selectByQid(qid);
+        List<ExamTitle> examTitle = examTitleMapper.selectByQid(qid);
+        examService.downloadExamResultData(response,main,examResult,examTitle);
+    }
+
+    @RequestMapping(value = "getExamResultList", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExamResultList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request, HttpServletResponse response) {
+        BaseUser loginUser = SessionUtil.getLoginUser();
+        Map<String,Object> param=new HashMap<>(5);
+        JSONObject parseObject = JSON.parseObject(jsonParam);
+        String qid = HiStringUtil.getJsonStringByKey(parseObject, "qid");
+        param.put("qid",qid);
+        if(loginUser.getRoleId().equals("guest")){
+            param.put("companpy",loginUser.getCompany());
+        }
+        String keyword=HiStringUtil.getJsonStringByKey(parseObject, "keyword");
+        if(!StringUtils.isEmpty(keyword)){
+            keyword="%"+keyword+"%";
+            param.put("keyword",keyword);
+        }
+        int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
+        param.put("startIndex",(page-1)*numberPerPage);
+        param.put("pCount",numberPerPage);
+        List<Map<String,Object>> examResult= examDetailMapper.getEnterpriseExamResult(param);
+        if(!CollectionUtils.isEmpty(examResult)) {
+            double listNum = examDetailMapper.getEnterpriseExamResultNum(param);
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalPage", Math.ceil(listNum / numberPerPage));
+            result.put("list", examResult);
+            result.put("currentPage", page);
+            return JSON.toJSONString(result);
+        }
+        return "";
     }
 
 

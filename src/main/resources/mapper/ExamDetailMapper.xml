@@ -107,6 +107,7 @@
       e.company_name,
       e.enterprise_name,
       e.office,
+      d.main_qid,
       d.enterprise_cis,
       d.server_code,
       d.score_array,
@@ -123,6 +124,47 @@
      <if test="company != null and company !=''" >
       AND e.company_name =  #{company,jdbcType=VARCHAR}
      </if>
-    ORDER BY d.enterprise_cis,d.server_code
+    ORDER BY d.enterprise_cis,d.mean_score desc
+  </select>
+  <select id="getEnterpriseExamResult" parameterType="map" resultType="map">
+    SELECT DISTINCT
+    d.enterprise_cis,
+    e.company_name,
+    e.office,
+    e.enterprise_name,
+    d.mean_score
+    FROM
+    exam_detail d
+    JOIN base_enterprise e
+    ON d.enterprise_cis = e.cis
+    WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
+    <if test="keyword != null and keyword !=''" >
+      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.cis LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.office LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.company_name LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
+    <if test="company != null and company !=''" >
+      AND e.company_name =  #{company,jdbcType=VARCHAR}
+    </if>
+    ORDER BY d.mean_score desc,d.enterprise_cis
+      LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+  </select>
+  <select id="getEnterpriseExamResultNum"  parameterType="map" resultType="Integer">
+    SELECT COUNT(DISTINCT d.enterprise_cis)
+    FROM
+    exam_detail d
+    JOIN base_enterprise e
+    ON d.enterprise_cis = e.cis
+    WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
+    <if test="keyword != null and keyword !=''" >
+      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.cis LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.office LIKE #{keyword,jdbcType=VARCHAR}
+      OR e.company_name LIKE #{keyword,jdbcType=VARCHAR})
+    </if>
+    <if test="company != null and company !=''" >
+      AND e.company_name =  #{company,jdbcType=VARCHAR}
+    </if>
   </select>
 </mapper>
