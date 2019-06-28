@@ -15,8 +15,8 @@
         <mapper resource="mapper/BaseRoleMapper.xml"/>
         <mapper resource="mapper/BaseServerMapper.xml"/>
         <mapper resource="mapper/BaseUserMapper.xml"/>
-        <mapper resource="mapper/EstimateMainMapper.xml"/>
-        <mapper resource="mapper/EstimateResultMapper.xml"/>
+        <mapper resource="mapper/ExamMainMapper.xml"/>
+        <mapper resource="mapper/ExamDetailMapper.xml"/>
         <mapper resource="mapper/ServerEnterpriseRelMapper.xml"/>
     </mappers>
 </configuration>

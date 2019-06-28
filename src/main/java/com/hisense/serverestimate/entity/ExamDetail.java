@@ -4,22 +4,24 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class EstimateResult implements Serializable {
-    private String resultId;
+public class ExamDetail implements Serializable {
+    private String detailId;
 
-    private String mainId;
+    private String mainQid;
 
     private String enterpriseCis;
 
     private String serverCode;
 
-    private Date createDate;
+    private Date submittime;
+
+    private Integer timetaken;
 
     private String scoreArray;
 
     private String textArray;
 
-    private BigDecimal totleScore;
+    private Integer totleScore;
 
     private BigDecimal meanScore;
 
@@ -27,20 +29,20 @@ public class EstimateResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public String getResultId() {
-        return resultId;
+    public String getDetailId() {
+        return detailId;
     }
 
-    public void setResultId(String resultId) {
-        this.resultId = resultId == null ? null : resultId.trim();
+    public void setDetailId(String detailId) {
+        this.detailId = detailId == null ? null : detailId.trim();
     }
 
-    public String getMainId() {
-        return mainId;
+    public String getMainQid() {
+        return mainQid;
     }
 
-    public void setMainId(String mainId) {
-        this.mainId = mainId == null ? null : mainId.trim();
+    public void setMainQid(String mainQid) {
+        this.mainQid = mainQid == null ? null : mainQid.trim();
     }
 
     public String getEnterpriseCis() {
@@ -59,12 +61,20 @@ public class EstimateResult implements Serializable {
         this.serverCode = serverCode == null ? null : serverCode.trim();
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getSubmittime() {
+        return submittime;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setSubmittime(Date submittime) {
+        this.submittime = submittime;
+    }
+
+    public Integer getTimetaken() {
+        return timetaken;
+    }
+
+    public void setTimetaken(Integer timetaken) {
+        this.timetaken = timetaken;
     }
 
     public String getScoreArray() {
@@ -83,11 +93,11 @@ public class EstimateResult implements Serializable {
         this.textArray = textArray == null ? null : textArray.trim();
     }
 
-    public BigDecimal getTotleScore() {
+    public Integer getTotleScore() {
         return totleScore;
     }
 
-    public void setTotleScore(BigDecimal totleScore) {
+    public void setTotleScore(Integer totleScore) {
         this.totleScore = totleScore;
     }
 
@@ -113,11 +123,12 @@ public class EstimateResult implements Serializable {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", resultId=").append(resultId);
-        sb.append(", mainId=").append(mainId);
+        sb.append(", detailId=").append(detailId);
+        sb.append(", mainQid=").append(mainQid);
         sb.append(", enterpriseCis=").append(enterpriseCis);
         sb.append(", serverCode=").append(serverCode);
-        sb.append(", createDate=").append(createDate);
+        sb.append(", submittime=").append(submittime);
+        sb.append(", timetaken=").append(timetaken);
         sb.append(", scoreArray=").append(scoreArray);
         sb.append(", textArray=").append(textArray);
         sb.append(", totleScore=").append(totleScore);

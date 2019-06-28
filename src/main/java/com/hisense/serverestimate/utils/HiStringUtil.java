@@ -47,7 +47,7 @@ public class HiStringUtil {
         if(parseObject.containsKey(key)){
             return parseObject.getInteger(key);
         }
-        return 0;
+        return Integer.MIN_VALUE;
     }
     public static String uuid(){
         return UUID.randomUUID().toString().replaceAll("-", "");

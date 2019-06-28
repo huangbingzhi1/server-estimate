@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.ExamDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.ExamDetail" >
+    <id column="detail_id" property="detailId" jdbcType="VARCHAR" />
+    <result column="main_qid" property="mainQid" jdbcType="VARCHAR" />
+    <result column="enterprise_cis" property="enterpriseCis" jdbcType="VARCHAR" />
+    <result column="server_code" property="serverCode" jdbcType="VARCHAR" />
+    <result column="submittime" property="submittime" jdbcType="TIMESTAMP" />
+    <result column="timetaken" property="timetaken" jdbcType="DECIMAL" />
+    <result column="score_array" property="scoreArray" jdbcType="VARCHAR" />
+    <result column="text_array" property="textArray" jdbcType="VARCHAR" />
+    <result column="totle_score" property="totleScore" jdbcType="DECIMAL" />
+    <result column="mean_score" property="meanScore" jdbcType="DECIMAL" />
+    <result column="source_data" property="sourceData" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from exam_detail
+    where detail_id = #{detailId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.ExamDetail" >
+    insert into exam_detail (detail_id, main_qid, enterprise_cis,
+      server_code, submittime, timetaken, 
+      score_array, text_array, totle_score, 
+      mean_score, source_data)
+    values (#{detailId,jdbcType=VARCHAR}, #{mainQid,jdbcType=VARCHAR}, #{enterpriseCis,jdbcType=VARCHAR},
+      #{serverCode,jdbcType=VARCHAR}, #{submittime,jdbcType=TIMESTAMP}, #{timetaken,jdbcType=DECIMAL}, 
+      #{scoreArray,jdbcType=VARCHAR}, #{textArray,jdbcType=VARCHAR}, #{totleScore,jdbcType=DECIMAL}, 
+      #{meanScore,jdbcType=DECIMAL}, #{sourceData,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.ExamDetail" >
+    update exam_detail
+    set main_qid = #{mainQid,jdbcType=VARCHAR},
+      enterprise_cis = #{enterpriseCis,jdbcType=VARCHAR},
+      server_code = #{serverCode,jdbcType=VARCHAR},
+      submittime = #{submittime,jdbcType=TIMESTAMP},
+      timetaken = #{timetaken,jdbcType=DECIMAL},
+      score_array = #{scoreArray,jdbcType=VARCHAR},
+      text_array = #{textArray,jdbcType=VARCHAR},
+      totle_score = #{totleScore,jdbcType=DECIMAL},
+      mean_score = #{meanScore,jdbcType=DECIMAL},
+      source_data = #{sourceData,jdbcType=LONGVARCHAR}
+    where detail_id = #{detailId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select detail_id, main_qid, enterprise_cis, server_code, submittime, timetaken, score_array,
+    text_array, totle_score, mean_score, source_data
+    from exam_detail
+    where detail_id = #{detailId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select detail_id, main_qid, enterprise_cis, server_code, submittime, timetaken, score_array,
+    text_array, totle_score, mean_score, source_data
+    from exam_detail
+  </select>
+  <insert id="addExamDetail" parameterType="java.lang.String" >
+    INSERT INTO exam_detail (
+      detail_id,
+      main_qid,
+      enterprise_cis,
+      server_code
+    )
+    SELECT
+      UUID(),
+      #{mainQid,jdbcType=VARCHAR},
+      enterprise_cis,
+      server_code
+    FROM
+      server_enterprise_rel
+  </insert>
+  <select id="selectByQidCisServerCode" resultMap="BaseResultMap" parameterType="map" >
+   select detail_id, main_qid, enterprise_cis, server_code, submittime, timetaken, score_array,
+    text_array, totle_score, mean_score, source_data
+    from exam_detail
+    where main_qid = #{qid,jdbcType=VARCHAR}
+    and enterprise_cis=#{cis,jdbcType=VARCHAR}
+    and server_code=#{serverCode,jdbcType=VARCHAR}
+  </select>
+  <update id="updateMeanScoreByQidCis" parameterType="map" >
+    UPDATE
+      exam_detail
+    SET
+      mean_score =
+      (SELECT
+        a.meanScore
+      FROM
+        (SELECT
+          AVG(totle_score) meanScore
+        FROM
+          exam_detail
+        WHERE enterprise_cis =#{cis,jdbcType=VARCHAR}
+          AND main_qid =#{qid,jdbcType=VARCHAR}
+          AND totle_score IS NOT NULL) a)
+    WHERE enterprise_cis = #{cis,jdbcType=VARCHAR}
+      AND main_qid = #{qid,jdbcType=VARCHAR}
+      AND totle_score IS NOT NULL
+  </update>
+  <select id="getAllExamResult" parameterType="map" resultType="map">
+    SELECT 
+      s.city,
+      s.province,
+      s.district,
+      s.company_name AS server_company_name,
+      s.server_name,
+      s.server_type,
+      s.manager,
+      e.company_name,
+      e.enterprise_name,
+      e.office,
+      d.enterprise_cis,
+      d.server_code,
+      d.score_array,
+      d.text_array,
+      d.totle_score,
+      d.mean_score 
+    FROM
+      exam_detail d 
+      JOIN base_enterprise e 
+        ON d.enterprise_cis = e.cis 
+      LEFT JOIN base_server s 
+        ON s.server_code = d.server_code 
+    WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
+     <if test="company != null and company !=''" >
+      AND e.company_name =  #{company,jdbcType=VARCHAR}
+     </if>
+    ORDER BY d.enterprise_cis,d.server_code
+  </select>
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.ExamMainMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.ExamMain" >
+    <id column="main_id" property="mainId" jdbcType="VARCHAR" />
+    <result column="exam_qid" property="examQid" jdbcType="VARCHAR" />
+    <result column="exam_name" property="examName" jdbcType="VARCHAR" />
+    <result column="exam_domain" property="examDomain" jdbcType="VARCHAR" />
+    <result column="begindate" property="begindate" jdbcType="TIMESTAMP" />
+    <result column="answercount" property="answercount" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="score_type_indexs" property="scoreTypeIndexs" jdbcType="VARCHAR" />
+    <result column="text_type_indexs" property="textTypeIndexs" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from exam_main
+    where main_id = #{mainId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.ExamMain" >
+    insert into exam_main (main_id, exam_qid, exam_name, 
+      exam_domain, begindate, answercount, 
+      `status`, score_type_indexs, text_type_indexs
+      )
+    values (#{mainId,jdbcType=VARCHAR}, #{examQid,jdbcType=VARCHAR}, #{examName,jdbcType=VARCHAR}, 
+      #{examDomain,jdbcType=VARCHAR}, #{begindate,jdbcType=TIMESTAMP}, #{answercount,jdbcType=DECIMAL}, 
+      #{status,jdbcType=VARCHAR}, #{scoreTypeIndexs,jdbcType=VARCHAR}, #{textTypeIndexs,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.ExamMain" >
+    update exam_main
+    set exam_qid = #{examQid,jdbcType=VARCHAR},
+      exam_name = #{examName,jdbcType=VARCHAR},
+      exam_domain = #{examDomain,jdbcType=VARCHAR},
+      begindate = #{begindate,jdbcType=TIMESTAMP},
+      answercount = #{answercount,jdbcType=DECIMAL},
+      `status` = #{status,jdbcType=VARCHAR},
+      score_type_indexs = #{scoreTypeIndexs,jdbcType=VARCHAR},
+      text_type_indexs = #{textTypeIndexs,jdbcType=VARCHAR}
+    where main_id = #{mainId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select main_id, exam_qid, exam_name, exam_domain, begindate, answercount, `status`, 
+    score_type_indexs, text_type_indexs
+    from exam_main
+    where main_id = #{mainId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select main_id, exam_qid, exam_name, exam_domain, begindate, answercount, `status`, 
+    score_type_indexs, text_type_indexs
+    from exam_main
+  </select>
+  <select id="getExamList" parameterType="map" resultMap="BaseResultMap" >
+    select e.*
+     from exam_main e
+    where status in ('开启','关闭')
+    <if test="keyword != null and keyword !=''" >
+     and (exam_qid like  #{keyword,jdbcType=VARCHAR}
+      or exam_name like  #{keyword,jdbcType=VARCHAR})
+    </if>
+    order by e.begindate desc
+    LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+  </select>
+  <select id="getExamListNum" parameterType="map" resultType="Integer">
+    select count(1)
+     from exam_main e
+    where status in ('开启','关闭')
+    <if test="keyword != null and keyword !=''" >
+      and (exam_qid like #{keyword,jdbcType=VARCHAR}
+      or exam_name like #{keyword,jdbcType=VARCHAR})
+    </if>
+  </select>
+  <select id="getExamInfoByCis" parameterType="map" resultType="map">
+    SELECT
+      CONCAT(
+        CONCAT(
+          CONCAT(m.exam_domain, d.`main_qid`),
+          '.aspx?sojumpparm='
+        ),
+        CONCAT(
+          CONCAT(d.`enterprise_cis`, ','),
+          d.`server_code`
+        )
+      ) AS url,
+      s.`server_name`,
+      s.`server_code`,
+      m.`exam_name`,
+      m.`exam_qid`,
+      ifnull(d.submittime,'') as submittime
+    FROM
+      exam_detail d
+      LEFT JOIN exam_main m
+        ON m.exam_qid = d.main_qid
+      LEFT JOIN base_server s
+        ON s.`server_code` = d.`server_code`
+    WHERE d.`enterprise_cis` = #{cis,jdbcType=VARCHAR}
+      AND m.`status` = '开启'
+      <if test="hasDealed != null and hasDealed =='false'" >
+        AND d.`submittime` IS  NULL
+      </if>
+      <if test="startDate != null" >
+        AND DATE_FORMAT( m.`begindate`  , '%Y-%m-%d') >=#{startDate,jdbcType=DATE}
+      </if>
+     <if test="endDate != null" >
+       AND  #{endDate,jdbcType=DATE}>=DATE_FORMAT( m.`begindate` , '%Y-%m-%d')
+     </if>
+  </select>
+  <select id="selectByQid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select main_id, exam_qid, exam_name, exam_domain, begindate, answercount, `status`,
+    score_type_indexs, text_type_indexs
+    from exam_main
+    where exam_qid = #{qid,jdbcType=VARCHAR}
+  </select>
+  <update id="setExpireByPrimaryKey" parameterType="java.lang.String" >
+     UPDATE exam_main SET STATUS='失效' WHERE main_id= #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

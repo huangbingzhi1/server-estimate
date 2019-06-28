@@ -36,6 +36,7 @@ public class EnterpriseController extends BaseController{
         JSONObject parseObject = JSON.parseObject(jsonParam);
         int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
         Map<String,Object> param=new HashMap<>();
+//        numberPerPage=100;
         param.put("startIndex",(page-1)*numberPerPage);
         param.put("pCount",numberPerPage);
         String keyword=HiStringUtil.getJsonStringByKey(parseObject,"keyword");

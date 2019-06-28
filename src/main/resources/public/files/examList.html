@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>问卷列表</title>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/hi-main.css"/>
+    <style type="text/css">
+        .label-right{
+            width: 90px;
+            display: block;
+            align-content: right;
+            align-items: right;
+            text-align: right;
+            float: left;
+        }
+    </style>
+</head>
+<SCRIPT language=JavaScript>
+    var globalExamList;
+    $(function () {
+        loadExamList(1);
+        $("#addNew").click(function () {
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/examController/synchronizeExam",
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if("success"==data){
+                        loadExamList(1);
+                    }
+                },
+                error: function (result) {
+                    alert("同步失败")
+                }
+            });
+        })
+        $("#searchBtn").click(function () {
+            loadExamList(1);
+        })
+
+
+        $("#prePage").click(function () {
+            if(parseInt($("#currentPage").html())>1){
+                loadExamList(parseInt($("#currentPage").html())-1);
+            }
+        })
+        $("#firstPage").click(function () {
+            if(parseInt($("#currentPage").html())>1){
+                loadExamList(1);
+            }
+        })
+        $("#lastPage").click(function () {
+            loadExamList($("#totalPage").html());
+        })
+        $("#nextPage").click(function () {
+            if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
+                loadExamList(parseInt($("#currentPage").html())+1);
+            }
+        })
+
+    })
+
+
+    deleteExamBtn=function(id){
+        $("#confirmDialog").dialog({
+            height:200,
+            width:400,
+            resizable: false,
+            buttons: {
+                "确定": function() {
+                    deleteExamById(id);
+                    $( this ).dialog( "close" );
+                },
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
+    }
+    viewExamResult=function(id){
+        window.location = "examResult.html?id="+id;
+    }
+    editExamBtn=function(id){
+        for(var i=0;i<globalExamList.length;i++){
+            if(globalExamList[i].mainId==id){
+                $("#formExamId").val(globalExamList[i].mainId);
+                $("#formExamQid").val(globalExamList[i].examQid);
+                $("#formExamName").val(globalExamList[i].examName);
+                $("#formStatus").val(globalExamList[i].status);
+                $("#formScoreTypeIndexs").val(globalExamList[i].scoreTypeIndexs);
+                $("#formTextTypeIndexs").val(globalExamList[i].textTypeIndexs);
+                $("#formExamDomain").val(globalExamList[i].examDomain);
+                $("#examMainDialog").dialog({
+                    height:300,
+                    width:400,
+                    resizable: false,
+                    buttons: {
+                        "确定": function() {
+                            saveExam();
+                            $( this ).dialog( "close" );
+                        },
+                        "取消": function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+            }
+        }
+    }
+    saveExam=function(){
+        var json="{mainId:'"+$("#formExamId").val()+"',examName:'"+ $("#formExamName").val()
+            +"',status:'"+$("#formStatus").val()+"',scoreTypeIndexs:'"+$("#formScoreTypeIndexs").val()
+            +"',textTypeIndexs:'"+$("#formTextTypeIndexs").val()+"',examDomain:'"+$("#formExamDomain").val()+"'}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/examController/saveExam",
+            data:{jsonParam: json},
+            async: true,
+            success: function (data) {
+                if(data=='success'){
+                    window.location = 'examList.html'
+                }else{
+                    showInfoDialog($("#failedDialog"));
+                }
+            },
+            error: function (result) {
+                showInfoDialog($("#failedDialog"));
+            }
+        });
+    }
+    deleteExamById=function(id){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/examController/deleteExamById",
+            data: {jsonParam: id},
+            async: true,
+            success: function (data) {
+                if(data=="success"){
+                    loadExamList(1);
+                }else{
+                    alert("删除失败")
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    loadExamList = function (page) {
+        var keyword=$("#keyword").val();
+        var jsonParam = "{page:" + page + ",keyword:'" + keyword + "'}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/examController/getExamList",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (data) {
+                if(data){
+                    var sourceData = eval('(' + data + ')');
+                    $("#totalPage").html(sourceData.totalPage)
+                    $("#currentPage").html(sourceData.currentPage)
+                    if (sourceData.list && sourceData.list.length > 0) {
+                        globalExamList=sourceData.list
+                        addRows(sourceData.list);
+                    }
+                }else {
+                    $("#totalPage").html(0);
+                    $("#tbMain").html("");
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    addRows = function (entityList) {
+        var html = "";
+        for (var i = 0; i < entityList.length; i++) {
+            var entity = entityList[i];
+            html += "<tr onmouseover='addclass(this)' onmouseout='removeclass(this)'>";
+            html += "<td>" + (i + 1) + "</td>";
+            html += "<td>" + entity.examQid+ "</td>";
+            html += "<td>" + entity.examName+ "</td>";
+            html += "<td>" + entity.answercount+ "</td>";
+            // html += "<td>" + entity.scoreTypeIndexs+ "</td>";
+            // html += "<td>" + entity.textTypeIndexs+ "</td>";
+            html += "<td>" + new Date(entity.begindate).Format("yyyy-MM-dd")+ "</td>";
+            html += "<td>" + entity.status+ "</td>";
+            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看数据</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.mainId+"'"+')" href="#">删除</a>' + "</td>";
+            html += "</tr>";
+        }
+        $("#tbMain").html(html);
+    }
+    getExamInfo=function () {
+        var jsonParam = "{cis:" + '7111487' + ",startDate:'" + '2019-06-26'+ "',endDate:'" + '2019-06-26'+ "',hasDealed:" + true + "}";
+        $.ajax({
+            type: "post",
+            url: "/serverestimate/examController/getExamInfoListApi",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (data) {
+                if(data){
+                    console.log(data)
+                }else {
+
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+</SCRIPT>
+
+<body>
+    <div class="toolbar">
+       <span><h4>问卷列表</h4></span>
+    </div>
+    <div class="list-button">
+        <span class="addBtn" id="addNew">同步问卷列表</span>
+        <span class="addBtn" onclick="getExamInfo()" id="getExamInfo">获取问卷列表</span>
+        <input type="text" id="keyword"/>
+        <span class="addBtn" id="searchBtn">查询</span>
+    </div>
+    <div class="list-table">
+        <table width="95%" align="center" >
+            <tr >
+                <th width="5%">序号</th>
+                <th width="10%">问卷星ID</th>
+                <th width="20%">问卷名称</th>
+                <th width="10%">已回答数量</th>
+<!--                <th width="10%">数据问题题号</th>-->
+<!--                <th width="10%">文字问题题号</th>-->
+                <th width="10%">创建时间</th>
+                <th width="5%">状态</th>
+                <th width="15%">操作</th>
+            </tr>
+            <tbody id="tbMain">
+            </tbody>
+        </table>
+    </div>
+    <div class="pagebutton">
+        <span class="pageClass"><span id="currentPage">1</span>/<span id="totalPage">5</span></span>
+        <a href="#" id="firstPage">首页</a>  <a href="#" id="prePage">上一页</a>
+         <a id="nextPage" href="#">下一页</a>  <a id="lastPage" href="#" >末页</a>
+
+    </div>
+    <div id="confirmDialog" style="display:none;" title="系统提示">
+        <p align="center">删除后无法恢复，确定删除吗？</p>
+    </div>
+
+    <div id="examMainDialog" title="问卷详情" style="display: none">
+        <div id="errorDiv" style="color:red"></div>
+        <form id="examMainForm" enctype="multipart/form-data" >
+            <input type="hidden" id="formExamId"/>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 问卷星ID：</label>
+                <input id="formExamQid" readonly="readonly" type="text" class="text" style="width:200px" value=""/>
+            </div>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 问卷名称：</label>
+                <input id="formExamName" type="text" class="text" style="width:200px" value=""/>
+            </div>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 状态：</label>
+                <select id="formStatus"  style="width:200px">
+                    <option value='关闭'>关闭</option>
+                    <option value='开启'>开启</option>
+                </select>
+            </div>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 数值类的题号：</label>
+                <input id="formScoreTypeIndexs" type="text" class="text" style="width:200px" value="书法大赛地方"/>
+            </div>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 文字类的题号：</label>
+                <input id="formTextTypeIndexs" type="text" class="text" style="width:200px" value=""/>
+            </div>
+            <div style="padding-top: 10px;">
+                <label class="label-right"> 域名：</label>
+                <input id="formExamDomain" type="text" class="text" style="width:200px" value=""/>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
