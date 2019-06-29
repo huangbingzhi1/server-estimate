@@ -7,6 +7,8 @@ import com.hisense.serverestimate.mapper.ExamDetailMapper;
 import com.hisense.serverestimate.mapper.ExamMainMapper;
 import com.hisense.serverestimate.mapper.ExamTitleMapper;
 import com.hisense.serverestimate.service.ExamService;
+import com.hisense.serverestimate.service.ServerService;
+import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,8 @@ public class ExamController extends BaseController {
     private RestTemplate restTemplate;
     @Autowired
     private ExamService examService;
+    @Autowired
+    private ServerService serverService;
 
     @RequestMapping(value = "getExamList", method = RequestMethod.GET)
     @ResponseBody
@@ -200,6 +204,12 @@ public class ExamController extends BaseController {
                 param.put("endDate", endDate);
             }
             List<Map<String, Object>> examInfoByCisList = examMainMapper.getExamInfoByCis(param);
+            for (int i = 0; i < examInfoByCisList.size(); i++) {
+                Map<String, Object> exams=examInfoByCisList.get(i);
+                StringBuilder stringBuilder=new StringBuilder(exams.get("url").toString());
+                stringBuilder.append(Encryption.encrypByMD5(cis.concat(",").concat(exams.getOrDefault("server_code","").toString())));
+                exams.put("url",stringBuilder.toString());
+            }
             return JSON.toJSONString(examInfoByCisList);
         } catch (Exception e) {
             return "";
@@ -215,10 +225,16 @@ public class ExamController extends BaseController {
     public void receiveExamResult(@RequestParam("jsonParam") String jsonParam) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            jsonParam="{'activity':'41962622','sojumpparm':'7111487,JMS1608010167','name':'问卷名称','parteruser':'15581018823','parterjoiner':'test4','timetaken':'528','submittime':'2016-08-23 10:01:59', 'q1':'50','q2': '7','q3':'13','q4':'9','q5':'2','q6':'878787','q7':'似的sss发射点发射点',joinid:'101812480275','totalvalue':'15'}";
+//            jsonParam="{'activity':'41943184','sojumpparm':'242076AC66EC61FF9E348218E3995C4F','name':'问卷名称','parteruser':'15581018823','parterjoiner':'test4','timetaken':'528','submittime':'2016-08-23 10:01:59', 'q1':'50','q2': '7','q3':'13','q4':'9','q5':'2','q6':'878787','q7':'似的sss发射点发射点',joinid:'101812480275','totalvalue':'15'}";
             JSONObject parseObject = JSON.parseObject(jsonParam);
             String qid = HiStringUtil.getJsonStringByKey(parseObject, "activity");
             String sojumpparm = HiStringUtil.getJsonStringByKey(parseObject, "sojumpparm");
+            Map<String, String> cisServerCodeMd5Map = serverService.getCisServerCodeMd5Map();
+            if(cisServerCodeMd5Map.containsKey(sojumpparm)){
+                sojumpparm=cisServerCodeMd5Map.get(sojumpparm);
+            }else{
+                System.out.println("sojumpparm错误");
+            }
             String cis=null;
             String serverCode=null;
             if(!StringUtils.isEmpty(sojumpparm)){

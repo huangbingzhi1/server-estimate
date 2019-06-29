@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>商家列表</title>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../js/hi-utils.js"></script>
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/hi-main.css"/>
+</head>
+<SCRIPT language=JavaScript>
+    var globalQid=null;
+    $(function () {
+        var request = getRequest();
+        globalQid=request["id"];
+        loadExamResultList(1);
+        $("#searchBtn").click(function () {
+            console.log($("#keyword").val())
+            loadExamResultList(1,$("#keyword").val());
+        })
+        $("#downloadBtn").click(function () {
+            window.location = "/serverestimate/examController/downloadExamResultData?qid="+globalQid;
+        })
+
+        $("#prePage").click(function () {
+            if(parseInt($("#currentPage").html())>1){
+                loadExamResultList(parseInt($("#currentPage").html())-1);
+            }
+        })
+        $("#firstPage").click(function () {
+            if(parseInt($("#currentPage").html())>1){
+                loadExamResultList(1);
+            }
+        })
+        $("#lastPage").click(function () {
+            loadExamResultList($("#totalPage").html(), 4);
+        })
+        $("#nextPage").click(function () {
+            if(parseInt($("#currentPage").html())<parseInt($("#totalPage").html())){
+                loadExamResultList(parseInt($("#currentPage").html())+1);
+            }
+        })
+
+    })
+
+
+    deleteEnterpriseBtn=function(id){
+        $("#confirmDialog").dialog({
+            height:200,
+            width:400,
+            resizable: false,
+            buttons: {
+                "确定": function() {
+                    deleteEnterpriseById(id);
+                    $( this ).dialog( "close" );
+                },
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
+    }
+    deleteEnterpriseById=function(serverId){
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/enterpriseController/deleteEnterpriseById",
+            data: {jsonParam: serverId},
+            async: true,
+            success: function (data) {
+                if(data=="success"){
+                    loadExamResultList(1);
+                }else{
+                    alert("删除失败")
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    loadExamResultList = function (page) {
+        var keyword=$("#keyword").val();
+        var jsonParam = "{page:" + page + ",keyword:'" + keyword + "',qid:'" + globalQid + "'}";
+        $.ajax({
+            type: "get",
+            url: "/serverestimate/examController/getExamResultList",
+            data: {jsonParam: jsonParam},
+            async: true,
+            success: function (data) {
+                if(data){
+                    var sourceData = eval('(' + data + ')');
+                    $("#totalPage").html(sourceData.totalPage)
+                    $("#currentPage").html(sourceData.currentPage)
+                    if (sourceData.list && sourceData.list.length > 0) {
+                        addRows(sourceData.list);
+                    }
+                }else {
+                    $("#totalPage").html(0);
+                    $("#tbMain").html("");
+                }
+            },
+            error: function (result) {
+                console.log("failed")
+            }
+        });
+    }
+    addRows = function (entityList) {
+        var html = "";
+        for (var i = 0; i < entityList.length; i++) {
+            var entity = entityList[i];
+            html += "<tr onmouseover='addclass(this)'onmouseout='removeclass(this)'>";
+            html += "<td>" + (i + 1) + "</td>";
+            html += "<td>" + entity.company_name+ "</td>";
+            html += "<td>" + entity.enterprise_cis+ "</td>";
+            html += "<td>" + entity.enterprise_name+ "</td>";
+            html += "<td>" + entity.mean_score+ "</td>";
+            html += "</tr>";
+        }
+        $("#tbMain").html(html);
+    }
+
+
+</SCRIPT>
+
+<body>
+<div class="toolbar">
+    <span><h4>问卷结果</h4></span>
+</div>
+<div class="list-button">
+    <span class="addBtn" id="downloadBtn">下载</span>
+    <input type="text" id="keyword"/>
+    <span class="addBtn" id="searchBtn">查询</span>
+    <span class="addBtn" id="backBtn" onclick="window.location = 'examList.html'">返回</span>
+</div>
+<div class="list-table">
+    <table width="95%" align="center"  id="mainTable">
+        <tr >
+            <th width="5%">序号</th>
+            <th width="10%">分公司</th>
+            <th width="10%">CIS编号</th>
+            <th width="45%">商家名称</th>
+            <th width="10%">最终得分</th>
+        </tr>
+        <tbody id="tbMain">
+        </tbody>
+    </table>
+</div>
+<div class="pagebutton">
+    <span class="pageClass"><span id="currentPage">1</span>/<span id="totalPage">5</span></span>
+    <a href="#" id="firstPage">首页</a>  <a href="#" id="prePage">上一页</a>
+    <a id="nextPage" href="#">下一页</a>  <a id="lastPage" href="#" >末页</a>
+
+</div>
+<div id="confirmDialog" style="display:none;" title="系统提示">
+    <p align="center">删除后无法恢复，确定删除吗？</p>
+</div>
+
+<div id="importDialog" title="商家、服务商信息导入" style="display: none">
+    <div id="errorDiv" style="color:red"></div>
+    <form id="uploadDataForm" enctype="multipart/form-data" >
+        <p style="color: red">注意：数据导入会将原有的商家信息、服务商信息都清空</p>
+        <p>
+            <input id="dataFile" type="file" name="dataFile">
+        </p>
+    </form>
+</div>
+</body>
+</html>

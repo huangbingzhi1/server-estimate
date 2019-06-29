@@ -8,6 +8,7 @@ import com.hisense.serverestimate.mapper.BaseEnterpriseMapper;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -66,6 +67,7 @@ public class EnterpriseController extends BaseController{
      */
     @RequestMapping(value = "deleteEnterpriseById", method = RequestMethod.GET)
     @ResponseBody
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
     public String deleteEnterpriseById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
             enterpriseMapper.deleteServerByEnterpriseId(jsonParam);
@@ -87,6 +89,7 @@ public class EnterpriseController extends BaseController{
     @RequestMapping(value = "saveEnterprise", method = RequestMethod.GET)
     @ResponseBody
     @Transactional
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
     public String saveEnterprise(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try {
             JSONObject parseObject = JSON.parseObject(jsonParam);

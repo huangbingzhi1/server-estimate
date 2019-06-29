@@ -128,6 +128,16 @@
 			<artifactId>poi</artifactId>
 			<version>4.0.0</version>
 		</dependency>
+		<!--		ehcache缓存     开始-->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<!--		ehcache缓存     结束-->
 	</dependencies>
 
 	<build>

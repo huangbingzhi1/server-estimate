@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.ExamTitleMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.ExamTitle" >
+    <id column="title_id" property="titleId" jdbcType="VARCHAR" />
+    <result column="qid" property="qid" jdbcType="VARCHAR" />
+    <result column="title_no" property="titleNo" jdbcType="VARCHAR" />
+    <result column="title_name" property="titleName" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from exam_title
+    where title_id = #{titleId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.ExamTitle" >
+    insert into exam_title (title_id, qid, title_no, 
+      title_name)
+    values (#{titleId,jdbcType=VARCHAR}, #{qid,jdbcType=VARCHAR}, #{titleNo,jdbcType=VARCHAR}, 
+      #{titleName,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.ExamTitle" >
+    update exam_title
+    set qid = #{qid,jdbcType=VARCHAR},
+      title_no = #{titleNo,jdbcType=VARCHAR},
+      title_name = #{titleName,jdbcType=VARCHAR}
+    where title_id = #{titleId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select title_id, qid, title_no, title_name
+    from exam_title
+    where title_id = #{titleId,jdbcType=VARCHAR}
+  </select>
+  <select id="deleteByQid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    delete from exam_title
+    where qid = #{qid,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select title_id, qid, title_no, title_name
+    from exam_title
+  </select>
+  <select id="selectByQid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select title_id, qid, title_no, title_name
+    from exam_title
+    where qid=#{qid,jdbcType=VARCHAR}
+    order by title_no
+  </select>
+
+</mapper>

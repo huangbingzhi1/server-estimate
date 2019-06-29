@@ -74,14 +74,8 @@
   <select id="getExamInfoByCis" parameterType="map" resultType="map">
     SELECT
       CONCAT(
-        CONCAT(
-          CONCAT(m.exam_domain, d.`main_qid`),
-          '.aspx?sojumpparm='
-        ),
-        CONCAT(
-          CONCAT(d.`enterprise_cis`, ','),
-          d.`server_code`
-        )
+        CONCAT(m.exam_domain, d.`main_qid`),
+        '.aspx?sojumpparm='
       ) AS url,
       s.`server_name`,
       s.`server_code`,

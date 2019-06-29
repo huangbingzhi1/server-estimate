@@ -15,6 +15,7 @@ import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -96,6 +97,7 @@ public class ServerController extends BaseController{
      */
     @RequestMapping(value = "deleteServerById", method = RequestMethod.GET)
     @ResponseBody
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
     public String deleteServerById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
             serverMapper.deleteEnterpriseByServerId(jsonParam);
@@ -117,6 +119,7 @@ public class ServerController extends BaseController{
     @RequestMapping(value = "saveServer", method = RequestMethod.GET)
     @ResponseBody
     @Transactional
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
     public String saveServer(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try {
             JSONObject parseObject = JSON.parseObject(jsonParam);

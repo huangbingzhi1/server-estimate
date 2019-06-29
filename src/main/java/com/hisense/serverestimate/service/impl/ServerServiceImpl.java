@@ -7,11 +7,14 @@ import com.hisense.serverestimate.mapper.BaseEnterpriseMapper;
 import com.hisense.serverestimate.mapper.BaseServerMapper;
 import com.hisense.serverestimate.mapper.ServerEnterpriseRelMapper;
 import com.hisense.serverestimate.service.ServerService;
+import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.monitorjbl.xlsx.StreamingReader;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,15 +32,15 @@ public class ServerServiceImpl implements ServerService {
     private int startRow;
 
     @Autowired
+    private ServerEnterpriseRelMapper serverEnterpriseRelMapper;
+    @Autowired
     private BaseServerMapper serverMapper;
 
     @Autowired
     private BaseEnterpriseMapper enterpriseMapper;
 
-    @Autowired
-    private ServerEnterpriseRelMapper serverEnterpriseRelMapper;
-
     @Override
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
     public boolean importServerEnterprise(MultipartFile dataFile) {
         Workbook workbook = null;
         try {
@@ -121,6 +124,19 @@ public class ServerServiceImpl implements ServerService {
                 case ERROR:
                     break;
             }
+        }
+        return result;
+    }
+
+    @Cacheable(value = "cacheEnterpriseCisServerCodeMD5")
+    public Map<String,String> getCisServerCodeMd5Map(){
+        Map<String,String> result=new HashMap<>();
+        List<ServerEnterpriseRel> serverEnterpriseRels = serverEnterpriseRelMapper.selectAll();
+        for (int i = 0; i < serverEnterpriseRels.size(); i++) {
+            ServerEnterpriseRel rel = serverEnterpriseRels.get(i);
+            String relStr = rel.getEnterpriseCis().concat(",").concat(rel.getServerCode());
+            String md5 = Encryption.encrypByMD5(relStr);
+            result.put(md5,relStr);
         }
         return result;
     }
