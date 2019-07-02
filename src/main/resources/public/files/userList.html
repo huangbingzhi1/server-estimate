@@ -35,6 +35,36 @@
                 loadServerList(parseInt($("#currentPage").html())+1, 4);
             }
         })
+        $("#testRel").click(function () {
+            $.ajax({
+                type : "get",
+                async:false,
+                url : "http://10.19.34.80:9090/com.hisense.cis.getCustAmount",
+                dataType : "jsonp",//数据类型为jsonp
+                jsonp: "jsonpCallback",
+                success : function(data){
+                    console.log(data)
+                },
+                error:function(){
+                    alert('fail');
+                }
+            });
+
+            $.ajax({
+                type : "get",
+                async:false,
+                url : "http://10.19.34.80:9090/com.hisense.cis.getCustAmount",
+                data:  {"cisCode":"","type":"DMS","beginDate":"","endDate":""},
+                dataType : "jsonp",//数据类型为jsonp
+                jsonp: "jsonpCallback",
+                success : function(data){
+                    console.log(data)
+                },
+                error:function(){
+                    alert('fail');
+                }
+            });
+        })
 
     })
 
@@ -141,7 +171,10 @@
     <div class="toolbar">
        <span><h4>用户管理</h4></span>
     </div>
-    <div class="list-button"><span class="addBtn" id="addNew">添加用户</span></div>
+    <div class="list-button">
+        <span class="addBtn" id="addNew">添加用户</span>
+        <span class="addBtn" id="testRel">测试获取商家、账户关联信息</span>
+    </div>
     <div class="list-table">
         <table width="95%" align="center" >
             <tr >

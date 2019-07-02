@@ -19,9 +19,9 @@ public class WebAppConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //addPathPattern后跟拦截地址，excludePathPatterns后跟排除拦截地址
-        registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/login.html","/images/**","/js/**","/css/**","/userController/login");
+//        registry.addInterceptor(new LoginInterceptor())
+//                .addPathPatterns("/**")
+//                .excludePathPatterns("/login.html","/images/**","/js/**","/css/**","/userController/login","/userController/ssoLogin");
     }
 
 }

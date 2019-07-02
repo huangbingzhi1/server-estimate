@@ -112,6 +112,20 @@ public class ExamController extends BaseController {
         return SUCCESS;
     }
 
+    @RequestMapping(value = "testAccountRel", method = RequestMethod.GET)
+    @ResponseBody
+    @Transactional
+    public String testAccountRel() {
+        Map<String,String> param=new HashMap<>();
+        param.put("cisCode","");
+        param.put("type","DMS");
+        param.put("beginDate","");
+        param.put("endDate","");
+        param.put("head","RWEcE7vleMejXI7ZhO/o7A==");
+        String forObject = restTemplate.getForObject("OperationCode :com.hisense.cis.cisrest.getCustAmount", String.class, param);
+        System.out.println(forObject);
+        return forObject;
+    }
     @RequestMapping(value = "synchronizeExam", method = RequestMethod.GET)
     @ResponseBody
     @Transactional

@@ -2,6 +2,7 @@ package com.hisense.serverestimate.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.hisense.serverestimate.entity.BaseRole;
 import com.hisense.serverestimate.entity.BaseUser;
 import com.hisense.serverestimate.mapper.BaseRoleMapper;
@@ -16,10 +17,14 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +38,43 @@ import java.util.Map;
 @RestController
 @RequestMapping("userController")
 public class UserController extends BaseController {
+    @Value("${xinshang.callApiTokenUrl}")
+    public String callApiTokenUrl;
+    @Value("${xinshang.checkSsoLoginTokenUrl}")
+    public String checkSsoLoginTokenUrl;
+
     @Autowired
     private BaseUserMapper userMapper;
     @Autowired
     private BaseRoleMapper roleMapper;
+    @Autowired
+    private RestTemplate restTemplate;
 
+    @RequestMapping(value = "ssoLogin", method = RequestMethod.GET)
+    @ResponseBody
+    public String ssoLogin(HttpServletRequest request,HttpServletResponse response) {
+        String apiTokenStr = restTemplate.getForObject(callApiTokenUrl, String.class);
+        JSONObject apiTokenObj = JSON.parseObject(apiTokenStr);
+        String resCode = HiStringUtil.getJsonStringByKey(apiTokenObj, "resCode");
+        String tokenId = HiStringUtil.getJsonStringByKey(apiTokenObj, "tokenId");
+        HttpSession session = SessionUtil.getSession();
+        if(!StringUtils.isEmpty(resCode)&&!StringUtils.isEmpty(tokenId)&&SUCCESS.equalsIgnoreCase(resCode)){
+            String ssoLoginToken=getCookieValue(request,"ssoLoginToken");
+            if(!StringUtils.isEmpty(ssoLoginToken)){
+                StringBuilder sb=new StringBuilder(checkSsoLoginTokenUrl);
+                sb.append("?tokenId=")
+                        .append(tokenId)
+                        .append("&ssoLoginToken=")
+                        .append(ssoLoginToken);
+                String accountStr = restTemplate.getForObject(sb.toString(), String.class);
+                return accountStr;
+            }else{
+                return FAILED;
+            }
+        }else{
+            return FAILED;
+        }
+    }
     /**
      * 用户登录
      *
@@ -252,6 +289,23 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
         return FAILED;
+    }
+    @RequestMapping(value = "testSso", method = RequestMethod.GET)
+    @ResponseBody
+    @Transactional
+    public String testSso(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
+        String ssoLoginToken=getCookieValue(request,"ssoLoginToken");
+        String tokenId=getCookieValue(request,"tokenId ");
+        return "success";
+    }
+    private String getCookieValue(HttpServletRequest request,String key){
+        Cookie[] cookies = request.getCookies();
+        for (int i = 0; i < cookies.length; i++) {
+            if(cookies[i].getName().equals(key)) {
+                return cookies[i].getValue();
+            }
+        }
+        return "";
     }
 
     /*
