@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisense.serverestimate.mapper.XsAccountMapper" >
+  <resultMap id="BaseResultMap" type="com.hisense.serverestimate.entity.XsAccount" >
+    <id column="aid" property="aid" jdbcType="VARCHAR" />
+    <result column="cis_code" property="cisCode" jdbcType="VARCHAR" />
+    <result column="mdm_code" property="mdmCode" jdbcType="VARCHAR" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="full_name" property="fullName" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from xs_account
+    where aid = #{aid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.hisense.serverestimate.entity.XsAccount" >
+    insert into xs_account (aid, cis_code, mdm_code, 
+      account, mobile, email, 
+      username, full_name, create_date
+      )
+    values (#{aid,jdbcType=VARCHAR}, #{cisCode,jdbcType=VARCHAR}, #{mdmCode,jdbcType=VARCHAR}, 
+      #{account,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{username,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.XsAccount" >
+    update xs_account
+    set cis_code = #{cisCode,jdbcType=VARCHAR},
+      mdm_code = #{mdmCode,jdbcType=VARCHAR},
+      account = #{account,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      full_name = #{fullName,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP}
+    where aid = #{aid,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
+    from xs_account
+    where aid = #{aid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
+    from xs_account
+  </select>
+</mapper>

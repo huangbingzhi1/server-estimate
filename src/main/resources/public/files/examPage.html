@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t';
+            // $("#mainExams").append(script)
+            // $("body").append(script)
+            $("#s1").click(function () {
+                var html = '<script type="text/javascript" src="https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t"><\/script>';
+                $('#mainExams').html(html);
+            })
+        })
+    </script>
+
+</head>
+
+
+<body style="color:#4B4967">
+<select id="s1">
+    <option value="1">…Ãªß1</option>
+</select>
+<br>
+    <iframe width="800px" height="600px" src="https://www.wjx.cn/jq/41962622.aspx?sojumpparm=7111487,JMS1608010161"></iframe>
+<!--<script type='text/javascript' id="examUrl"-->
+<!--        src='https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t'>
+ </script>-->
+<div id="mainExams">
+
+</div>
+</body>
+</html>
