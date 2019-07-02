@@ -29,4 +29,6 @@ public interface ExamDetailMapper {
     List<Map<String, Object>> getEnterpriseExamResult(Map<String, Object> param);
 
     int getEnterpriseExamResultNum(Map<String, Object> param);
+
+    List<Map<String, Object>> getExamDetailListByCis(String cisCode);
 }

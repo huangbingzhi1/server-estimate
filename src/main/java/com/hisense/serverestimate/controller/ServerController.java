@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hisense.serverestimate.entity.BaseRole;
 import com.hisense.serverestimate.entity.BaseServer;
 import com.hisense.serverestimate.entity.BaseUser;
+import com.hisense.serverestimate.entity.XsAccount;
 import com.hisense.serverestimate.mapper.BaseEnterpriseMapper;
 import com.hisense.serverestimate.mapper.BaseRoleMapper;
 import com.hisense.serverestimate.mapper.BaseServerMapper;

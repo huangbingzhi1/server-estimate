@@ -93,10 +93,4 @@ public class ApiEnterpriseController<main> extends BaseController{
             }
         }
     }
-
-  /*public static void main(String[] args) {
-        ApiEnterpriseController controller=new ApiEnterpriseController();
-        controller.dealResponseData("");
-    }*/
-
 }

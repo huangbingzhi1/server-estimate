@@ -167,4 +167,21 @@
       AND e.company_name =  #{company,jdbcType=VARCHAR}
     </if>
   </select>
+  <select id="getExamDetailListByCis" resultType="map" parameterType="string">
+    select
+      d.main_qid,
+      m.exam_name,
+      d.enterprise_cis,
+      d.server_code,
+      s.server_name,
+      d.submittime
+    from
+      exam_detail d
+      left join exam_main m
+        on m.exam_qid = d.main_qid
+      left join base_server s
+        on s.server_code = d.server_code
+    where enterprise_cis = #{cis,jdbcType=VARCHAR}
+      and m.status = '开启'
+  </select>
 </mapper>

@@ -11,37 +11,23 @@ import com.hisense.serverestimate.service.ServerService;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Huang.bingzhi
@@ -378,6 +364,17 @@ public class ExamController extends BaseController {
         return "";
     }
 
-
+    @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExamDetailListByLoginAccount(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        Object obj = session.getAttribute("account");
+        if(null!=obj){
+            XsAccount account=(XsAccount)obj;
+            List<Map<String,Object>> detailList=examDetailMapper.getExamDetailListByCis(account.getCisCode());
+            return JSON.toJSONString(detailList);
+        }
+        return "";
+    }
 }
 

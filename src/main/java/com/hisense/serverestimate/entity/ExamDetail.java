@@ -13,6 +13,8 @@ public class ExamDetail implements Serializable {
 
     private String serverCode;
 
+    private String serverName;
+
     private Date submittime;
 
     private Integer timetaken;
@@ -115,6 +117,14 @@ public class ExamDetail implements Serializable {
 
     public void setSourceData(String sourceData) {
         this.sourceData = sourceData == null ? null : sourceData.trim();
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     @Override
