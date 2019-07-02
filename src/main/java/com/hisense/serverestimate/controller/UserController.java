@@ -3,13 +3,18 @@ package com.hisense.serverestimate.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.hisense.serverestimate.ExecutorConfig;
 import com.hisense.serverestimate.entity.BaseRole;
 import com.hisense.serverestimate.entity.BaseUser;
+import com.hisense.serverestimate.entity.XsAccount;
 import com.hisense.serverestimate.mapper.BaseRoleMapper;
 import com.hisense.serverestimate.mapper.BaseUserMapper;
+import com.hisense.serverestimate.mapper.XsAccountMapper;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +54,16 @@ public class UserController extends BaseController {
     private BaseRoleMapper roleMapper;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private XsAccountMapper xsAccountMapper;
 
+
+    /**
+     * 单点登录
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "ssoLogin", method = RequestMethod.GET)
     @ResponseBody
     public String ssoLogin(HttpServletRequest request,HttpServletResponse response) {
@@ -58,6 +72,7 @@ public class UserController extends BaseController {
         String resCode = HiStringUtil.getJsonStringByKey(apiTokenObj, "resCode");
         String tokenId = HiStringUtil.getJsonStringByKey(apiTokenObj, "tokenId");
         HttpSession session = SessionUtil.getSession();
+        session.removeAttribute("loginUser");
         if(!StringUtils.isEmpty(resCode)&&!StringUtils.isEmpty(tokenId)&&SUCCESS.equalsIgnoreCase(resCode)){
             String ssoLoginToken=getCookieValue(request,"ssoLoginToken");
             if(!StringUtils.isEmpty(ssoLoginToken)){
@@ -67,13 +82,22 @@ public class UserController extends BaseController {
                         .append("&ssoLoginToken=")
                         .append(ssoLoginToken);
                 String accountStr = restTemplate.getForObject(sb.toString(), String.class);
-                return accountStr;
-            }else{
-                return FAILED;
+                final JSONObject responseObj = JSON.parseObject(accountStr);
+                resCode=HiStringUtil.getJsonStringByKey(responseObj,"resCode");
+                if(resCode.equalsIgnoreCase(SUCCESS)){
+                    String uid=HiStringUtil.getJsonStringByKey(responseObj,"uid");
+                    XsAccount xsAccount= xsAccountMapper.selectByAccount(uid);
+                    if(null!=xsAccount){
+                        BaseUser user=userMapper.getUserByUsername("enterprise");
+                        session.setMaxInactiveInterval(-1);
+                        session.setAttribute("loginUser", user);
+                        session.setAttribute("account",xsAccount);
+                        return SUCCESS;
+                    }
+                }
             }
-        }else{
-            return FAILED;
         }
+        return FAILED;
     }
     /**
      * 用户登录
@@ -105,7 +129,6 @@ public class UserController extends BaseController {
         HttpSession session = SessionUtil.getSession();
         try {
             session.removeAttribute("loginUser");
-
         }catch (Exception e){
             e.printStackTrace();
             return FAILED;
@@ -289,14 +312,6 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
         return FAILED;
-    }
-    @RequestMapping(value = "testSso", method = RequestMethod.GET)
-    @ResponseBody
-    @Transactional
-    public String testSso(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        String ssoLoginToken=getCookieValue(request,"ssoLoginToken");
-        String tokenId=getCookieValue(request,"tokenId ");
-        return "success";
     }
     private String getCookieValue(HttpServletRequest request,String key){
         Cookie[] cookies = request.getCookies();

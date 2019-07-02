@@ -15,4 +15,6 @@ public interface XsAccountMapper {
     List<XsAccount> selectAll();
 
     int updateByPrimaryKey(XsAccount record);
+
+    XsAccount selectByAccount(String account);
 }

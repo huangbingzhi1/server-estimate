@@ -11,16 +11,34 @@ import com.hisense.serverestimate.service.ServerService;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -112,20 +130,6 @@ public class ExamController extends BaseController {
         return SUCCESS;
     }
 
-    @RequestMapping(value = "testAccountRel", method = RequestMethod.GET)
-    @ResponseBody
-    @Transactional
-    public String testAccountRel() {
-        Map<String,String> param=new HashMap<>();
-        param.put("cisCode","");
-        param.put("type","DMS");
-        param.put("beginDate","");
-        param.put("endDate","");
-        param.put("head","RWEcE7vleMejXI7ZhO/o7A==");
-        String forObject = restTemplate.getForObject("OperationCode :com.hisense.cis.cisrest.getCustAmount", String.class, param);
-        System.out.println(forObject);
-        return forObject;
-    }
     @RequestMapping(value = "synchronizeExam", method = RequestMethod.GET)
     @ResponseBody
     @Transactional
@@ -234,7 +238,7 @@ public class ExamController extends BaseController {
      * 接收推送的填写者提交的数据
       * @param jsonParam
      */
-    @RequestMapping(value = "receiveExamResult", method = RequestMethod.GET)
+    @RequestMapping(value = "receiveExamResult", method = RequestMethod.POST)
     @ResponseBody
     public void receiveExamResult(@RequestParam("jsonParam") String jsonParam) {
         try {

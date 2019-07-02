@@ -43,6 +43,12 @@
     from xs_account
     where aid = #{aid,jdbcType=VARCHAR}
   </select>
+  <select id="selectByAccount" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
+    from xs_account
+    where account = #{account,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectAll" resultMap="BaseResultMap" >
     select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
     from xs_account
