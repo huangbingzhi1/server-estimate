@@ -178,24 +178,26 @@ public class ExamController extends BaseController {
         return SUCCESS;
     }
 
-    @RequestMapping(value = "getExamInfoListApi", method = RequestMethod.POST)
+    @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.POST)
     @ResponseBody
-    public String getExamInfoListApi(@RequestParam("jsonParam") String jsonParam) {
+    public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam,HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             if (StringUtils.isEmpty(jsonParam)) {
                 return "";
             }
             JSONObject parseObject = JSON.parseObject(jsonParam);
-            String cis = HiStringUtil.getJsonStringByKey(parseObject, "cis");
+            HttpSession session = request.getSession();
+            Object obj = session.getAttribute("account");
+            if(null==obj) {
+                return "";
+            }
             String hasDealed = HiStringUtil.getJsonStringByKey(parseObject, "hasDealed");
             String startDate = HiStringUtil.getJsonStringByKey(parseObject, "startDate");
             String endDate = HiStringUtil.getJsonStringByKey(parseObject, "endDate");
-            if (StringUtils.isEmpty(cis)) {
-                return "";
-            }
+            XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();
-            param.put("cis", cis);
+            param.put("cis", account.getCisCode());
             if (!StringUtils.isEmpty(hasDealed)) {
                 param.put("hasDealed", hasDealed);
             }
@@ -211,7 +213,7 @@ public class ExamController extends BaseController {
             for (int i = 0; i < examInfoByCisList.size(); i++) {
                 Map<String, Object> exams=examInfoByCisList.get(i);
                 StringBuilder stringBuilder=new StringBuilder(exams.get("url").toString());
-                stringBuilder.append(Encryption.encrypByMD5(cis.concat(",").concat(exams.getOrDefault("server_code","").toString())));
+                stringBuilder.append(Encryption.encrypByMD5(account.getCisCode().concat(",").concat(exams.getOrDefault("server_code","").toString())));
                 exams.put("url",stringBuilder.toString());
             }
             return JSON.toJSONString(examInfoByCisList);
@@ -315,7 +317,7 @@ public class ExamController extends BaseController {
         }
     }
     /**
-     * 接收推送的填写者提交的数据
+     * 下载问卷结果
      * @param qid
      */
     @RequestMapping(value = "downloadExamResultData", method = RequestMethod.GET)
@@ -360,19 +362,6 @@ public class ExamController extends BaseController {
             result.put("list", examResult);
             result.put("currentPage", page);
             return JSON.toJSONString(result);
-        }
-        return "";
-    }
-
-    @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.GET)
-    @ResponseBody
-    public String getExamDetailListByLoginAccount(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession();
-        Object obj = session.getAttribute("account");
-        if(null!=obj){
-            XsAccount account=(XsAccount)obj;
-            List<Map<String,Object>> detailList=examDetailMapper.getExamDetailListByCis(account.getCisCode());
-            return JSON.toJSONString(detailList);
         }
         return "";
     }
