@@ -2,8 +2,6 @@ package com.hisense.serverestimate.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.hisense.serverestimate.ExecutorConfig;
 import com.hisense.serverestimate.entity.BaseRole;
 import com.hisense.serverestimate.entity.BaseUser;
 import com.hisense.serverestimate.entity.XsAccount;
@@ -13,18 +11,14 @@ import com.hisense.serverestimate.mapper.XsAccountMapper;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +50,17 @@ public class UserController extends BaseController {
     private RestTemplate restTemplate;
     @Autowired
     private XsAccountMapper xsAccountMapper;
+    @Autowired
+    private ExamController examController;
 
+    @RequestMapping(value = "ssoTest", method = RequestMethod.GET)
+    public void ssoTest(HttpServletRequest request,HttpServletResponse response) {
+        try {
+            response.sendRedirect("../files/examPage.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 单点登录
@@ -66,7 +70,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "ssoLogin", method = RequestMethod.GET)
     @ResponseBody
-    public String ssoLogin(HttpServletRequest request,HttpServletResponse response) {
+    public void ssoLogin(HttpServletRequest request,HttpServletResponse response) {
         String apiTokenStr = restTemplate.getForObject(callApiTokenUrl, String.class);
         JSONObject apiTokenObj = JSON.parseObject(apiTokenStr);
         String resCode = HiStringUtil.getJsonStringByKey(apiTokenObj, "resCode");
@@ -92,13 +96,23 @@ public class UserController extends BaseController {
                         session.setMaxInactiveInterval(-1);
                         session.setAttribute("loginUser", user);
                         session.setAttribute("account",xsAccount);
-                        return SUCCESS;
+                        toExamPage(request, response);
                     }
                 }
             }
         }
-        return FAILED;
     }
+
+    private void toExamPage(HttpServletRequest request,HttpServletResponse response) {
+        try {
+            String examDetailListByLoginAccount = examController.getExamDetailListByLoginAccount(null,request);
+            request.getSession().setAttribute("examData",examDetailListByLoginAccount);
+            response.sendRedirect("../files/examPage.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 用户登录
      *

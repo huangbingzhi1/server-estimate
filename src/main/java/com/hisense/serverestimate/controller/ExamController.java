@@ -183,31 +183,34 @@ public class ExamController extends BaseController {
     public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam,HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            if (StringUtils.isEmpty(jsonParam)) {
-                return "";
-            }
-            JSONObject parseObject = JSON.parseObject(jsonParam);
+
+
             HttpSession session = request.getSession();
             Object obj = session.getAttribute("account");
             if(null==obj) {
                 return "";
             }
-            String hasDealed = HiStringUtil.getJsonStringByKey(parseObject, "hasDealed");
-            String startDate = HiStringUtil.getJsonStringByKey(parseObject, "startDate");
-            String endDate = HiStringUtil.getJsonStringByKey(parseObject, "endDate");
             XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();
-            param.put("cis", account.getCisCode());
-            if (!StringUtils.isEmpty(hasDealed)) {
-                param.put("hasDealed", hasDealed);
-            }
-            if (!StringUtils.isEmpty(startDate)) {
-                Date parseDate = sdf.parse(startDate);
-                param.put("startDate", parseDate);
-            }
-            if (!StringUtils.isEmpty(endDate)) {
-                Date parseDate = sdf.parse(endDate);
-                param.put("endDate", endDate);
+//            param.put("cis", account.getCisCode());
+//            测试
+            param.put("cis", "7111406");
+            if(!StringUtils.isEmpty(jsonParam)){
+                JSONObject parseObject = JSON.parseObject(jsonParam);
+                String hasDealed = HiStringUtil.getJsonStringByKey(parseObject, "hasDealed");
+                String startDate = HiStringUtil.getJsonStringByKey(parseObject, "startDate");
+                String endDate = HiStringUtil.getJsonStringByKey(parseObject, "endDate");
+                if (!StringUtils.isEmpty(hasDealed)) {
+                    param.put("hasDealed", hasDealed);
+                }
+                if (!StringUtils.isEmpty(startDate)) {
+                    Date parseDate = sdf.parse(startDate);
+                    param.put("startDate", parseDate);
+                }
+                if (!StringUtils.isEmpty(endDate)) {
+                    Date parseDate = sdf.parse(endDate);
+                    param.put("endDate", endDate);
+                }
             }
             List<Map<String, Object>> examInfoByCisList = examMainMapper.getExamInfoByCis(param);
             for (int i = 0; i < examInfoByCisList.size(); i++) {
