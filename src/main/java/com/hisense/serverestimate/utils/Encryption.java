@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
  * @Version 1.0
  */
 public class Encryption {
-    private final static String[] hexArray = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+    private final static String[] HEX_ARRAY = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 
     /***
      * 对指定的字符串进行MD5加密
@@ -50,6 +50,6 @@ public class Encryption {
         }
         int d1 = n / 16;
         int d2 = n % 16;
-        return hexArray[d1]+hexArray[d2];
+        return HEX_ARRAY[d1]+ HEX_ARRAY[d2];
     }
 }

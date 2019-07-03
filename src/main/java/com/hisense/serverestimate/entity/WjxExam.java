@@ -69,7 +69,7 @@ public class WjxExam {
         String textTypeIndexs = "1";
         String[] scoreTypeQuestionNo = textTypeIndexs.split(",");
         for (int i = 0; i <scoreTypeQuestionNo.length ; i++) {
-            scoreTypeQuestionNo[i]="q"+scoreTypeQuestionNo[i];
+            scoreTypeQuestionNo[i]="q".concat(scoreTypeQuestionNo[i]);
         }
         System.out.println(scoreTypeQuestionNo);
     }

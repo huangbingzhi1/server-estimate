@@ -16,10 +16,6 @@ import java.io.IOException;
 public class BaseController {
     @Value("${user.numberperpage}")
     public int numberPerPage;
-//    @Value("${user.mailurgeposttitle}")
-    public String postTitle="请执行[服务商季度评价系统]提报任务";
-//    @Value("${user.mailurgechecktitle}")
-    public String checkTitle="请执行[服务商季度评价系统]审批任务";
     public static final String SUCCESS = "success";
     public static final String FAILED = "failed";
 }

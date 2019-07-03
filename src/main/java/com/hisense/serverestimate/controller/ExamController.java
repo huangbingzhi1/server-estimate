@@ -65,7 +65,7 @@ public class ExamController extends BaseController {
     public String getExamList(@RequestParam("jsonParam") String jsonParam) {
         JSONObject parseObject = JSON.parseObject(jsonParam);
         int page = HiStringUtil.getJsonIntByKey(parseObject, "page");
-        Map<String, Object> param = new HashMap<>();
+        Map<String, Object> param = new HashMap<>(10);
         param.put("startIndex", (page - 1) * numberPerPage);
         param.put("pCount", numberPerPage);
         String keyword = HiStringUtil.getJsonStringByKey(parseObject, "keyword");
@@ -326,7 +326,7 @@ public class ExamController extends BaseController {
         BaseUser loginUser = SessionUtil.getLoginUser();
         Map<String,Object> param=new HashMap<>(2);
         param.put("qid",qid);
-        if(loginUser.getRoleId().equals("guest")){
+        if("guest".equals(loginUser.getRoleId())){
             param.put("companpy",loginUser.getCompany());
         }
         List<Map<String,Object>> examResult= examDetailMapper.getAllExamResult(param);
@@ -343,7 +343,7 @@ public class ExamController extends BaseController {
         JSONObject parseObject = JSON.parseObject(jsonParam);
         String qid = HiStringUtil.getJsonStringByKey(parseObject, "qid");
         param.put("qid",qid);
-        if(loginUser.getRoleId().equals("guest")){
+        if("guest".equals(loginUser.getRoleId())){
             param.put("companpy",loginUser.getCompany());
         }
         String keyword=HiStringUtil.getJsonStringByKey(parseObject, "keyword");

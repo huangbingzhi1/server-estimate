@@ -107,7 +107,7 @@ public class HiFileUtil {
                 System.out.println(e.toString());
             } finally {
             }
-            return result;
         }
+        return result;
     }
 }

@@ -109,12 +109,6 @@ public class BaseEnterprise implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof BaseEnterprise) {
             BaseEnterprise temp = (BaseEnterprise) obj;
-//            System.out.println(this.cis.equals(temp.cis));
-//            System.out.println(this.enterpriseName.equals(temp.enterpriseName));
-//            System.out.println(this.office.equals(temp.office));
-//            System.out.println(this.companyId.equals(temp.companyId));
-//            System.out.println(this.companyName.equals(temp.companyName));
-
             return this.cis.equals(temp.cis) &&
                     this.enterpriseName.equals(temp.enterpriseName) &&
                     this.office.equals(temp.office) &&

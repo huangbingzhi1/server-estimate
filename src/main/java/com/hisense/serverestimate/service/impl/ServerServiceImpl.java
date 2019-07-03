@@ -40,11 +40,11 @@ public class ServerServiceImpl implements ServerService {
     private BaseEnterpriseMapper enterpriseMapper;
 
     @Override
-    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5",allEntries = true)
+    @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5", allEntries = true)
     public boolean importServerEnterprise(MultipartFile dataFile) {
         Workbook workbook = null;
         try {
-            workbook=StreamingReader.builder()
+            workbook = StreamingReader.builder()
                     .rowCacheSize(100)
                     .bufferSize(4098)
                     .open(dataFile.getInputStream());
@@ -123,20 +123,23 @@ public class ServerServiceImpl implements ServerService {
                     break;
                 case ERROR:
                     break;
+                default:
+                    break;
             }
         }
         return result;
     }
 
+    @Override
     @Cacheable(value = "cacheEnterpriseCisServerCodeMD5")
-    public Map<String,String> getCisServerCodeMd5Map(){
-        Map<String,String> result=new HashMap<>();
+    public Map<String, String> getCisServerCodeMd5Map() {
+        Map<String, String> result = new HashMap<>();
         List<ServerEnterpriseRel> serverEnterpriseRels = serverEnterpriseRelMapper.selectAll();
         for (int i = 0; i < serverEnterpriseRels.size(); i++) {
             ServerEnterpriseRel rel = serverEnterpriseRels.get(i);
             String relStr = rel.getEnterpriseCis().concat(",").concat(rel.getServerCode());
             String md5 = Encryption.encrypByMD5(relStr);
-            result.put(md5,relStr);
+            result.put(md5, relStr);
         }
         return result;
     }

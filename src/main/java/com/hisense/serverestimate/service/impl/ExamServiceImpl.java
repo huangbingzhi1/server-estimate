@@ -54,13 +54,10 @@ public class ExamServiceImpl implements ExamService {
 
 
         for (Map<String, Object> detail:examResult){
-            if(detail.get("server_code").toString().equals("JMS1608010167")){
-                System.out.println(detail);
-            }
-            String company_name = detail.get("company_name").toString();
-            Sheet currSheet = workbook.getSheet(company_name);
+            String companyName = detail.get("company_name").toString();
+            Sheet currSheet = workbook.getSheet(companyName);
             if(null==currSheet){
-                currSheet = workbook.createSheet(company_name);
+                currSheet = workbook.createSheet(companyName);
                 createSheetTitle(currSheet,scoreTypeIndexArr,titles);
             }
             String  scoreStr = detail.getOrDefault("score_array","").toString();

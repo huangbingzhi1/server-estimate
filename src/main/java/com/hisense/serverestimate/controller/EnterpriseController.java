@@ -36,7 +36,7 @@ public class EnterpriseController extends BaseController{
     public String getEnterpriseList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         JSONObject parseObject = JSON.parseObject(jsonParam);
         int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
-        Map<String,Object> param=new HashMap<>();
+        Map<String,Object> param=new HashMap<>(10);
 //        numberPerPage=100;
         param.put("startIndex",(page-1)*numberPerPage);
         param.put("pCount",numberPerPage);
@@ -50,7 +50,7 @@ public class EnterpriseController extends BaseController{
         List<BaseEnterprise> serverList= enterpriseMapper.getEnterpriseList(param);
         if(!CollectionUtils.isEmpty(serverList)) {
             double listNum = enterpriseMapper.getEnterpriseListNum(param);
-            Map<String, Object> result = new HashMap<>();
+            Map<String, Object> result = new HashMap<>(10);
             result.put("totalPage", Math.ceil(listNum / numberPerPage));
             result.put("list", serverList);
             result.put("currentPage", page);
