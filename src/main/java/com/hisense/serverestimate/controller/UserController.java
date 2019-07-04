@@ -37,6 +37,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("userController")
 public class UserController extends BaseController {
+    @Value("${baseinfo.defaultPassword}")
+    public String defaultPassword;
     @Value("${xinshang.callApiTokenUrl}")
     public String callApiTokenUrl;
     @Value("${xinshang.checkSsoLoginTokenUrl}")
@@ -256,7 +258,7 @@ public class UserController extends BaseController {
     public String resetPassword(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try{
             BaseUser userById = userMapper.selectByPrimaryKey(jsonParam);
-            userById.setPassword(Encryption.encrypByMD5("1"));
+            userById.setPassword(Encryption.encrypByMD5(defaultPassword));
             userMapper.updateByPrimaryKey(userById);
             return SUCCESS;
         }catch (Exception e){
@@ -315,7 +317,7 @@ public class UserController extends BaseController {
             if(StringUtils.isEmpty(id)){
                 //新增
                 entity.setUserId(HiStringUtil.getRandomUUID());
-                entity.setPassword(Encryption.encrypByMD5("1"));
+                entity.setPassword(Encryption.encrypByMD5(defaultPassword));
                 userMapper.insert(entity);
             }else{
                 //修改
@@ -336,142 +338,4 @@ public class UserController extends BaseController {
         }
         return "";
     }
-
-    /*
-
-
-    */
-
-/**
-     * 获取用户列表
-     * @param jsonParam
-     * @param request
-     * @return
-     */
-/**
-     * 获取所有用户
-     * @return
-     *//*
-
-    @RequestMapping(value = "getAllUsers", method = RequestMethod.GET)
-    @ResponseBody
-    public String getAllUsers() {
-        List<BaseUser> userList=userMapper.getAllUsers();
-
-        if(!CollectionUtils.isEmpty(userList)){
-            return JSON.toJSONString(userList);
-        }
-        return "";
-    }
-
-    */
-/**
-     * 新增或者修改用户
-     * 根据id是否为空来判断新增或者修改
-     * @param jsonParam
-     * @param request
-     * @return
-     *//*
-
-    @RequestMapping(value = "saveUser", method = RequestMethod.GET)
-    @ResponseBody
-    @Transactional
-    public String saveUser(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try {
-            JSONObject parseObject = JSON.parseObject(jsonParam);
-            String id = HiStringUtil.getJsonStringByKey(parseObject, "id");
-            String username = HiStringUtil.getJsonStringByKey(parseObject, "username");
-            String trueName = HiStringUtil.getJsonStringByKey(parseObject, "trueName");
-            String email = HiStringUtil.getJsonStringByKey(parseObject, "email");
-            String company = HiStringUtil.getJsonStringByKey(parseObject, "company");
-            BaseUser entity=new BaseUser(id,username,trueName,email,company);
-            if(StringUtils.isEmpty(id)){
-                //新增
-                entity.setId(HiStringUtil.getRandomUUID());
-                entity.setPassword(Encryption.encrypByMD5(entity.getUsername()));
-                userMapper.insertUser(entity);
-            }else{
-                //修改
-                userMapper.updateUser(entity);
-            }
-            return SUCCESS;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return FAILED;
-    }
-
-
-
-
-    @RequestMapping(value = "getUserByUsername", method = RequestMethod.GET)
-    @ResponseBody
-    public String getUserByUsername(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try{
-            BaseUser u=userMapper.getUserByUsername(jsonParam);
-            if(null!=u){
-                return JSON.toJSONString(u);
-            }
-
-        }catch (Exception e){
-
-        }
-        return "";
-    }
-    @RequestMapping(value = "getUserById", method = RequestMethod.GET)
-    @ResponseBody
-    public String getUserById(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try{
-            BaseUser u=userMapper.getUserById(jsonParam);
-            if(null!=u){
-                return JSON.toJSONString(u);
-            }
-
-        }catch (Exception e){
-
-        }
-        return "";
-    }
-
-    */
-/**
-     * 根据重置密码
-     * @param jsonParam
-     * @param request
-     * @return
-     *//*
-
-    @RequestMapping(value = "resetPassword", method = RequestMethod.GET)
-    @ResponseBody
-    public String resetPassword(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
-        try{
-            BaseUser userById = userMapper.getUserById(jsonParam);
-            userMapper.resetPassword(jsonParam,Encryption.encrypByMD5("1"));
-            return SUCCESS;
-        }catch (Exception e){
-
-        }
-        return FAILED;
-    }
-
-
-
-
-
-    @RequestMapping("getUserById/{id}")
-    public BaseUser getUserById(@PathVariable(name = "id") String id) {
-        if (!StringUtils.isEmpty(id)) {
-//            return new BaseUser();
-            BaseUser userById = userMapper.getUserById("1");
-            System.out.println(userById.getTrueName());
-            return userMapper.getUserById(id);
-        }
-        return null;
-    }
-
-*/
-
-
-
-
 }

@@ -75,11 +75,7 @@ public class ServerController extends BaseController{
     @ResponseBody
     @Transactional
     public String importServerEnterprise(MultipartFile dataFile){
-        final String id = HiStringUtil.getRandomUUID();
-        String fileUrl = null;
-        String fileName = null;
         boolean result=false;
-        final String loginUserId = SessionUtil.getLoginUserId();
         if(null!=dataFile&&!StringUtils.isEmpty(dataFile.getOriginalFilename())) {
             result = serverService.importServerEnterprise(dataFile);
         }

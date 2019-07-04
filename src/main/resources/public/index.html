@@ -37,10 +37,11 @@
               console.log(entity)
               if(entity.roleName.indexOf('admin')>=0){
                 $("#leftFrame").attr("src","files/left.html")
-                // $("#mainFrame").attr("src","files/topicList.html")
+                $("#mainFrame").attr("src","files/examList.html")
                 break;
               }else if(entity.roleName.indexOf('guest')>=0){
-                $("#leftFrame").attr("src","files/left-guest.html")
+                $("#leftFrame").attr("src","files/left-guest.html");
+                $("#mainFrame").attr("src","files/examList.html");
               }
             }
           }else{

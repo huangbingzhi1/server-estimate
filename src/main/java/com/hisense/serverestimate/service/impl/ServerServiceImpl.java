@@ -7,6 +7,7 @@ import com.hisense.serverestimate.mapper.BaseEnterpriseMapper;
 import com.hisense.serverestimate.mapper.BaseServerMapper;
 import com.hisense.serverestimate.mapper.ServerEnterpriseRelMapper;
 import com.hisense.serverestimate.service.ServerService;
+import com.hisense.serverestimate.service.UserService;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.monitorjbl.xlsx.StreamingReader;
@@ -33,6 +34,10 @@ public class ServerServiceImpl implements ServerService {
 
     @Autowired
     private ServerEnterpriseRelMapper serverEnterpriseRelMapper;
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     private BaseServerMapper serverMapper;
 
@@ -42,6 +47,7 @@ public class ServerServiceImpl implements ServerService {
     @Override
     @CacheEvict(value = "cacheEnterpriseCisServerCodeMD5", allEntries = true)
     public boolean importServerEnterprise(MultipartFile dataFile) {
+        Set<String> companySet=new HashSet<>(100);
         Workbook workbook = null;
         try {
             workbook = StreamingReader.builder()
@@ -67,6 +73,7 @@ public class ServerServiceImpl implements ServerService {
                     getValue(row.getCell(2)), getValue(row.getCell(1)), getValue(row.getCell(0)),
                     getValue(row.getCell(3)), getValue(row.getCell(4)), getValue(row.getCell(5)),
                     getValue(row.getCell(6)), getValue(row.getCell(7)));
+            companySet.add(getValue(row.getCell(8)));
             BaseEnterprise enterprise = new BaseEnterprise(HiStringUtil.getRandomUUID(), getValue(row.getCell(11)),
                     getValue(row.getCell(10)), getValue(row.getCell(9)), getValue(row.getCell(8)), getValue(row.getCell(8)));
 
@@ -99,6 +106,7 @@ public class ServerServiceImpl implements ServerService {
         serverMapper.insertAll(serverMap.values());
         serverEnterpriseRelMapper.deleteAll();
         serverEnterpriseRelMapper.insertAll(serverEnterpriseRels);
+        userService.addCompanyUser(companySet);
         return true;
     }
 

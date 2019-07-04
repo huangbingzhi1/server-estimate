@@ -12,7 +12,6 @@ import java.io.IOException;
  * @Version 1.0
  * 基类，定义各个controller常用到的方法和变量
  */
-@Controller
 public class BaseController {
     @Value("${user.numberperpage}")
     public int numberPerPage;

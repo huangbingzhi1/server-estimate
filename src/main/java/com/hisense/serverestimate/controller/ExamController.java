@@ -178,7 +178,7 @@ public class ExamController extends BaseController {
         return SUCCESS;
     }
 
-    @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.POST)
+    @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.GET)
     @ResponseBody
     public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam,HttpServletRequest request) {
         try {
@@ -193,7 +193,7 @@ public class ExamController extends BaseController {
             XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();
 //            param.put("cis", account.getCisCode());
-//            测试
+//            测试数据
             param.put("cis", "7111406");
             if(!StringUtils.isEmpty(jsonParam)){
                 JSONObject parseObject = JSON.parseObject(jsonParam);
@@ -330,7 +330,7 @@ public class ExamController extends BaseController {
         Map<String,Object> param=new HashMap<>(2);
         param.put("qid",qid);
         if("guest".equals(loginUser.getRoleId())){
-            param.put("companpy",loginUser.getCompany());
+            param.put("company",loginUser.getCompany());
         }
         List<Map<String,Object>> examResult= examDetailMapper.getAllExamResult(param);
         ExamMain main=examMainMapper.selectByQid(qid);
@@ -347,7 +347,7 @@ public class ExamController extends BaseController {
         String qid = HiStringUtil.getJsonStringByKey(parseObject, "qid");
         param.put("qid",qid);
         if("guest".equals(loginUser.getRoleId())){
-            param.put("companpy",loginUser.getCompany());
+            param.put("company",loginUser.getCompany());
         }
         String keyword=HiStringUtil.getJsonStringByKey(parseObject, "keyword");
         if(!StringUtils.isEmpty(keyword)){

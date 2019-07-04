@@ -3,9 +3,7 @@ package com.hisense.serverestimate.service.impl;
 import com.hisense.serverestimate.entity.ExamMain;
 import com.hisense.serverestimate.entity.ExamTitle;
 import com.hisense.serverestimate.service.ExamService;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +25,40 @@ import java.util.Map;
 public class ExamServiceImpl implements ExamService {
     public static final int LINE_START_ENTERPRISE=2;
 
+    private CellStyle normalCellStyle;
+    private CellStyle titleCellStyle;
+
     @Override
     public void addExamDetail(ExamMain main) {
 
+    }
+    /**
+     * 生成样式
+     */
+    private void createCellStyle(Workbook workbook) {
+        normalCellStyle = workbook.createCellStyle();
+        normalCellStyle.setBorderBottom(BorderStyle.THIN);
+        normalCellStyle.setBorderLeft(BorderStyle.THIN);
+        normalCellStyle.setBorderRight(BorderStyle.THIN);
+        normalCellStyle.setBorderTop(BorderStyle.THIN);
+
+        titleCellStyle = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        titleCellStyle.setFont(font);
+        titleCellStyle.setBorderBottom(BorderStyle.THIN);
+        titleCellStyle.setBorderLeft(BorderStyle.THIN);
+        titleCellStyle.setBorderRight(BorderStyle.THIN);
+        titleCellStyle.setBorderTop(BorderStyle.THIN);
+        titleCellStyle.setFillForegroundColor(IndexedColors.GOLD.getIndex());
+        titleCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        titleCellStyle.setAlignment(HorizontalAlignment.CENTER);
     }
 
     @Override
     public void downloadExamResultData(HttpServletResponse response, ExamMain main, List<Map<String, Object>> examResult, List<ExamTitle> titles) {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        String fileName="sss.xlsx";
+        String fileName=main.getExamName()+".xlsx";
         try {
             response.setHeader("Content-Disposition", "attachment;filename=\""+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
         } catch (UnsupportedEncodingException e) {
@@ -48,7 +72,10 @@ public class ExamServiceImpl implements ExamService {
         }
 
         Workbook workbook =  new XSSFWorkbook() ;
-        int rowIndex=2;
+        createCellStyle(workbook);
+//        int rowIndex=2;
+        int rowIndexStart=2;
+        Map<String,Integer> rowIndexMap=new HashMap<>(100);
         String scoreTypeIndexs = main.getScoreTypeIndexs();
         String[] scoreTypeIndexArr = scoreTypeIndexs.split(",");
 
@@ -57,13 +84,15 @@ public class ExamServiceImpl implements ExamService {
             String companyName = detail.get("company_name").toString();
             Sheet currSheet = workbook.getSheet(companyName);
             if(null==currSheet){
+                rowIndexMap.put(companyName,rowIndexStart);
                 currSheet = workbook.createSheet(companyName);
                 createSheetTitle(currSheet,scoreTypeIndexArr,titles);
             }
             String  scoreStr = detail.getOrDefault("score_array","").toString();
             String[] scoreArr = scoreStr.split(",");
             int cellIndex=0;
-            Row currRow = currSheet.createRow(rowIndex++);
+            Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
+            rowIndexMap.put(companyName,rowIndexMap.get(companyName)+1);
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("server_company_name","").toString());
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("server_name","").toString());
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("server_code","").toString());
@@ -80,11 +109,14 @@ public class ExamServiceImpl implements ExamService {
                 if(i<scoreArr.length){
                     currRow.createCell(cellIndex++).setCellValue(scoreArr[i]);
                 }else{
-                    cellIndex++;
+                    currRow.createCell(cellIndex++);
                 }
             }
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("totle_score","").toString());
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("mean_score","").toString());
+            for (int i = 0; i < cellIndex; i++) {
+                currRow.getCell(i).setCellStyle(normalCellStyle);
+            }
         }
 
         try {
@@ -99,14 +131,16 @@ public class ExamServiceImpl implements ExamService {
         for (int j = 0; j < LINE_START_ENTERPRISE; j++) {
             Row newRow = sheet.createRow(j);
             for (int i = 0; i < 14 + scoreTypeIndexArr.length; i++) {
-                newRow.createCell(i);
+                Cell cell = newRow.createCell(i);
+                cell.setCellStyle(titleCellStyle);
+                sheet.setColumnWidth(i, 20 * 256);
             }
         }
         CellRangeAddress region = new CellRangeAddress(0, 0, 0, 7);
         sheet.addMergedRegion(region);
         region = new CellRangeAddress(0, 0, 8, 11);
         sheet.addMergedRegion(region);
-        region = new CellRangeAddress(0, 0, 12, 14+scoreTypeIndexArr.length);
+        region = new CellRangeAddress(0, 0, 12, 13+scoreTypeIndexArr.length);
         sheet.addMergedRegion(region);
         Row row1=sheet.getRow(0);
         row1.getCell(0).setCellValue("赛维服务商信息");

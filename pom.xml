@@ -138,10 +138,14 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
 		<!--		ehcache缓存     结束-->
+		<!-- https://mvnrepository.com/artifact/com.belerweb/pinyin4j -->
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
+			<groupId>com.belerweb</groupId>
+			<artifactId>pinyin4j</artifactId>
+			<version>2.5.1</version>
 		</dependency>
+
+
 	</dependencies>
 
 	<build>

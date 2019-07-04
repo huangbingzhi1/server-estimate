@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/jquery-ui.min.css">
     <link rel="stylesheet" type="text/css" href="../css/hi-main.css"/>
 </head>
-<SCRIPT language=JavaScript>
+<script language=JavaScript>
     var globalQid=null;
     $(function () {
         var request = getRequest();
@@ -115,14 +115,18 @@
             html += "<td>" + entity.company_name+ "</td>";
             html += "<td>" + entity.enterprise_cis+ "</td>";
             html += "<td>" + entity.enterprise_name+ "</td>";
-            html += "<td>" + entity.mean_score+ "</td>";
+            if(entity.mean_score!=undefined){
+                html += "<td>" + entity.mean_score + "</td>";
+            }else{
+                html += "<td></td>";
+            }
             html += "</tr>";
         }
         $("#tbMain").html(html);
     }
 
 
-</SCRIPT>
+</script>
 
 <body>
 <div class="toolbar">
