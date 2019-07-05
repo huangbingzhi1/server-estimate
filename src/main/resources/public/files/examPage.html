@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script type="text/javascript" src="../js/jquery.js"></script>
     <script type="text/javascript">
+
+        function getCookie(name){
+            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+            if(arr=document.cookie.match(reg)){
+                return unescape(arr[2]);
+            }else {
+                return null;
+            }
+        }
+
         $(function () {
+            var iframe = document.getElementById('mainFrame');
+            iframe.onload = function() {
+                console.log(123)
+            }
+            var examDetail=decodeURIComponent(decodeURIComponent(getCookie("examDetails")));
             var script = document.createElement('script');
             script.type = 'text/javascript';
-            script.src = 'https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t';
-            // $("#mainExams").append(script)
-            // $("body").append(script)
-            $("#s1").click(function () {
-                var html = '<script type="text/javascript" src="https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t"><\/script>';
-                $('#mainExams').html(html);
-            })
+            script.src = 'https://www.wjx.cn/jq/42322270,i,t.aspx?width=800&sojumpparm=1';
         })
     </script>
 </head>
@@ -20,10 +30,10 @@
 
 <body style="color:#4B4967">
 <select id="s1">
-    <option value="1">�̻�1</option>
+    <option value="1">sdf撒旦法</option>
 </select>
 <br>
-    <iframe width="800px" height="600px" src="https://www.wjx.cn/jq/41962622.aspx?sojumpparm=7111487,JMS1608010161"></iframe>
+    <iframe  id="mainFrame" width="800px" height="600px" src="https://www.wjx.cn/jq/42322270,i,t.aspx?width=800&sojumpparm=2"></iframe>
 <!--<script type='text/javascript' id="examUrl"-->
 <!--        src='https://www.wjx.cn/handler/jqemed.ashx?activity=41943184&sojumpparm=7111487,JMS1608010165&width=760&source=iframe&tm=1&sm=t'>
  </script>-->

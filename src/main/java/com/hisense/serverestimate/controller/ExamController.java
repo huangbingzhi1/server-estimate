@@ -183,8 +183,6 @@ public class ExamController extends BaseController {
     public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam,HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-
             HttpSession session = request.getSession();
             Object obj = session.getAttribute("account");
             if(null==obj) {
@@ -192,9 +190,9 @@ public class ExamController extends BaseController {
             }
             XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();
-//            param.put("cis", account.getCisCode());
+            param.put("cis", account.getCisCode());
 //            测试数据
-            param.put("cis", "7111406");
+            param.put("cis", "2007651");
             if(!StringUtils.isEmpty(jsonParam)){
                 JSONObject parseObject = JSON.parseObject(jsonParam);
                 String hasDealed = HiStringUtil.getJsonStringByKey(parseObject, "hasDealed");

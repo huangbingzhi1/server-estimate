@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,11 +95,12 @@ public class UserController extends BaseController {
                     String uid=HiStringUtil.getJsonStringByKey(responseObj,"uid");
                     XsAccount xsAccount= xsAccountMapper.selectByAccount(uid);
                     if(null!=xsAccount){
-                        BaseUser user=userMapper.getUserByUsername("enterprise");
+                        BaseUser user=new BaseUser("temp","temp","temp","temp","temp","temp");
                         session.setMaxInactiveInterval(-1);
                         session.setAttribute("loginUser", user);
                         session.setAttribute("account",xsAccount);
                         toExamPage(request, response);
+
                     }
                 }
             }
@@ -108,7 +110,10 @@ public class UserController extends BaseController {
     private void toExamPage(HttpServletRequest request,HttpServletResponse response) {
         try {
             String examDetailListByLoginAccount = examController.getExamDetailListByLoginAccount(null,request);
-            request.getSession().setAttribute("examData",examDetailListByLoginAccount);
+            Cookie cookie=new Cookie("examDetails", URLEncoder.encode(URLEncoder.encode(examDetailListByLoginAccount, "utf-8"), "utf-8"));
+            cookie.setMaxAge(60);
+            cookie.setPath("/");
+            response.addCookie(cookie);
             response.sendRedirect("../files/examPage.html");
         } catch (IOException e) {
             e.printStackTrace();
