@@ -113,8 +113,9 @@
             html += "<tr onmouseover='addclass(this)'onmouseout='removeclass(this)'>";
             html += "<td>" + (i + 1) + "</td>";
             html += "<td>" + entity.company_name+ "</td>";
-            html += "<td>" + entity.enterprise_cis+ "</td>";
-            html += "<td>" + entity.enterprise_name+ "</td>";
+            html += "<td>" + entity.server_code+ "</td>";
+            html += "<td>" + entity.server_name+ "</td>";
+            html += "<td>" + entity.manager+ "</td>";
             if(entity.mean_score!=undefined){
                 html += "<td>" + entity.mean_score + "</td>";
             }else{
@@ -144,8 +145,9 @@
         <tr >
             <th width="5%">序号</th>
             <th width="10%">分公司</th>
-            <th width="10%">CIS编号</th>
-            <th width="45%">商家名称</th>
+            <th width="10%">服务商编码</th>
+            <th width="35%">服务商名称</th>
+            <th width="10%">服务商经理</th>
             <th width="10%">最终得分</th>
         </tr>
         <tbody id="tbMain">

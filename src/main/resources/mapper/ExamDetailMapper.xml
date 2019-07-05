@@ -128,40 +128,49 @@
   </select>
   <select id="getEnterpriseExamResult" parameterType="map" resultType="map">
     SELECT DISTINCT
-    d.enterprise_cis,
-    e.company_name,
-    e.office,
-    e.enterprise_name,
-    d.mean_score
+      d.server_code,
+      d.mean_score,
+      s.server_name,
+      s.company_name,
+      s.province,
+      s.manager,
+      s.city,
+      s.district
     FROM
     exam_detail d
-    JOIN base_enterprise e
-    ON d.enterprise_cis = e.cis
+    JOIN base_server s
+    ON d.server_code = s.server_code
+    LEFT JOIN base_enterprise e
+    ON e.cis=d.enterprise_cis
     WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
     <if test="keyword != null and keyword !=''" >
-      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.cis LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.office LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.company_name LIKE #{keyword,jdbcType=VARCHAR})
+      AND (s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.province LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.city LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.district LIKE #{keyword,jdbcType=VARCHAR})
     </if>
     <if test="company != null and company !=''" >
       AND e.company_name =  #{company,jdbcType=VARCHAR}
     </if>
-    ORDER BY d.mean_score desc,d.enterprise_cis
+    ORDER BY d.mean_score desc,d.server_code
       LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
   </select>
   <select id="getEnterpriseExamResultNum"  parameterType="map" resultType="Integer">
-    SELECT COUNT(DISTINCT d.enterprise_cis)
+    SELECT COUNT(DISTINCT d.server_code)
     FROM
     exam_detail d
-    JOIN base_enterprise e
-    ON d.enterprise_cis = e.cis
+    JOIN base_server s
+    ON d.server_code = s.server_code
+    LEFT JOIN base_enterprise e
+    ON e.cis=d.enterprise_cis
     WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
     <if test="keyword != null and keyword !=''" >
-      AND (e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.cis LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.office LIKE #{keyword,jdbcType=VARCHAR}
-      OR e.company_name LIKE #{keyword,jdbcType=VARCHAR})
+      AND (s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.province LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.city LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.district LIKE #{keyword,jdbcType=VARCHAR})
     </if>
     <if test="company != null and company !=''" >
       AND e.company_name =  #{company,jdbcType=VARCHAR}
