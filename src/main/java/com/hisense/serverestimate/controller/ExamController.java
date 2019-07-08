@@ -8,9 +8,12 @@ import com.hisense.serverestimate.mapper.ExamMainMapper;
 import com.hisense.serverestimate.mapper.ExamTitleMapper;
 import com.hisense.serverestimate.service.ExamService;
 import com.hisense.serverestimate.service.ServerService;
+import com.hisense.serverestimate.service.impl.UserServiceImpl;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +40,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("examController")
 public class ExamController extends BaseController {
+    private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
+
     @Value("${wjx.examListUrl}")
     public String wjxExamListUrl;
     @Value("${wjx.examTitleListUrl}")
@@ -104,8 +109,6 @@ public class ExamController extends BaseController {
             examMain.setExamDomain(examDomain);
             examMainMapper.updateByPrimaryKey(examMain);
         }
-
-        System.out.println(parseObject);
         return SUCCESS;
     }
 
@@ -172,7 +175,6 @@ public class ExamController extends BaseController {
                         }
                     }
                 }
-                System.out.println(wjxExamTitleList);
             }
         }
         return SUCCESS;
@@ -219,6 +221,7 @@ public class ExamController extends BaseController {
             }
             return JSON.toJSONString(examInfoByCisList);
         } catch (Exception e) {
+            logger.error(e.toString());
             return "";
         }
     }
@@ -240,7 +243,7 @@ public class ExamController extends BaseController {
             if(cisServerCodeMd5Map.containsKey(sojumpparm)){
                 sojumpparm=cisServerCodeMd5Map.get(sojumpparm);
             }else{
-                System.out.println("sojumpparm错误");
+                logger.error("sojumpparm错误");
             }
             String cis=null;
             String serverCode=null;
@@ -252,7 +255,7 @@ public class ExamController extends BaseController {
                 }
             }
             if(StringUtils.isEmpty(cis)||StringUtils.isEmpty(serverCode)){
-                System.out.println("缺少cis或者服务商编码");
+                logger.error("缺少cis或者服务商编码");
             }
             if(StringUtils.isEmpty(qid)){
                 return;
@@ -264,7 +267,7 @@ public class ExamController extends BaseController {
             param.put("cis",cis);
             ExamDetail examDetail = examDetailMapper.selectByQidCisServerCode(param);
             if(null==examMain||null==examDetail){
-                System.out.println("查不到相关问卷");
+                logger.error("查不到相关问卷");
             }
             int timetaken=HiStringUtil.getJsonIntByKey(parseObject,"timetaken");
             Date submittime=new Date();
@@ -314,7 +317,7 @@ public class ExamController extends BaseController {
             examDetailMapper.updateByPrimaryKey(examDetail);
             examDetailMapper.updateMeanScoreByQidCis(param);
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.toString());
         }
     }
     /**
