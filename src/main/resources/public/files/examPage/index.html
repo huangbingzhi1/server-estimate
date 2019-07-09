@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>调查问卷</title>
+
+    <link rel="stylesheet" href="css/styles.css" type="text/css"/>
+    <link rel="stylesheet" href="../../css/awesome/css/font-awesome.min.css" type="text/css"/>
+    <script type="text/javascript" src="../../js/jquery.js"></script>
+    <script type="text/javascript">
+        function getCookie(name){
+            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+            if(arr=document.cookie.match(reg)){
+                return unescape(arr[2]);
+            }else {
+                return null;
+            }
+        }
+
+        $(document).ready(function () {
+            var examDetail=decodeURIComponent(decodeURIComponent(getCookie("examDetails")));
+            if(examDetail){
+                initMenu(examDetail);
+            }
+            var iframe = document.getElementById('mainFrame');
+            iframe.onload = function() {
+                console.log($("#mainFrame").attr("src"))
+            }
+            /* 滑动/展开 */
+            $("ul.expmenu li > div.header").click(function () {
+                var arrow = $(this).find("span.arrow");
+                if (arrow.hasClass("up")) {
+                    arrow.removeClass("up");
+                    arrow.addClass("down");
+                } else if (arrow.hasClass("down")) {
+                    arrow.removeClass("down");
+                    arrow.addClass("up");
+                }
+                $(this).parent().find("ul.menu").slideToggle();
+            });
+            $("li").click(function () {
+
+            })
+            $(".menu li").click(function () {
+                if($(this).attr("value")){
+                    if ($(this).hasClass("selected")) {
+                        $(this).removeClass("selected");
+                    } else {
+                        $(this).addClass("selected");
+                    }
+                    $(this).parent().parent().siblings().children().children().removeClass("selected")
+                    $(this).siblings().removeClass("selected");
+                    $("#mainFrame").attr("src",($(this).attr("value")));
+                }
+            })
+        });
+        $(window).resize(function () {
+            resize();
+        });
+        resize = function () {
+            winHeight = $(window).height();
+            $("#leftDiv").css("height", winHeight);
+            $("#mainDiv").css("height", winHeight);
+            $("#mainFrame").css("height", winHeight);
+            $("#mainFrame").css("width", (parseInt($("#mainDiv").css("width")) - 10) + "px");
+        }
+        initMenu=function (data) {
+            var examTitle=new Array();
+            var examList= eval('(' + data + ')');
+            for (var i = 0; i < examList.length; i++) {
+                if(examTitle.indexOf(examList[i].exam_name)<0){
+                    examTitle.push(examList[i].exam_name)
+                }
+            }
+            var html="";
+            if(examTitle.length>0){
+                for (var i = 0; i < examTitle.length; i++) {
+                    html+="<li>";
+                    html+="<div class='header'>";
+                    html+=" <span class='label'>"+"<i class='fa fa-star-half-o'></i>"+examTitle[i]+"</span>";
+                    html+="</div>";
+                    html+="<ul class='menu'>";
+                    for (var j = 0; j < examList.length; j++) {
+                        if(examTitle[i]==examList[j].exam_name){
+                            // if(!examList[j].submittime){
+                            if(examList[j].exam_name=="第一季度满意度调研"){
+                                // html+=;
+                                html+="<li style='color: silver;cursor: default;' value=''>"+"<i class='fa fa-check-circle fa-fw'></i>"+examList[j].server_name+"</li>";
+                            }else{
+                                html+="<li value='"+examList[j].url+"'>"+"<i class='fa fa-circle-o fa-fw'></i>"+examList[j].server_name+"</li>";
+                            }
+                        }
+                    }
+                    html+="</ul>";
+                    html+="</li>";
+                }
+            }
+            $(".expmenu").empty();
+            $(".expmenu").append(html);
+        }
+    </script>
+    <style type="text/css">
+        .posted{
+            background: #60B900;
+        }
+    </style>
+</head>
+<body>
+<div class="logo">
+    <div style="float:left;"><img alt="" src="images/hisense-logo.png" ><span>海信服务评价系统<span></div>
+    <div class="clearall" style="clear: both;"></div>
+
+</div>
+<div id="leftDiv" style="width:29%;float: left;border-right-color: #019ea1;border-right-width:2px;border-right-style: solid; height="100%">
+    <ul class="expmenu">
+        <!--<li>
+            <div class="header">
+                <span class="label"><i class='fa fa-pencil fa-fw'></i>箭牌卫浴</span>
+            </div>
+            <ul class="menu">
+                <li class="posted" value="https://www.wjx.cn/jq/42322270,i,t.aspx?width=800&sojumpparm=1">小便器</li>
+            </ul>
+        </li>-->
+    </ul>
+</div>
+<div id="mainDiv" style="width:70%;float: left;">
+    <iframe id="mainFrame" style="border:0px" width="800px" height="100%;" onload="resize()"
+            src=""></iframe>
+</div>
+</body>
+</html>

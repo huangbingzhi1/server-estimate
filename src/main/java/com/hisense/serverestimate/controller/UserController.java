@@ -56,15 +56,6 @@ public class UserController extends BaseController {
     @Autowired
     private ExamController examController;
 
-    @RequestMapping(value = "ssoTest", method = RequestMethod.GET)
-    public void ssoTest(HttpServletRequest request,HttpServletResponse response) {
-        try {
-            response.sendRedirect("../files/examPage.html");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * 单点登录
      * @param request
@@ -114,7 +105,7 @@ public class UserController extends BaseController {
             cookie.setMaxAge(60);
             cookie.setPath("/");
             response.addCookie(cookie);
-            response.sendRedirect("../files/examPage.html");
+            response.sendRedirect("../files/examPage/index.html");
         } catch (IOException e) {
             e.printStackTrace();
         }
