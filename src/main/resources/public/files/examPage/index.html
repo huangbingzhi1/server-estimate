@@ -9,20 +9,26 @@
     <link rel="stylesheet" href="../../css/awesome/css/font-awesome.min.css" type="text/css"/>
     <script type="text/javascript" src="../../js/jquery.js"></script>
     <script type="text/javascript">
-        function getCookie(name){
-            var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
-            if(arr=document.cookie.match(reg)){
-                return unescape(arr[2]);
-            }else {
-                return null;
-            }
+        //通过Ajax 发送请求
+        function queryexamlist() {
+            $.ajax({
+                type: "GET",
+                url: "../../examController/getExamDetailListByLoginAccount",
+                data: {"jsonParam":""},
+                dataType: "json",
+                success: function(data){
+                    if((data==null) || (data=="")){
+                        alert("没有对应服务商");
+                        return ;
+                    }else {
+                        // 对结果进行处理
+                        initMenu(data);
+                    }
+                }
+            });
         }
-
         $(document).ready(function () {
-            var examDetail=decodeURIComponent(decodeURIComponent(getCookie("examDetails")));
-            if(examDetail){
-                initMenu(examDetail);
-            }
+            queryexamlist();
             var iframe = document.getElementById('mainFrame');
             iframe.onload = function() {
                 console.log($("#mainFrame").attr("src"))
@@ -40,9 +46,10 @@
                 $(this).parent().find("ul.menu").slideToggle();
             });
             $("li").click(function () {
-
+                    alert("====");
             })
             $(".menu li").click(function () {
+                console.info("====");
                 if($(this).attr("value")){
                     if ($(this).hasClass("selected")) {
                         $(this).removeClass("selected");
@@ -65,9 +72,9 @@
             $("#mainFrame").css("height", winHeight);
             $("#mainFrame").css("width", (parseInt($("#mainDiv").css("width")) - 10) + "px");
         }
-        initMenu=function (data) {
+        initMenu=function (examList) {
             var examTitle=new Array();
-            var examList= eval('(' + data + ')');
+           // var examList= eval('(' + data + ')');
             for (var i = 0; i < examList.length; i++) {
                 if(examTitle.indexOf(examList[i].exam_name)<0){
                     examTitle.push(examList[i].exam_name)
