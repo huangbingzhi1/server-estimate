@@ -31,3 +31,7 @@ HELP.md
 
 #### property ###
 /src/main/resources/application.properties
+
+/src/main/resources/application-test2.properties
+/server-estimate.log
+/README.md

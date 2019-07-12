@@ -14,6 +14,8 @@ import com.hisense.serverestimate.service.ServerService;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,6 +40,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("serverController")
 public class ServerController extends BaseController{
+    private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
     @Autowired
     private BaseServerMapper serverMapper;
 
@@ -162,7 +165,7 @@ public class ServerController extends BaseController{
             }
 
         }catch (Exception e){
-
+            logger.error(e.toString());
         }
         return "";
     }
@@ -177,7 +180,7 @@ public class ServerController extends BaseController{
             }
 
         }catch (Exception e){
-
+            logger.error(e.toString());
         }
         return "";
     }

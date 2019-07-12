@@ -11,6 +11,9 @@ import com.hisense.serverestimate.mapper.XsAccountMapper;
 import com.hisense.serverestimate.utils.Encryption;
 import com.hisense.serverestimate.utils.HiStringUtil;
 import com.hisense.serverestimate.utils.SessionUtil;
+import java_cup.symbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("userController")
 public class UserController extends BaseController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Value("${baseinfo.defaultPassword}")
     public String defaultPassword;
     @Value("${xinshang.callApiTokenUrl}")
@@ -73,13 +77,18 @@ public class UserController extends BaseController {
         session.removeAttribute("loginUser");
         if(!StringUtils.isEmpty(resCode)&&!StringUtils.isEmpty(tokenId)&&SUCCESS.equalsIgnoreCase(resCode)){
             String ssoLoginToken=getCookieValue(request,"ssoLoginToken");
+            if(StringUtils.isEmpty(ssoLoginToken)){
+                ssoLoginToken=request.getParameter("ssoLoginToken");
+            }
+            logger.error("ssoLoginToken:[{}]", ssoLoginToken);
             if(!StringUtils.isEmpty(ssoLoginToken)){
                 StringBuilder sb=new StringBuilder(checkSsoLoginTokenUrl);
                 sb.append("?tokenId=")
                         .append(tokenId)
                         .append("&ssoLoginToken=")
-                        .append(ssoLoginToken);
+                         .append(ssoLoginToken);
                 String accountStr = restTemplate.getForObject(sb.toString(), String.class);
+                logger.error("accountStr:[{}]", accountStr);
                 final JSONObject responseObj = JSON.parseObject(accountStr);
                 resCode=HiStringUtil.getJsonStringByKey(responseObj,"resCode");
                 if(resCode.equalsIgnoreCase(SUCCESS)){
@@ -90,10 +99,11 @@ public class UserController extends BaseController {
                         session.setMaxInactiveInterval(-1);
                         session.setAttribute("loginUser", user);
                         session.setAttribute("account",xsAccount);
+                        logger.error("user:[{}]", user.toString());
                         toExamPage(request, response);
-
                     }
                 }
+
             }
         }
     }
@@ -102,7 +112,7 @@ public class UserController extends BaseController {
         try {
             String examDetailListByLoginAccount = examController.getExamDetailListByLoginAccount(null,request);
             Cookie cookie=new Cookie("examDetails", URLEncoder.encode(URLEncoder.encode(examDetailListByLoginAccount, "utf-8"), "utf-8"));
-            cookie.setMaxAge(60);
+            cookie.setMaxAge(60*60*24);
             cookie.setPath("/");
             response.addCookie(cookie);
             response.sendRedirect("../files/examPage/index.html");
@@ -110,6 +120,7 @@ public class UserController extends BaseController {
             e.printStackTrace();
         }
     }
+
 
     /**
      * 用户登录

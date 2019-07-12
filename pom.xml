@@ -144,9 +144,14 @@
 			<artifactId>pinyin4j</artifactId>
 			<version>2.5.1</version>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.8</version>
+        </dependency>
 
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>
@@ -155,7 +160,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<fork>true</fork>
-					<mainClass>com.hisense.serverestimate.serverestimateApplication</mainClass>
+					<mainClass>com.hisense.serverestimate.ServerEstimateApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

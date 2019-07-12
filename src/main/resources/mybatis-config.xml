@@ -20,6 +20,7 @@
         <mapper resource="mapper/ExamDetailMapper.xml"/>
         <mapper resource="mapper/ServerEnterpriseRelMapper.xml"/>
         <mapper resource="mapper/XsAccountMapper.xml"/>
+        <mapper resource="mapper/ErrorExamDetailMapper.xml"/>
 
     </mappers>
 </configuration>

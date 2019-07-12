@@ -3,6 +3,7 @@ package com.hisense.serverestimate.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hisense.serverestimate.entity.*;
+import com.hisense.serverestimate.mapper.ErrorExamDetailMapper;
 import com.hisense.serverestimate.mapper.ExamDetailMapper;
 import com.hisense.serverestimate.mapper.ExamMainMapper;
 import com.hisense.serverestimate.mapper.ExamTitleMapper;
@@ -25,6 +26,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +55,8 @@ public class ExamController extends BaseController {
     public String textTypeIndexs;
     @Value("${wjx.domain}")
     public String wjxDomain;
+    @Autowired
+    private ErrorExamDetailMapper errorExamDetailMapper;
     @Autowired
     private ExamMainMapper examMainMapper;
     @Autowired
@@ -133,7 +138,7 @@ public class ExamController extends BaseController {
                 if (entity.getQid().equals(main.getExamQid())) {
                     existFlag = true;
                     int newAnswer = Integer.parseInt(entity.getAnswercount());
-                    if (newAnswer != main.getAnswercount()||!entity.getName().equals(main.getExamName())) {
+                    if (newAnswer != main.getAnswercount() || !entity.getName().equals(main.getExamName())) {
                         main.setAnswercount(newAnswer);
                         main.setExamName(entity.getName());
                         examMainMapper.updateByPrimaryKey(main);
@@ -163,10 +168,10 @@ public class ExamController extends BaseController {
                 String[] titleLine = wjxExamTitleList.split("<br/>");
                 examTitleMapper.deleteByQid(entity.getQid());
                 for (int i = 0; i < titleLine.length; i++) {
-                    if(!StringUtils.isEmpty(titleLine[i])&&titleLine[i].contains(":")){
+                    if (!StringUtils.isEmpty(titleLine[i]) && titleLine[i].contains(":")) {
                         String[] lineEntity = titleLine[i].split(":");
-                        if(2==lineEntity.length){
-                            ExamTitle examTitle=new ExamTitle();
+                        if (2 == lineEntity.length) {
+                            ExamTitle examTitle = new ExamTitle();
                             examTitle.setTitleId(HiStringUtil.getRandomUUID());
                             examTitle.setQid(entity.getQid());
                             examTitle.setTitleNo(lineEntity[0]);
@@ -182,20 +187,20 @@ public class ExamController extends BaseController {
 
     @RequestMapping(value = "getExamDetailListByLoginAccount", method = RequestMethod.GET)
     @ResponseBody
-    public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam,HttpServletRequest request) {
+    public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             HttpSession session = request.getSession();
             Object obj = session.getAttribute("account");
-            if(null==obj) {
+            if (null == obj) {
                 return "";
             }
             XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();
             param.put("cis", account.getCisCode());
 //            测试数据
-            param.put("cis", "2007651");
-            if(!StringUtils.isEmpty(jsonParam)){
+//            param.put("cis", "2007651");
+            if (!StringUtils.isEmpty(jsonParam)) {
                 JSONObject parseObject = JSON.parseObject(jsonParam);
                 String hasDealed = HiStringUtil.getJsonStringByKey(parseObject, "hasDealed");
                 String startDate = HiStringUtil.getJsonStringByKey(parseObject, "startDate");
@@ -214,10 +219,10 @@ public class ExamController extends BaseController {
             }
             List<Map<String, Object>> examInfoByCisList = examMainMapper.getExamInfoByCis(param);
             for (int i = 0; i < examInfoByCisList.size(); i++) {
-                Map<String, Object> exams=examInfoByCisList.get(i);
-                StringBuilder stringBuilder=new StringBuilder(exams.get("url").toString());
-                stringBuilder.append(Encryption.encrypByMD5(account.getCisCode().concat(",").concat(exams.getOrDefault("server_code","").toString())));
-                exams.put("url",stringBuilder.toString());
+                Map<String, Object> exams = examInfoByCisList.get(i);
+                StringBuilder stringBuilder = new StringBuilder(exams.get("url").toString());
+                stringBuilder.append(Encryption.encrypByMD5(account.getCisCode().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
+                exams.put("url", stringBuilder.toString());
             }
             return JSON.toJSONString(examInfoByCisList);
         } catch (Exception e) {
@@ -228,80 +233,103 @@ public class ExamController extends BaseController {
 
     /**
      * 接收推送的填写者提交的数据
-      * @param jsonParam
      */
     @RequestMapping(value = "receiveExamResult", method = RequestMethod.POST)
     @ResponseBody
-    public void receiveExamResult(@RequestParam("jsonParam") String jsonParam) {
+    public void receiveExamResult(HttpServletRequest request, HttpServletResponse response, BufferedReader br) {
+        String jsonParam = "";
+        StringBuilder stringBuilder=new StringBuilder();
         try {
+            //body部分
+            String inputLine;
+            try {
+                while ((inputLine = br.readLine()) != null) {
+                    stringBuilder.append(inputLine);
+                }
+                br.close();
+            } catch (IOException e) {
+                System.out.println("IOException: " + e);
+            }
+            jsonParam=stringBuilder.toString();
+            System.out.println("str:" + jsonParam);
+            logger.error("==================");
+            logger.error(jsonParam);
+            errorExamDetailMapper.addErrorExamDetail("received",jsonParam);
+            logger.error("------------------");
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //            jsonParam="{'activity':'41943184','sojumpparm':'242076AC66EC61FF9E348218E3995C4F','name':'问卷名称','parteruser':'15581018823','parterjoiner':'test4','timetaken':'528','submittime':'2016-08-23 10:01:59', 'q1':'50','q2': '7','q3':'13','q4':'9','q5':'2','q6':'878787','q7':'似的sss发射点发射点',joinid:'101812480275','totalvalue':'15'}";
             JSONObject parseObject = JSON.parseObject(jsonParam);
             String qid = HiStringUtil.getJsonStringByKey(parseObject, "activity");
             String sojumpparm = HiStringUtil.getJsonStringByKey(parseObject, "sojumpparm");
             Map<String, String> cisServerCodeMd5Map = serverService.getCisServerCodeMd5Map();
-            if(cisServerCodeMd5Map.containsKey(sojumpparm)){
-                sojumpparm=cisServerCodeMd5Map.get(sojumpparm);
-            }else{
+            if (cisServerCodeMd5Map.containsKey(sojumpparm)) {
+                sojumpparm = cisServerCodeMd5Map.get(sojumpparm);
+            } else {
+                errorExamDetailMapper.addErrorExamDetail("sojumpparm错误",jsonParam);
                 logger.error("sojumpparm错误");
-            }
-            String cis=null;
-            String serverCode=null;
-            if(!StringUtils.isEmpty(sojumpparm)){
-                String[] split = sojumpparm.split(",");
-                if(split.length==2){
-                    cis = split[0];
-                    serverCode=split[1];
-                }
-            }
-            if(StringUtils.isEmpty(cis)||StringUtils.isEmpty(serverCode)){
-                logger.error("缺少cis或者服务商编码");
-            }
-            if(StringUtils.isEmpty(qid)){
                 return;
             }
-            ExamMain examMain=examMainMapper.selectByQid(qid);
-            Map<String,String> param=new HashMap<>();
-            param.put("qid",qid);
-            param.put("serverCode",serverCode);
-            param.put("cis",cis);
-            ExamDetail examDetail = examDetailMapper.selectByQidCisServerCode(param);
-            if(null==examMain||null==examDetail){
-                logger.error("查不到相关问卷");
+            String cis = null;
+            String serverCode = null;
+            if (!StringUtils.isEmpty(sojumpparm)) {
+                String[] split = sojumpparm.split(",");
+                if (split.length == 2) {
+                    cis = split[0];
+                    serverCode = split[1];
+                }
             }
-            int timetaken=HiStringUtil.getJsonIntByKey(parseObject,"timetaken");
-            Date submittime=new Date();
+            if (StringUtils.isEmpty(cis) || StringUtils.isEmpty(serverCode)) {
+                errorExamDetailMapper.addErrorExamDetail("缺少cis或者服务商编码",jsonParam);
+                logger.error("缺少cis或者服务商编码");
+                return;
+            }
+            if (StringUtils.isEmpty(qid)) {
+                return;
+            }
+            ExamMain examMain = examMainMapper.selectByQid(qid);
+            Map<String, String> param = new HashMap<>();
+            param.put("qid", qid);
+            param.put("serverCode", serverCode);
+            param.put("cis", cis);
+            ExamDetail examDetail = examDetailMapper.selectByQidCisServerCode(param);
+            if (null == examMain || null == examDetail) {
+                errorExamDetailMapper.addErrorExamDetail("查不到相关问卷",jsonParam);
+                logger.error("查不到相关问卷");
+                return;
+            }
+            int timetaken = HiStringUtil.getJsonIntByKey(parseObject, "timetaken");
+            Date submittime = new Date();
             String submittimeStr = HiStringUtil.getJsonStringByKey(parseObject, "submittime");
-            if(StringUtils.isEmpty(submittimeStr)){
-                submittime =sdf.parse(submittimeStr);
+            if (StringUtils.isEmpty(submittimeStr)) {
+                submittime = sdf.parse(submittimeStr);
             }
             String scoreTypeIndexs = examMain.getScoreTypeIndexs();
             String textTypeIndexs = examMain.getTextTypeIndexs();
             String[] scoreTypeQuestionNo = null;
-            String[]  textTypeQuestionNo= null;
-            StringBuilder scoreStringBuilder=new StringBuilder();
-            StringBuilder textStringBuilder=new StringBuilder();
-            int totalScore=0;
-            if(!StringUtils.isEmpty(scoreTypeIndexs)){
-                scoreTypeQuestionNo=scoreTypeIndexs.split(",");
+            String[] textTypeQuestionNo = null;
+            StringBuilder scoreStringBuilder = new StringBuilder();
+            StringBuilder textStringBuilder = new StringBuilder();
+            int totalScore = 0;
+            if (!StringUtils.isEmpty(scoreTypeIndexs)) {
+                scoreTypeQuestionNo = scoreTypeIndexs.split(",");
             }
-            if(!StringUtils.isEmpty(textTypeIndexs)){
-                textTypeQuestionNo=textTypeIndexs.split(",");
+            if (!StringUtils.isEmpty(textTypeIndexs)) {
+                textTypeQuestionNo = textTypeIndexs.split(",");
             }
-            if(null!=scoreTypeQuestionNo) {
+            if (null != scoreTypeQuestionNo) {
                 for (int i = 0; i < scoreTypeQuestionNo.length; i++) {
-                    int jsonIntByKey = HiStringUtil.getJsonIntByKey(parseObject, "q" +scoreTypeQuestionNo[i]);
-                    if(i!=0){
+                    int jsonIntByKey = HiStringUtil.getJsonIntByKey(parseObject, "q" + scoreTypeQuestionNo[i]);
+                    if (i != 0) {
                         scoreStringBuilder.append(',');
                     }
                     scoreStringBuilder.append(jsonIntByKey);
-                    totalScore+=jsonIntByKey;
+                    totalScore += jsonIntByKey;
                 }
             }
-            if(null!=textTypeQuestionNo) {
+            if (null != textTypeQuestionNo) {
                 for (int i = 0; i < textTypeQuestionNo.length; i++) {
-                    String jsonStringByKey = HiStringUtil.getJsonStringByKey(parseObject, "q" +textTypeQuestionNo[i]);
-                    if(i!=0){
+                    String jsonStringByKey = HiStringUtil.getJsonStringByKey(parseObject, "q" + textTypeQuestionNo[i]);
+                    if (i != 0) {
                         scoreStringBuilder.append(',');
                     }
                     textStringBuilder.append(jsonStringByKey);
@@ -316,50 +344,54 @@ public class ExamController extends BaseController {
             examDetail.setSourceData(jsonParam);
             examDetailMapper.updateByPrimaryKey(examDetail);
             examDetailMapper.updateMeanScoreByQidCis(param);
+            logger.error("---------success-----------");
         } catch (Exception e) {
             logger.error(e.toString());
+            errorExamDetailMapper.addErrorExamDetail(e.toString().substring(0,99),jsonParam);
         }
     }
+
     /**
      * 下载问卷结果
+     *
      * @param qid
      */
     @RequestMapping(value = "downloadExamResultData", method = RequestMethod.GET)
     @ResponseBody
     public void downloadExamResultData(@RequestParam("qid") String qid, HttpServletRequest request, HttpServletResponse response) {
         BaseUser loginUser = SessionUtil.getLoginUser();
-        Map<String,Object> param=new HashMap<>(2);
-        param.put("qid",qid);
-        if("guest".equals(loginUser.getRoleId())){
-            param.put("company",loginUser.getCompany());
+        Map<String, Object> param = new HashMap<>(2);
+        param.put("qid", qid);
+        if ("guest".equals(loginUser.getRoleId())) {
+            param.put("company", loginUser.getCompany());
         }
-        List<Map<String,Object>> examResult= examDetailMapper.getAllExamResult(param);
-        ExamMain main=examMainMapper.selectByQid(qid);
+        List<Map<String, Object>> examResult = examDetailMapper.getAllExamResult(param);
+        ExamMain main = examMainMapper.selectByQid(qid);
         List<ExamTitle> examTitle = examTitleMapper.selectByQid(qid);
-        examService.downloadExamResultData(response,main,examResult,examTitle);
+        examService.downloadExamResultData(response, main, examResult, examTitle);
     }
 
     @RequestMapping(value = "getExamResultList", method = RequestMethod.GET)
     @ResponseBody
     public String getExamResultList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request, HttpServletResponse response) {
         BaseUser loginUser = SessionUtil.getLoginUser();
-        Map<String,Object> param=new HashMap<>(5);
+        Map<String, Object> param = new HashMap<>(5);
         JSONObject parseObject = JSON.parseObject(jsonParam);
         String qid = HiStringUtil.getJsonStringByKey(parseObject, "qid");
-        param.put("qid",qid);
-        if("guest".equals(loginUser.getRoleId())){
-            param.put("company",loginUser.getCompany());
+        param.put("qid", qid);
+        if ("guest".equals(loginUser.getRoleId())) {
+            param.put("company", loginUser.getCompany());
         }
-        String keyword=HiStringUtil.getJsonStringByKey(parseObject, "keyword");
-        if(!StringUtils.isEmpty(keyword)){
-            keyword="%"+keyword+"%";
-            param.put("keyword",keyword);
+        String keyword = HiStringUtil.getJsonStringByKey(parseObject, "keyword");
+        if (!StringUtils.isEmpty(keyword)) {
+            keyword = "%" + keyword + "%";
+            param.put("keyword", keyword);
         }
-        int page= HiStringUtil.getJsonIntByKey(parseObject,"page");
-        param.put("startIndex",(page-1)*numberPerPage);
-        param.put("pCount",numberPerPage);
-        List<Map<String,Object>> examResult= examDetailMapper.getEnterpriseExamResult(param);
-        if(!CollectionUtils.isEmpty(examResult)) {
+        int page = HiStringUtil.getJsonIntByKey(parseObject, "page");
+        param.put("startIndex", (page - 1) * numberPerPage);
+        param.put("pCount", numberPerPage);
+        List<Map<String, Object>> examResult = examDetailMapper.getEnterpriseExamResult(param);
+        if (!CollectionUtils.isEmpty(examResult)) {
             double listNum = examDetailMapper.getEnterpriseExamResultNum(param);
             Map<String, Object> result = new HashMap<>();
             result.put("totalPage", Math.ceil(listNum / numberPerPage));
