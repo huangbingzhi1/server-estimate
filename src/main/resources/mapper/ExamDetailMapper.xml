@@ -88,10 +88,10 @@
           AVG(totle_score) meanScore
         FROM
           exam_detail
-        WHERE enterprise_cis =#{cis,jdbcType=VARCHAR}
+        WHERE server_code =#{serverCode,jdbcType=VARCHAR}
           AND main_qid =#{qid,jdbcType=VARCHAR}
           AND totle_score IS NOT NULL) a)
-    WHERE enterprise_cis = #{cis,jdbcType=VARCHAR}
+    WHERE server_code = #{serverCode,jdbcType=VARCHAR}
       AND main_qid = #{qid,jdbcType=VARCHAR}
       AND totle_score IS NOT NULL
   </update>
@@ -144,7 +144,9 @@
     ON e.cis=d.enterprise_cis
     WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
     <if test="keyword != null and keyword !=''" >
-      AND (s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      AND (
+      s.server_name LIKE #{keyword,jdbcType=VARCHAR}
+      s.company_name LIKE #{keyword,jdbcType=VARCHAR}
       OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
       OR s.province LIKE #{keyword,jdbcType=VARCHAR}
       OR s.city LIKE #{keyword,jdbcType=VARCHAR}
@@ -166,7 +168,9 @@
     ON e.cis=d.enterprise_cis
     WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
     <if test="keyword != null and keyword !=''" >
-      AND (s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      AND (
+      s.server_name LIKE #{keyword,jdbcType=VARCHAR}
+      s.company_name LIKE #{keyword,jdbcType=VARCHAR}
       OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
       OR s.province LIKE #{keyword,jdbcType=VARCHAR}
       OR s.city LIKE #{keyword,jdbcType=VARCHAR}
