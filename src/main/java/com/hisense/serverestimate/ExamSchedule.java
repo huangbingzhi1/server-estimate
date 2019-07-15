@@ -1,5 +1,6 @@
 package com.hisense.serverestimate;
 
+import com.hisense.serverestimate.controller.ApiEnterpriseController;
 import com.hisense.serverestimate.controller.ExamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +21,22 @@ import java.time.LocalDateTime;
 public class ExamSchedule {
     @Autowired
     private ExamController examController;
+    @Autowired
+    private ApiEnterpriseController apiEnterpriseController;
     /**
      *  每隔1小时执行一次拉取和更新问卷任务
      */
     @Scheduled(cron = "0 0 0/1 * * ?")
     private void configureTasks() {
-        System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
+
         examController.synchronizeExam();
     }
+    /**
+     *  每隔1天执行一次拉取和更新问卷任务
+     */
+    @Scheduled(cron = "0 0 0 1 * ?")
+    private void xsAccount() {
+        apiEnterpriseController.getAccountRel();
+    }
+
 }

@@ -101,10 +101,16 @@ public class UserController extends BaseController {
                         session.setAttribute("account",xsAccount);
                         logger.error("user:[{}]", user.toString());
                         toExamPage(request, response);
+                        return;
                     }
                 }
 
             }
+        }
+        try {
+            response.sendRedirect("../login.html");
+        } catch (IOException e) {
+            logger.error(e.toString());
         }
     }
 
