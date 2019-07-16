@@ -117,10 +117,13 @@ public class ExamController extends BaseController {
         return SUCCESS;
     }
 
-    @RequestMapping(value = "deleteExamById", method = RequestMethod.GET)
+    @RequestMapping(value = "deleteExamByQid", method = RequestMethod.GET)
     @ResponseBody
-    public String deleteExamById(@RequestParam("jsonParam") String jsonParam) {
-        examMainMapper.setExpireByPrimaryKey(jsonParam);
+    @Transactional
+    public String deleteExamByQid(@RequestParam("jsonParam") String jsonParam) {
+        examMainMapper.setExpireByQid(jsonParam);
+        examDetailMapper.deleteByQid(jsonParam);
+        examTitleMapper.deleteByQid(jsonParam);
         return SUCCESS;
     }
 

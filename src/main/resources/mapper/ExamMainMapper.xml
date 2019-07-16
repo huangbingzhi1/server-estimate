@@ -106,7 +106,7 @@
     from exam_main
     where exam_qid = #{qid,jdbcType=VARCHAR}
   </select>
-  <update id="setExpireByPrimaryKey" parameterType="java.lang.String" >
-     UPDATE exam_main SET STATUS='失效' WHERE main_id= #{id,jdbcType=VARCHAR}
+  <update id="setExpireByQid" parameterType="java.lang.String" >
+     DELETE from exam_main  WHERE exam_qid= #{qid,jdbcType=VARCHAR}
   </update>
 </mapper>

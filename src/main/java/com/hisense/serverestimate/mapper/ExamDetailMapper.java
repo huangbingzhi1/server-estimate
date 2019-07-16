@@ -31,4 +31,6 @@ public interface ExamDetailMapper {
     int getEnterpriseExamResultNum(Map<String, Object> param);
 
     List<Map<String, Object>> getExamDetailListByCis(String cisCode);
+
+    void deleteByQid(String qid);
 }

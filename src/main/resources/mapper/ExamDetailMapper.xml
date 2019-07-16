@@ -197,4 +197,7 @@
     where enterprise_cis = #{cis,jdbcType=VARCHAR}
       and m.status = '开启'
   </select>
+  <delete id="deleteByQid" parameterType="string">
+     DELETE FROM exam_detail WHERE main_qid= #{qid,jdbcType=VARCHAR}
+  </delete>
 </mapper>

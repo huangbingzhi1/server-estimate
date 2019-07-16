@@ -68,14 +68,14 @@
     })
 
 
-    deleteExamBtn=function(id){
+    deleteExamBtn=function(qid){
         $("#confirmDialog").dialog({
             height:200,
             width:400,
             resizable: false,
             buttons: {
                 "确定": function() {
-                    deleteExamById(id);
+                    deleteExamById(qid);
                     $( this ).dialog( "close" );
                 },
                 "取消": function() {
@@ -136,11 +136,11 @@
             }
         });
     }
-    deleteExamById=function(id){
+    deleteExamById=function(qid){
         $.ajax({
             type: "get",
-            url: "/serverestimate/examController/deleteExamById",
-            data: {jsonParam: id},
+            url: "/serverestimate/examController/deleteExamByQid",
+            data: {jsonParam: qid},
             async: true,
             success: function (data) {
                 if(data=="success"){
@@ -194,7 +194,7 @@
             // html += "<td>" + entity.textTypeIndexs+ "</td>";
             html += "<td>" + new Date(entity.begindate).Format("yyyy-MM-dd")+ "</td>";
             html += "<td>" + entity.status+ "</td>";
-            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看结果</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.mainId+"'"+')" href="#">删除</a>' + "</td>";
+            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看结果</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.examQid+"'"+')" href="#">删除</a>' + "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);

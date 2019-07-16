@@ -26,5 +26,5 @@ public interface ExamMainMapper {
 
     ExamMain selectByQid(String qid);
 
-    void setExpireByPrimaryKey(String jsonParam);
+    void setExpireByQid(String qid);
 }
