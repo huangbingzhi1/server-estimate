@@ -77,7 +77,9 @@ public class ExamServiceImpl implements ExamService {
         int rowIndexStart=2;
         Map<String,Integer> rowIndexMap=new HashMap<>(100);
         String scoreTypeIndexs = main.getScoreTypeIndexs();
+        String textTypeIndexs = main.getTextTypeIndexs();
         String[] scoreTypeIndexArr = scoreTypeIndexs.split(",");
+        String[] textTypeIndexArr = textTypeIndexs.split(",");
 
 
         for (Map<String, Object> detail:examResult){
@@ -86,10 +88,13 @@ public class ExamServiceImpl implements ExamService {
             if(null==currSheet){
                 rowIndexMap.put(companyName,rowIndexStart);
                 currSheet = workbook.createSheet(companyName);
-                createSheetTitle(currSheet,scoreTypeIndexArr,titles);
+                createSheetTitle(currSheet,scoreTypeIndexArr,textTypeIndexArr,titles);
+//                createSheetTitle(currSheet,textTypeIndexArr,textTypeIndexArr,titles);
             }
             String  scoreStr = detail.getOrDefault("score_array","").toString();
             String[] scoreArr = scoreStr.split(",");
+            String  textStr = detail.getOrDefault("text_array","").toString();
+            String[] textArr = textStr.split(",");
             int cellIndex=0;
             Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
             rowIndexMap.put(companyName,rowIndexMap.get(companyName)+1);
@@ -112,6 +117,13 @@ public class ExamServiceImpl implements ExamService {
                     currRow.createCell(cellIndex++);
                 }
             }
+            for (int i = 0; i < textTypeIndexArr.length; i++) {
+                if(i<textArr.length){
+                    currRow.createCell(cellIndex++).setCellValue(textArr[i]);
+                }else{
+                    currRow.createCell(cellIndex++);
+                }
+            }
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("totle_score","").toString());
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("mean_score","").toString());
             for (int i = 0; i < cellIndex; i++) {
@@ -127,10 +139,10 @@ public class ExamServiceImpl implements ExamService {
         }
     }
 
-    private void createSheetTitle(Sheet sheet, String[] scoreTypeIndexArr, List<ExamTitle> titles) {
+    private void createSheetTitle(Sheet sheet, String[] scoreTypeIndexArr, String[] textTypeIndexArr, List<ExamTitle> titles) {
         for (int j = 0; j < LINE_START_ENTERPRISE; j++) {
             Row newRow = sheet.createRow(j);
-            for (int i = 0; i < 14 + scoreTypeIndexArr.length; i++) {
+            for (int i = 0; i < 14 + scoreTypeIndexArr.length+textTypeIndexArr.length; i++) {
                 Cell cell = newRow.createCell(i);
                 cell.setCellStyle(titleCellStyle);
                 sheet.setColumnWidth(i, 20 * 256);
@@ -140,7 +152,7 @@ public class ExamServiceImpl implements ExamService {
         sheet.addMergedRegion(region);
         region = new CellRangeAddress(0, 0, 8, 11);
         sheet.addMergedRegion(region);
-        region = new CellRangeAddress(0, 0, 12, 13+scoreTypeIndexArr.length);
+        region = new CellRangeAddress(0, 0, 12, 13+scoreTypeIndexArr.length+textTypeIndexArr.length);
         sheet.addMergedRegion(region);
         Row row1=sheet.getRow(0);
         row1.getCell(0).setCellValue("赛维服务商信息");
@@ -163,6 +175,13 @@ public class ExamServiceImpl implements ExamService {
         for (int i = 0; i <scoreTypeIndexArr.length ; i++) {
             for (ExamTitle title: titles){
                 if(title.getTitleNo().equals("q".concat(scoreTypeIndexArr[i]))){
+                    row2.getCell(cellIndex++).setCellValue(title.getTitleName());
+                }
+            }
+        }
+        for (int i = 0; i <textTypeIndexArr.length ; i++) {
+            for (ExamTitle title: titles){
+                if(title.getTitleNo().equals("q".concat(textTypeIndexArr[i]))){
                     row2.getCell(cellIndex++).setCellValue(title.getTitleName());
                 }
             }

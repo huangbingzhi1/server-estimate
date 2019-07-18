@@ -196,7 +196,7 @@ public class ExamController extends BaseController {
             HttpSession session = request.getSession();
             Object obj = session.getAttribute("account");
             if (null == obj) {
-                return "";
+                return "[]";
             }
             XsAccount account = (XsAccount) obj;
             Map<String, Object> param = new HashMap<>();

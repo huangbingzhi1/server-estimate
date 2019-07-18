@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>调查问卷</title>
 
-    <script type="text/javascript" src="/snsapi/ruxitagentjs_2bnr_0.js" data-dtconfig="agentUri=/snsapi/ruxitagentjs_2bnr_0.js|reportUrl=/snsapi/dynaTraceMonitor|rid=RID_444885934|rpid=-753270716|domain=hisense.com"></script><link rel="stylesheet" href="css/styles.css" type="text/css"/>
+    <link rel="stylesheet" href="css/styles.css" type="text/css"/>
     <link rel="stylesheet" href="../../css/awesome/css/font-awesome.min.css" type="text/css"/>
     <style>
         .availdNode{
@@ -51,8 +51,10 @@
                 data: {"jsonParam":""},
                 dataType: "json",
                 success: function(data){
-                    if((data==null) || (data=="")){
-                        alert("没有对应服务商");
+                    if((data==null) || ((JSON.stringify(data)=="[]"))){
+                        $("#leftDiv").hide();
+                        $("#mainDiv").hide();
+                        alert("没有您要评价的服务商");
                         return ;
                     }else {
                         // 对结果进行处理
