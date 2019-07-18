@@ -146,7 +146,7 @@
     <if test="keyword != null and keyword !=''" >
       AND (
       s.server_name LIKE #{keyword,jdbcType=VARCHAR}
-      s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.company_name LIKE #{keyword,jdbcType=VARCHAR}
       OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
       OR s.province LIKE #{keyword,jdbcType=VARCHAR}
       OR s.city LIKE #{keyword,jdbcType=VARCHAR}
@@ -170,7 +170,7 @@
     <if test="keyword != null and keyword !=''" >
       AND (
       s.server_name LIKE #{keyword,jdbcType=VARCHAR}
-      s.company_name LIKE #{keyword,jdbcType=VARCHAR}
+      OR s.company_name LIKE #{keyword,jdbcType=VARCHAR}
       OR s.manager LIKE #{keyword,jdbcType=VARCHAR}
       OR s.province LIKE #{keyword,jdbcType=VARCHAR}
       OR s.city LIKE #{keyword,jdbcType=VARCHAR}
