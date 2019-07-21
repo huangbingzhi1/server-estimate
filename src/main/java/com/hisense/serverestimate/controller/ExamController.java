@@ -193,14 +193,18 @@ public class ExamController extends BaseController {
     public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Map<String, Object> param = new HashMap<>();
             HttpSession session = request.getSession();
-            Object obj = session.getAttribute("account");
-            if (null == obj) {
+
+            if(null!=session.getAttribute("loginUser")){
+                BaseUser user= (BaseUser) session.getAttribute("loginUser");
+                param.put("cis",user.getUsername());
+            }else if(null!=session.getAttribute("account")){
+                XsAccount account = (XsAccount) session.getAttribute("account");
+                param.put("cis", account.getCisCode());
+            }else{
                 return "[]";
             }
-            XsAccount account = (XsAccount) obj;
-            Map<String, Object> param = new HashMap<>();
-            param.put("cis", account.getCisCode());
 //            测试数据
 //            param.put("cis", "2007651");
             if (!StringUtils.isEmpty(jsonParam)) {
@@ -224,7 +228,7 @@ public class ExamController extends BaseController {
             for (int i = 0; i < examInfoByCisList.size(); i++) {
                 Map<String, Object> exams = examInfoByCisList.get(i);
                 StringBuilder stringBuilder = new StringBuilder(exams.get("url").toString());
-                stringBuilder.append(Encryption.encrypByMD5(account.getCisCode().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
+                stringBuilder.append(Encryption.encrypByMD5(param.get("cis").toString().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
                 exams.put("url", stringBuilder.toString());
             }
             return JSON.toJSONString(examInfoByCisList);
@@ -396,6 +400,36 @@ public class ExamController extends BaseController {
         List<Map<String, Object>> examResult = examDetailMapper.getEnterpriseExamResult(param);
         if (!CollectionUtils.isEmpty(examResult)) {
             double listNum = examDetailMapper.getEnterpriseExamResultNum(param);
+            Map<String, Object> result = new HashMap<>();
+            result.put("totalPage", Math.ceil(listNum / numberPerPage));
+            result.put("list", examResult);
+            result.put("currentPage", page);
+            return JSON.toJSONString(result);
+        }
+        return "";
+    }
+    @RequestMapping(value = "getExamProcessList", method = RequestMethod.GET)
+    @ResponseBody
+    public String getExamProcessList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request, HttpServletResponse response) {
+        BaseUser loginUser = SessionUtil.getLoginUser();
+        Map<String, Object> param = new HashMap<>(5);
+        JSONObject parseObject = JSON.parseObject(jsonParam);
+        String qid = HiStringUtil.getJsonStringByKey(parseObject, "qid");
+        param.put("qid", qid);
+        if ("guest".equals(loginUser.getRoleId())) {
+            param.put("company", loginUser.getCompany());
+        }
+        String keyword = HiStringUtil.getJsonStringByKey(parseObject, "keyword");
+        if (!StringUtils.isEmpty(keyword)) {
+            keyword = "%" + keyword + "%";
+            param.put("keyword", keyword);
+        }
+        int page = HiStringUtil.getJsonIntByKey(parseObject, "page");
+        param.put("startIndex", (page - 1) * numberPerPage);
+        param.put("pCount", numberPerPage);
+        List<Map<String, Object>> examResult = examDetailMapper.getEnterpriseExamProcess(param);
+        if (!CollectionUtils.isEmpty(examResult)) {
+            double listNum = examDetailMapper.getEnterpriseExamProcessNum(param);
             Map<String, Object> result = new HashMap<>();
             result.put("totalPage", Math.ceil(listNum / numberPerPage));
             result.put("list", examResult);

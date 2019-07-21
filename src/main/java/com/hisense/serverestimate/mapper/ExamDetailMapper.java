@@ -33,4 +33,8 @@ public interface ExamDetailMapper {
     List<Map<String, Object>> getExamDetailListByCis(String cisCode);
 
     void deleteByQid(String qid);
+
+    List<Map<String, Object>> getEnterpriseExamProcess(Map<String, Object> param);
+
+    int getEnterpriseExamProcessNum(Map<String, Object> param);
 }

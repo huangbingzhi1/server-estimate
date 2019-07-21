@@ -16,6 +16,7 @@
     }
   </style>
   <script type="text/javascript">
+      var roles;
     reLogin=function(){
       window.location = '../login.html';
     }
@@ -29,12 +30,11 @@
           if(!result){
             window.location = 'login.html';
           }
-          var roles = eval('(' + result + ')');
+          roles = eval('(' + result + ')');
           if(roles){
             var roleIds="";
             for (var i = 0; i < roles.length; i++) {
               var entity = roles[i];
-              console.log(entity)
               if(entity.roleName.indexOf('admin')>=0){
                 $("#leftFrame").attr("src","files/left.html")
                 $("#mainFrame").attr("src","files/examList.html")

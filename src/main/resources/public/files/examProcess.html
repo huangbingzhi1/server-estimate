@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>服务商列表</title>
+    <title>商家列表</title>
     <script type="text/javascript" src="../js/jquery.js"></script>
     <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="../js/hi-utils.js"></script>
@@ -18,9 +18,6 @@
         $("#searchBtn").click(function () {
             console.log($("#keyword").val())
             loadExamResultList(1,$("#keyword").val());
-        })
-        $("#downloadBtn").click(function () {
-            window.location = "/serverestimate/examController/downloadExamResultData?qid="+globalQid;
         })
 
         $("#prePage").click(function () {
@@ -44,48 +41,12 @@
 
     })
 
-
-    deleteEnterpriseBtn=function(id){
-        $("#confirmDialog").dialog({
-            height:200,
-            width:400,
-            resizable: false,
-            buttons: {
-                "确定": function() {
-                    deleteEnterpriseById(id);
-                    $( this ).dialog( "close" );
-                },
-                "取消": function() {
-                    $( this ).dialog( "close" );
-                }
-            }
-        });
-
-    }
-    deleteEnterpriseById=function(serverId){
-        $.ajax({
-            type: "get",
-            url: "/serverestimate/enterpriseController/deleteEnterpriseById",
-            data: {jsonParam: serverId},
-            async: true,
-            success: function (data) {
-                if(data=="success"){
-                    loadExamResultList(1);
-                }else{
-                    alert("删除失败")
-                }
-            },
-            error: function (result) {
-                console.log("failed")
-            }
-        });
-    }
     loadExamResultList = function (page) {
         var keyword=$("#keyword").val();
         var jsonParam = "{page:" + page + ",keyword:'" + keyword + "',qid:'" + globalQid + "'}";
         $.ajax({
             type: "get",
-            url: "/serverestimate/examController/getExamResultList",
+            url: "/serverestimate/examController/getExamProcessList",
             data: {jsonParam: jsonParam},
             async: true,
             success: function (data) {
@@ -112,15 +73,13 @@
             var entity = entityList[i];
             html += "<tr onmouseover='addclass(this)'onmouseout='removeclass(this)'>";
             html += "<td>" + (i + 1) + "</td>";
+            html += "<td>" + entity.enterprise_cis+ "</td>";
             html += "<td>" + entity.company_name+ "</td>";
-            html += "<td>" + entity.server_code+ "</td>";
-            html += "<td>" + entity.server_name+ "</td>";
-            html += "<td>" + entity.manager+ "</td>";
-            if(entity.mean_score!=undefined){
-                html += "<td>" + entity.mean_score + "</td>";
-            }else{
-                html += "<td></td>";
-            }
+            html += "<td>" + entity.enterprise_name+ "</td>";
+            html += "<td>" + entity.pre_num+ "</td>";
+            html += "<td>" + entity.post_num+ "</td>";
+            html += "<td>" + entity.total_num+ "</td>";
+
             html += "</tr>";
         }
         $("#tbMain").html(html);
@@ -132,10 +91,9 @@
 
 <body>
 <div class="toolbar">
-    <span><h4>评价结果</h4></span>
+    <span><h4>评价过程</h4></span>
 </div>
 <div class="list-button">
-    <span class="addBtn" id="downloadBtn">下载</span>
     <input type="text" id="keyword"/>
     <span class="addBtn" id="searchBtn">查询</span>
     <span class="addBtn" id="backBtn" onclick="window.location = 'examList.html'">返回</span>
@@ -145,10 +103,11 @@
         <tr >
             <th width="5%">序号</th>
             <th width="10%">分公司</th>
-            <th width="10%">服务商编码</th>
-            <th width="35%">服务商名称</th>
-            <th width="10%">服务商经理</th>
-            <th width="10%">最终得分</th>
+            <th width="10%">商家编码</th>
+            <th width="35%">商家名称</th>
+            <th width="10%">待评价</th>
+            <th width="10%">已评价</th>
+            <th width="10%">总计</th>
         </tr>
         <tbody id="tbMain">
         </tbody>
@@ -159,19 +118,6 @@
     <a href="#" id="firstPage">首页</a>  <a href="#" id="prePage">上一页</a>
     <a id="nextPage" href="#">下一页</a>  <a id="lastPage" href="#" >末页</a>
 
-</div>
-<div id="confirmDialog" style="display:none;" title="系统提示">
-    <p align="center">删除后无法恢复，确定删除吗？</p>
-</div>
-
-<div id="importDialog" title="商家、服务商信息导入" style="display: none">
-    <div id="errorDiv" style="color:red"></div>
-    <form id="uploadDataForm" enctype="multipart/form-data" >
-        <p style="color: red">注意：数据导入会将原有的商家信息、服务商信息都清空</p>
-        <p>
-            <input id="dataFile" type="file" name="dataFile">
-        </p>
-    </form>
 </div>
 </body>
 </html>

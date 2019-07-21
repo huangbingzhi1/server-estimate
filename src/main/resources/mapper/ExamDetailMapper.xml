@@ -158,6 +158,40 @@
     ORDER BY d.mean_score desc,d.server_code
       LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
   </select>
+  <select id="getEnterpriseExamProcess" parameterType="map" resultType="map">
+      SELECT
+      a.* ,e2.company_name,
+      e2.enterprise_name
+      FROM
+      (
+      SELECT
+      d.`enterprise_cis`,
+      COUNT(d.`enterprise_cis`) AS total_num,
+      SUM(IF(d.`submittime` IS NULL, 1, 0)) AS pre_num,
+      SUM(IF(d.`submittime` IS NOT NULL, 1, 0)) AS post_num
+      FROM
+      exam_detail d
+      JOIN base_server s
+      ON d.server_code = s.server_code
+      LEFT JOIN base_enterprise e
+      ON e.cis = d.enterprise_cis
+      WHERE d.main_qid = #{qid,jdbcType=VARCHAR}
+      <if test="keyword != null and keyword !=''" >
+          AND (
+          e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+          OR e.company_name LIKE #{keyword,jdbcType=VARCHAR}
+          OR e.cis LIKE #{keyword,jdbcType=VARCHAR})
+      </if>
+      <if test="company != null and company !=''" >
+          AND e.company_name =  #{company,jdbcType=VARCHAR}
+      </if>
+      GROUP BY d.enterprise_cis
+      )a
+      LEFT JOIN base_enterprise e2
+        ON a.enterprise_cis=e2.cis
+      ORDER BY company_name,pre_num DESC,total_num DESC
+      LIMIT #{startIndex,jdbcType = INTEGER},#{pCount,jdbcType = INTEGER}
+  </select>
   <select id="getEnterpriseExamResultNum"  parameterType="map" resultType="Integer">
     SELECT COUNT(DISTINCT d.server_code)
     FROM
@@ -179,6 +213,23 @@
     <if test="company != null and company !=''" >
       AND e.company_name =  #{company,jdbcType=VARCHAR}
     </if>
+  </select>
+  <select id="getEnterpriseExamProcessNum"  parameterType="map" resultType="Integer">
+        SELECT COUNT(DISTINCT d.enterprise_cis)
+        FROM
+        exam_detail d
+         JOIN base_enterprise e
+        ON e.cis=d.enterprise_cis
+        WHERE d.main_qid =  #{qid,jdbcType=VARCHAR}
+      <if test="keyword != null and keyword !=''" >
+          AND (
+          e.enterprise_name LIKE #{keyword,jdbcType=VARCHAR}
+          OR e.company_name LIKE #{keyword,jdbcType=VARCHAR}
+          OR e.cis LIKE #{keyword,jdbcType=VARCHAR})
+      </if>
+      <if test="company != null and company !=''" >
+          AND e.company_name =  #{company,jdbcType=VARCHAR}
+      </if>
   </select>
   <select id="getExamDetailListByCis" resultType="map" parameterType="string">
     select

@@ -88,6 +88,9 @@
     viewExamResult=function(id){
         window.location = "examResult.html?id="+id;
     }
+    viewExamProcess=function(id){
+        window.location = "examProcess.html?id="+id;
+    }
     editExamBtn=function(id){
         for(var i=0;i<globalExamList.length;i++){
             if(globalExamList[i].mainId==id){
@@ -182,6 +185,7 @@
         });
     }
     addRows = function (entityList) {
+        console.log(window.parent.roles[0]);
         var html = "";
         for (var i = 0; i < entityList.length; i++) {
             var entity = entityList[i];
@@ -194,7 +198,12 @@
             // html += "<td>" + entity.textTypeIndexs+ "</td>";
             html += "<td>" + new Date(entity.begindate).Format("yyyy-MM-dd")+ "</td>";
             html += "<td>" + entity.status+ "</td>";
-            html += "<td>" + '<a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">查看结果</a><a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.examQid+"'"+')" href="#">删除</a>' + "</td>";
+            html += "<td>" + '<a onclick="viewExamProcess('+"'"+entity.examQid+"'"+')" href="#">评价过程</a><a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">评价结果</a>'
+            if(window.parent.longinUser&&window.parent.longinUser.roleId=='admin'){
+                html +='<a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.examQid+"'"+')" href="#">删除</a>'
+            }
+
+            html+= "</td>";
             html += "</tr>";
         }
         $("#tbMain").html(html);
@@ -237,12 +246,12 @@
                 <th width="5%">序号</th>
                 <th width="10%">问卷星ID</th>
                 <th width="20%">问卷名称</th>
-                <th width="10%">已回答数量</th>
+                <th width="5%">已回答</th>
 <!--                <th width="10%">数据问题题号</th>-->
 <!--                <th width="10%">文字问题题号</th>-->
                 <th width="10%">创建时间</th>
                 <th width="5%">状态</th>
-                <th width="15%">操作</th>
+                <th width="25%">操作</th>
             </tr>
             <tbody id="tbMain">
             </tbody>

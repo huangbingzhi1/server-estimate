@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+    <link rel="icon" href="images/title2.ico" type="image/x-icon">
+    <link type="image/x-icon" rel="bookmark" href="images/title2.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>登录</title>
+    <style type="text/css">
+        <!--
+        body {
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-right: 0px;
+            margin-bottom: 0px;
+        }
+        .right-button01 {
+            font-family: 微软雅黑;
+            font-size: 14px;
+            color: white;
+            height: 30px;
+            width: 60px;
+            background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #4d5b76), color-stop(1, #6c7a95));
+            border-top-width: 0px;
+            border-right-width: 0px;
+            border-bottom-width: 0px;
+            border-left-width: 0px;
+        }
+        -->
+    </style>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#loginBtn").click(function () {
+                doLogin();
+            })
+        })
+        function keyLogin(){
+            if (event.keyCode==13)  //回车键的键值为13
+                doLogin();
+        }
+        doLogin=function () {
+            if(!$("#username").val()||!$("#password").val()){
+                return;
+            }
+            var jsonParam = '{username:"' + $("#username").val() + '",password:"' + $("#password").val() + '"}';
+            $.ajax({
+                type: "get",
+                url: "/serverestimate/userController/login",
+                data: {jsonParam: jsonParam},
+                async: true,
+                success: function (result) {
+                    if ("success" == result) {
+                        window.location = 'files/examPage/index.html';
+                    } else {
+                        alert("登陆失败")
+                    }
+                },
+                error: function (result) {
+                    console.log("failed")
+                }
+            });
+        }
+    </script>
+</head>
+
+<body  onkeydown="keyLogin();">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr style="background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #4d5b76), color-stop(1, #6c7a95));">
+        <td><h1 style="text-align: center;color: white;">海信服务评价系统</h1></td>
+    </tr>
+</table>
+<table width="562" border="0" align="center" cellpadding="0" cellspacing="0" class="right-table03">
+    <tr>
+        <td width="221">
+            <table width="95%" border="0" cellpadding="0" cellspacing="0" class="login-text01">
+
+                <tr>
+                    <td>
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="login-text01">
+                            <tr>
+                                <td align="center"><img src="images/ico13.gif" width="107" height="97"/></td>
+                            </tr>
+                            <tr>
+                                <td height="40" align="center">&nbsp;</td>
+                            </tr>
+
+                        </table>
+                    </td>
+                    <td><img src="images/line01.gif" width="5" height="292"/></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="31%" height="35" class="login-text02">用户名：<br/></td>
+                    <td width="69%"><input id="username" type="text" size="20"/></td>
+                </tr>
+                <tr>
+                    <td height="35" class="login-text02">密　码：<br/></td>
+                    <td><input id="password" type="password" size="20"/></td>
+                </tr>
+
+                <tr>
+                    <td height="35">&nbsp;</td>
+                    <td><input id="loginBtn" type="button" class="right-button01" value="登陆"/>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
