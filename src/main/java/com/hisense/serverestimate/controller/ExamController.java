@@ -193,15 +193,16 @@ public class ExamController extends BaseController {
     public String getExamDetailListByLoginAccount(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            XsAccount account=null;
             Map<String, Object> param = new HashMap<>();
             HttpSession session = request.getSession();
 
-            if(null!=session.getAttribute("loginUser")){
+            if(null!=session.getAttribute("account")){
+                account = (XsAccount) session.getAttribute("account");
+                param.put("cis", account.getCisCode());
+            }else if(null!=session.getAttribute("loginUser")){
                 BaseUser user= (BaseUser) session.getAttribute("loginUser");
                 param.put("cis",user.getUsername());
-            }else if(null!=session.getAttribute("account")){
-                XsAccount account = (XsAccount) session.getAttribute("account");
-                param.put("cis", account.getCisCode());
             }else{
                 return "[]";
             }
@@ -225,6 +226,10 @@ public class ExamController extends BaseController {
                 }
             }
             List<Map<String, Object>> examInfoByCisList = examMainMapper.getExamInfoByCis(param);
+            if(CollectionUtils.isEmpty(examInfoByCisList)&&null!=account){
+                param.put("cis",account.getMdmCode());
+                examInfoByCisList = examMainMapper.getExamInfoByCis(param);
+            }
             for (int i = 0; i < examInfoByCisList.size(); i++) {
                 Map<String, Object> exams = examInfoByCisList.get(i);
                 StringBuilder stringBuilder = new StringBuilder(exams.get("url").toString());

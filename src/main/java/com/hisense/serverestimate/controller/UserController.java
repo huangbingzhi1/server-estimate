@@ -95,7 +95,7 @@ public class UserController extends BaseController {
                     String uid=HiStringUtil.getJsonStringByKey(responseObj,"uid");
                     XsAccount xsAccount= xsAccountMapper.selectByAccount(uid);
                     if(null!=xsAccount){
-                        BaseUser user=new BaseUser("temp","temp","temp","temp","temp","temp");
+                        BaseUser user=new BaseUser(xsAccount.getAid(),xsAccount.getCisCode(),xsAccount.getFullName(),"temp",xsAccount.getFullName(),"enterprise");
                         session.setMaxInactiveInterval(-1);
                         session.setAttribute("loginUser", user);
                         session.setAttribute("account",xsAccount);
@@ -344,9 +344,11 @@ public class UserController extends BaseController {
     }
     private String getCookieValue(HttpServletRequest request,String key){
         Cookie[] cookies = request.getCookies();
-        for (int i = 0; i < cookies.length; i++) {
-            if(cookies[i].getName().equals(key)) {
-                return cookies[i].getValue();
+        if(null!=cookies){
+            for (int i = 0; i < cookies.length; i++) {
+                if(cookies[i].getName().equals(key)) {
+                    return cookies[i].getValue();
+                }
             }
         }
         return "";

@@ -17,6 +17,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class ApiEnterpriseController<main> extends BaseController {
     @Transactional
     public void getAccountRel() {
         try {
+            logger.error("-----------开始同步账号");
             //headers
             HttpHeaders requestHeaders = new HttpHeaders();
             requestHeaders.add("appKey", appKey);
@@ -63,7 +65,17 @@ public class ApiEnterpriseController<main> extends BaseController {
             //post
             String responseData = "";
 
-            responseData = restTemplate.postForObject(getCustAmountUrl, requestEntity, String.class);
+            try {
+                responseData = restTemplate.postForObject(getCustAmountUrl, requestEntity, String.class);
+            } catch (RestClientException e) {
+                logger.error(e.toString());
+            }
+            if(StringUtils.isEmpty(responseData)){
+                logger.error("-------empty");
+            }else{
+                logger.error("-------responseData");
+                logger.error(String.valueOf(responseData.length()));
+            }
             if (!StringUtils.isEmpty(responseData)) {
                 dealResponseData(responseData);
                 logger.info("更新信商系统账号信息完成");
