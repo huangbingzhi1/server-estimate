@@ -17,4 +17,6 @@ public interface ExamService {
     void addExamDetail(ExamMain main);
 
     void downloadExamResultData(HttpServletResponse response, ExamMain main, List<Map<String, Object>> examResult, List<ExamTitle> examTitle);
+
+    void downloadExamProcessData(HttpServletResponse response, List<Map<String, Object>> examResult);
 }

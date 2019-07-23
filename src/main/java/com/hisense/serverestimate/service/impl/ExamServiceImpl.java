@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -137,6 +138,72 @@ public class ExamServiceImpl implements ExamService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void downloadExamProcessData(HttpServletResponse response, List<Map<String, Object>> examProcess) {
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        String fileName="评价过程.xlsx";
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=\""+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        OutputStream out = null;
+        try {
+            out = response.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Workbook workbook =  new XSSFWorkbook() ;
+        createCellStyle(workbook);
+        int rowIndexStart=1;
+        Map<String,Integer> rowIndexMap=new HashMap<>(100);
+        if(!CollectionUtils.isEmpty(examProcess)){
+            for (Map<String,Object> detail:examProcess){
+                String companyName = detail.get("company_name").toString();
+                Sheet currSheet = workbook.getSheet(companyName);
+                if(null==currSheet){
+                    rowIndexMap.put(companyName,rowIndexStart);
+                    currSheet = workbook.createSheet(companyName);
+                    createProcessSheetTitle(currSheet);
+                }
+                int cellIndex=0;
+                Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
+                rowIndexMap.put(companyName,rowIndexMap.get(companyName)+1);
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("company_name","").toString());
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("enterprise_cis","").toString());
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("enterprise_name","").toString());
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("pre_num","").toString());
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("post_num","").toString());
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("total_num","").toString());
+                for (int i = 0; i < cellIndex; i++) {
+                    currRow.getCell(i).setCellStyle(normalCellStyle);
+                }
+            }
+            try {
+                workbook.write(out);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+    private void createProcessSheetTitle(Sheet sheet){
+        Row newRow = sheet.createRow(0);
+        newRow.createCell(0).setCellValue("分公司");
+        newRow.createCell(1).setCellValue("商家编码");
+        newRow.createCell(2).setCellValue("商家名称");
+        newRow.createCell(3).setCellValue("待评价");
+        newRow.createCell(4).setCellValue("已评价");
+        newRow.createCell(5).setCellValue("总计");
+        for (int i = 0; i <= 5; i++) {
+            newRow.getCell(i).setCellStyle(titleCellStyle);
+            sheet.setColumnWidth(i, 10 * 256);
+        }
+        sheet.setColumnWidth(2, 40 * 256);
     }
 
     private void createSheetTitle(Sheet sheet, String[] scoreTypeIndexArr, String[] textTypeIndexArr, List<ExamTitle> titles) {

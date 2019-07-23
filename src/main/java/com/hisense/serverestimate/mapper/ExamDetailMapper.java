@@ -37,4 +37,6 @@ public interface ExamDetailMapper {
     List<Map<String, Object>> getEnterpriseExamProcess(Map<String, Object> param);
 
     int getEnterpriseExamProcessNum(Map<String, Object> param);
+
+    List<Map<String, Object>> getAllExamProcess(Map<String, Object> param);
 }

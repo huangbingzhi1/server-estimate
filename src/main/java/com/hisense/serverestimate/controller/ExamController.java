@@ -443,5 +443,20 @@ public class ExamController extends BaseController {
         }
         return "";
     }
+    /**
+     * 下载问卷过程
+     */
+    @RequestMapping(value = "downloadExamProcessData", method = RequestMethod.GET)
+    @ResponseBody
+    public void downloadExamProcessData(@RequestParam("qid") String qid, HttpServletRequest request, HttpServletResponse response) {
+        BaseUser loginUser = SessionUtil.getLoginUser();
+        Map<String, Object> param = new HashMap<>(2);
+        param.put("qid", qid);
+        if ("guest".equals(loginUser.getRoleId())) {
+            param.put("company", loginUser.getCompany());
+        }
+        List<Map<String, Object>> examResult = examDetailMapper.getAllExamProcess(param);
+        examService.downloadExamProcessData(response, examResult);
+    }
 }
 
