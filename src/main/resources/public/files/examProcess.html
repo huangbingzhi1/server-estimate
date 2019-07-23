@@ -19,6 +19,9 @@
             console.log($("#keyword").val())
             loadExamResultList(1,$("#keyword").val());
         })
+        $("#downloadBtn").click(function () {
+            window.location = "/serverestimate/examController/downloadExamProcessData?qid="+globalQid;
+        })
 
         $("#prePage").click(function () {
             if(parseInt($("#currentPage").html())>1){
@@ -94,6 +97,7 @@
     <span><h4>评价过程</h4></span>
 </div>
 <div class="list-button">
+    <span class="addBtn" id="downloadBtn">下载</span>
     <input type="text" id="keyword"/>
     <span class="addBtn" id="searchBtn">查询</span>
     <span class="addBtn" id="backBtn" onclick="window.location = 'examList.html'">返回</span>
