@@ -34,7 +34,7 @@ public class ExamSchedule {
     /**
      *  每隔1天执行一次拉取和更新问卷任务
      */
-    @Scheduled(cron = "0 30 16 * * ?")
+    @Scheduled(cron = "0 0 02 * * ?")
     private void xsAccount() {
         apiEnterpriseController.getAccountRel();
     }
