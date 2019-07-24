@@ -144,6 +144,7 @@ public class ExamServiceImpl implements ExamService {
     public void downloadExamProcessData(HttpServletResponse response, List<Map<String, Object>> examProcess) {
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
         String fileName="评价过程.xlsx";
+        String sheetName="全部";
         try {
             response.setHeader("Content-Disposition", "attachment;filename=\""+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
         } catch (UnsupportedEncodingException e) {
@@ -159,19 +160,19 @@ public class ExamServiceImpl implements ExamService {
         Workbook workbook =  new XSSFWorkbook() ;
         createCellStyle(workbook);
         int rowIndexStart=1;
+
         Map<String,Integer> rowIndexMap=new HashMap<>(100);
         if(!CollectionUtils.isEmpty(examProcess)){
             for (Map<String,Object> detail:examProcess){
-                String companyName = detail.get("company_name").toString();
-                Sheet currSheet = workbook.getSheet(companyName);
+                Sheet currSheet = workbook.getSheet(sheetName);
                 if(null==currSheet){
-                    rowIndexMap.put(companyName,rowIndexStart);
-                    currSheet = workbook.createSheet(companyName);
+                    rowIndexMap.put(sheetName,rowIndexStart);
+                    currSheet = workbook.createSheet(sheetName);
                     createProcessSheetTitle(currSheet);
                 }
                 int cellIndex=0;
-                Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
-                rowIndexMap.put(companyName,rowIndexMap.get(companyName)+1);
+                Row currRow = currSheet.createRow(rowIndexMap.get(sheetName));
+                rowIndexMap.put(sheetName,rowIndexMap.get(sheetName)+1);
                 currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("company_name","").toString());
                 currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("enterprise_cis","").toString());
                 currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("enterprise_name","").toString());
