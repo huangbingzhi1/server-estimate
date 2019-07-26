@@ -19,4 +19,6 @@ public interface ExamService {
     void downloadExamResultData(HttpServletResponse response, ExamMain main, List<Map<String, Object>> examResult, List<ExamTitle> examTitle);
 
     void downloadExamProcessData(HttpServletResponse response, List<Map<String, Object>> examResult);
+
+    void staticByServerCompany(HttpServletResponse response, List<Map<String, Object>> examResult);
 }

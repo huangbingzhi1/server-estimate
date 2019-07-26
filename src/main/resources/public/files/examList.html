@@ -91,6 +91,9 @@
     viewExamProcess=function(id){
         window.location = "examProcess.html?id="+id;
     }
+    staticByServerCompany=function(id){
+        window.location = "/serverestimate/examController/downloadStaticByServerCompany?qid="+id;
+    }
     editExamBtn=function(id){
         for(var i=0;i<globalExamList.length;i++){
             if(globalExamList[i].mainId==id){
@@ -200,6 +203,7 @@
             html += "<td>" + entity.status+ "</td>";
             html += "<td>" + '<a onclick="viewExamProcess('+"'"+entity.examQid+"'"+')" href="#">评价过程</a><a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">评价结果</a>'
             if(window.parent.longinUser&&window.parent.longinUser.roleId=='admin'){
+                html+='<a onclick="staticByServerCompany('+"'"+entity.examQid+"'"+')" href="#">评价汇总</a>';
                 html +='<a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.examQid+"'"+')" href="#">删除</a>'
             }
 
@@ -244,14 +248,14 @@
         <table width="95%" align="center" >
             <tr >
                 <th width="5%">序号</th>
-                <th width="10%">问卷星ID</th>
+                <th width="5%">问卷星ID</th>
                 <th width="20%">问卷名称</th>
 <!--                <th width="5%">已回答</th>-->
 <!--                <th width="10%">数据问题题号</th>-->
 <!--                <th width="10%">文字问题题号</th>-->
                 <th width="10%">创建时间</th>
                 <th width="5%">状态</th>
-                <th width="25%">操作</th>
+                <th width="35%">操作</th>
             </tr>
             <tbody id="tbMain">
             </tbody>

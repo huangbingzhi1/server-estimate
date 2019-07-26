@@ -28,17 +28,7 @@
         list(1);
         list(8);
         $("#logout").click(function () {
-            $.ajax({
-                type: "get",
-                url: "/serverestimate/userController/logout",
-                async: true,
-                success: function (data) {
-                    parent.reLogin();
-                },
-                error: function (result) {
-                    parent.reLogin();
-                }
-            });
+            parent.logout();
         })
     })
     function tupian(idt) {

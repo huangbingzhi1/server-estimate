@@ -46,12 +46,13 @@ public class ExamServiceImpl implements ExamService {
         titleCellStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
+        font.setColor(IndexedColors.WHITE.getIndex());
         titleCellStyle.setFont(font);
         titleCellStyle.setBorderBottom(BorderStyle.THIN);
         titleCellStyle.setBorderLeft(BorderStyle.THIN);
         titleCellStyle.setBorderRight(BorderStyle.THIN);
         titleCellStyle.setBorderTop(BorderStyle.THIN);
-        titleCellStyle.setFillForegroundColor(IndexedColors.GOLD.getIndex());
+        titleCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
         titleCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         titleCellStyle.setAlignment(HorizontalAlignment.CENTER);
     }
@@ -192,6 +193,95 @@ public class ExamServiceImpl implements ExamService {
 
         }
     }
+
+    @Override
+    public void staticByServerCompany(HttpServletResponse response, List<Map<String, Object>> examResult) {
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        String fileName="汇总.xlsx";
+        String sheetName="汇总";
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=\""+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        OutputStream out = null;
+        try {
+            out = response.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Workbook workbook =  new XSSFWorkbook() ;
+        Sheet sheet = workbook.createSheet(sheetName);
+        createCellStyle(workbook);
+        long totalAllNum=0;
+        long totalPostedNum=0;
+        float totalScore=0.0f;
+        int rowIndexStart=2;
+        if(!CollectionUtils.isEmpty(examResult)&&sheet!=null){
+            createStaticTitle(sheet);
+            for (Map<String,Object> detail:examResult){
+                int cellIndex=0;
+                Row currRow = sheet.createRow(rowIndexStart++);
+                currRow.createCell(cellIndex++).setCellValue(rowIndexStart-2);
+                currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("server_company_name","").toString());
+                long totalNum=(long)detail.getOrDefault("totalnum", 0);
+                long postedNum=(long)detail.getOrDefault("postednum", 0);
+                float avgScore=Float.parseFloat(detail.getOrDefault("avgscore", "0").toString());
+                currRow.createCell(cellIndex++).setCellValue(totalNum);
+                currRow.createCell(cellIndex++).setCellValue(postedNum);
+                currRow.createCell(cellIndex++).setCellValue(avgScore);
+                totalAllNum+=totalNum;
+                totalPostedNum+=postedNum;
+                totalScore+=postedNum*avgScore;
+                for (int i = 0; i < cellIndex; i++) {
+                    currRow.getCell(i).setCellStyle(normalCellStyle);
+                }
+            }
+            Row currRow = sheet.createRow(rowIndexStart);
+            int cellIndex=0;
+            currRow.createCell(cellIndex++).setCellValue("");
+            currRow.createCell(cellIndex++).setCellValue("总计");
+            currRow.createCell(cellIndex++).setCellValue(totalAllNum);
+            currRow.createCell(cellIndex++).setCellValue(totalPostedNum);
+            if(totalPostedNum==0){
+                currRow.createCell(cellIndex++).setCellValue(0);
+            }else{
+                currRow.createCell(cellIndex++).setCellValue(totalScore/totalPostedNum);
+            }
+            for (int i = 0; i < cellIndex; i++) {
+                currRow.getCell(i).setCellStyle(normalCellStyle);
+            }
+            try {
+                workbook.write(out);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void createStaticTitle(Sheet sheet) {
+        Row newRow = sheet.createRow(0);
+        for (int i = 0; i < 5; i++) {
+            Cell cell = newRow.createCell(0);
+            cell.setCellStyle(titleCellStyle);
+        }
+        newRow.getCell(0).setCellValue("服务商评价得分");
+        newRow = sheet.createRow(1);
+        newRow.createCell(0).setCellValue("序号");
+        newRow.createCell(1).setCellValue("分公司");
+        newRow.createCell(2).setCellValue("服务商数量");
+        newRow.createCell(3).setCellValue("评价商家数量");
+        newRow.createCell(4).setCellValue("平均分");
+        for (int i = 0; i < 5; i++) {
+            newRow.getCell(i).setCellStyle(titleCellStyle);
+            sheet.setColumnWidth(i, 20 * 256);
+        }
+        CellRangeAddress region = new CellRangeAddress(0, 0, 0, 4);
+        sheet.addMergedRegion(region);
+    }
+
     private void createProcessSheetTitle(Sheet sheet){
         Row newRow = sheet.createRow(0);
         newRow.createCell(0).setCellValue("分公司");

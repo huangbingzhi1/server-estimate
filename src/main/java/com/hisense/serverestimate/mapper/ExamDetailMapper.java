@@ -39,4 +39,7 @@ public interface ExamDetailMapper {
     int getEnterpriseExamProcessNum(Map<String, Object> param);
 
     List<Map<String, Object>> getAllExamProcess(Map<String, Object> param);
+
+    List<Map<String, Object>> staticByServerCompany(Map<String, Object> param);
+
 }

@@ -278,4 +278,18 @@
   <delete id="deleteByQid" parameterType="string">
      DELETE FROM exam_detail WHERE main_qid= #{qid,jdbcType=VARCHAR}
   </delete>
+    <select id="staticByServerCompany" resultType="map" parameterType="map">
+        SELECT
+          s.company_name AS server_company_name,
+          COUNT(s.company_name) AS totalnum,
+          COUNT(d.mean_score) AS postednum,
+          FORMAT(IFNULL(AVG(d.mean_score ),0) ,2)AS avgscore
+        FROM
+          exam_detail d
+          LEFT JOIN base_server s
+            ON s.server_code = d.server_code
+        WHERE d.main_qid = #{qid,jdbcType=VARCHAR}
+        GROUP BY s.company_name
+        ORDER BY AVG(d.mean_score) DESC
+    </select>
 </mapper>

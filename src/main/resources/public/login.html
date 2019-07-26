@@ -40,24 +40,29 @@
         doLogin=function () {
             if(!$("#username").val()||!$("#password").val()){
                 return;
+            }else{
+                $("#mainForm").submit();
             }
-            var jsonParam = '{username:"' + $("#username").val() + '",password:"' + $("#password").val() + '"}';
-            $.ajax({
-                type: "get",
-                url: "/serverestimate/userController/login",
-                data: {jsonParam: jsonParam},
-                async: true,
-                success: function (result) {
-                    if ("success" == result) {
-                        window.location = 'index.html';
-                    } else {
-                        alert("登陆失败")
-                    }
-                },
-                error: function (result) {
-                    console.log("failed")
-                }
-            });
+            // if(!$("#username").val()||!$("#password").val()){
+            //     return;
+            // }
+            // var jsonParam = '{username:"' + $("#username").val() + '",password:"' + $("#password").val() + '"}';
+            // $.ajax({
+            //     type: "get",
+            //     url: "/serverestimate/userController/login",
+            //     data: {jsonParam: jsonParam},
+            //     async: true,
+            //     success: function (result) {
+            //         if ("success" == result) {
+            //             window.location = 'index.html';
+            //         } else {
+            //             alert("登陆失败")
+            //         }
+            //     },
+            //     error: function (result) {
+            //         console.log("failed")
+            //     }
+            // });
         }
     </script>
 </head>
@@ -90,22 +95,24 @@
             </table>
         </td>
         <td>
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td width="31%" height="35" class="login-text02">用户名：<br/></td>
-                    <td width="69%"><input id="username" type="text" size="20"/></td>
-                </tr>
-                <tr>
-                    <td height="35" class="login-text02">密　码：<br/></td>
-                    <td><input id="password" type="password" size="20"/></td>
-                </tr>
+            <form id="mainForm" action="/serverestimate/userController/login">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="31%" height="35" class="login-text02">用户名：<br/></td>
+                        <td width="69%"><input id="username" name="username" type="text" size="20"/></td>
+                    </tr>
+                    <tr>
+                        <td height="35" class="login-text02">密　码：<br/></td>
+                        <td><input id="password" name="password" type="password" size="20"/></td>
+                    </tr>
 
-                <tr>
-                    <td height="35">&nbsp;</td>
-                    <td><input id="loginBtn" type="button" class="right-button01" value="登陆"/>
-                    </td>
-                </tr>
-            </table>
+                    <tr>
+                        <td height="35">&nbsp;</td>
+                        <td><input id="loginBtn" type="button" class="right-button01" value="登陆"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </td>
     </tr>
 </table>

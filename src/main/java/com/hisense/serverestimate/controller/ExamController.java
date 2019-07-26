@@ -383,6 +383,7 @@ public class ExamController extends BaseController {
         examService.downloadExamResultData(response, main, examResult, examTitle);
     }
 
+
     @RequestMapping(value = "getExamResultList", method = RequestMethod.GET)
     @ResponseBody
     public String getExamResultList(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request, HttpServletResponse response) {
@@ -457,6 +458,23 @@ public class ExamController extends BaseController {
         }
         List<Map<String, Object>> examResult = examDetailMapper.getAllExamProcess(param);
         examService.downloadExamProcessData(response, examResult);
+    }
+    /**
+     * 下载评价汇总
+     *
+     * @param qid
+     */
+    @RequestMapping(value = "downloadStaticByServerCompany", method = RequestMethod.GET)
+    @ResponseBody
+    public void downloadStaticByServerCompany(@RequestParam("qid") String qid, HttpServletRequest request, HttpServletResponse response) {
+        BaseUser loginUser = SessionUtil.getLoginUser();
+        Map<String, Object> param = new HashMap<>(2);
+        param.put("qid", qid);
+        if (!"admin".equals(loginUser.getRoleId())) {
+            return;
+        }
+        List<Map<String, Object>> examResult = examDetailMapper.staticByServerCompany(param);
+        examService.staticByServerCompany(response, examResult);
     }
 }
 

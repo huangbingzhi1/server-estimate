@@ -16,11 +16,30 @@
     }
   </style>
   <script type="text/javascript">
-      var roles;
+      roles=null;
+      loginUser=null;
+      function getCookie(name){
+          var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+          if(arr=document.cookie.match(reg)){
+              return unescape(arr[2]);
+          }else {
+              return null;
+          }
+      }
+
+    logout=function(){
+        window.open("/serverestimate/userController/logout");
+    }
     reLogin=function(){
       window.location = '../login.html';
     }
     $(function () {
+        loginUser=eval('(' + decodeURIComponent(decodeURIComponent(getCookie("loginUser"))) + ')');
+        // roles=decodeURIComponent(decodeURIComponent(getCookie("userRole")));
+        roles = eval('(' + decodeURIComponent(decodeURIComponent(getCookie("userRole"))) + ')');
+        console.log(loginUser);
+        console.log(roles);
+        console.log("---");
       $.ajax({
         type: "get",
         url: "/serverestimate/userController/getUserRole",

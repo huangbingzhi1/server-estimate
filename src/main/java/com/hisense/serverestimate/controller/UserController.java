@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +40,7 @@ import java.util.Map;
  * @Version 1.0
  */
 //@Controller
-@RestController
+@Controller
 @RequestMapping("userController")
 public class UserController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -135,34 +137,57 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "login", method = RequestMethod.GET)
-    @ResponseBody
-    public String login(@RequestParam("jsonParam") String jsonParam, HttpServletRequest request,HttpServletResponse response) {
-        JSONObject parseObject = JSON.parseObject(jsonParam);
+    public void login(@RequestParam("username") String username,@RequestParam("password") String password, HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+//        JSONObject parseObject = JSON.parseObject(jsonParam);
         HttpSession session = SessionUtil.getSession();
-        String username = HiStringUtil.getJsonStringByKey(parseObject, "username");
-        String password = HiStringUtil.getJsonStringByKey(parseObject, "password");
+//        String username = HiStringUtil.getJsonStringByKey(parseObject, "username");
+//        String password = HiStringUtil.getJsonStringByKey(parseObject, "password");
         Map<String, String> param = new HashMap<>();
         param.put("username", username);
         param.put("password", Encryption.encrypByMD5(password));
         BaseUser user = userMapper.getUserByNamePassword(param);
         if (null != user) {
+            user.setPassword("");
+            List<BaseRole> roleByUserId = roleMapper.getRoleByUserId(user.getUserId());
+
             session.setMaxInactiveInterval(-1);
             session.setAttribute("loginUser", user);
-            return SUCCESS;
+            Cookie cookie=new Cookie("loginUser", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(user), "utf-8"), "utf-8"));
+            cookie.setMaxAge(60*60*1);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            Cookie cookie2=new Cookie("userRole", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(roleByUserId), "utf-8"), "utf-8"));
+            cookie2.setMaxAge(60*60*1);
+            cookie2.setPath("/");
+            response.addCookie(cookie2);
+            try {
+                response.sendRedirect("../index.html");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                response.sendRedirect("../login.html");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return FAILED;
+
     }
     @RequestMapping(value = "logout", method = RequestMethod.GET)
-    @ResponseBody
-    public String logout(HttpServletRequest request,HttpServletResponse response) {
+    public void logout(HttpServletRequest request,HttpServletResponse response) {
         HttpSession session = SessionUtil.getSession();
         try {
             session.removeAttribute("loginUser");
         }catch (Exception e){
             e.printStackTrace();
-            return FAILED;
         }
-        return SUCCESS;
+        try {
+            response.sendRedirect("../login.html");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ;
     }
     @RequestMapping(value = "getUserRole", method = RequestMethod.GET)
     @ResponseBody
