@@ -133,15 +133,11 @@ public class UserController extends BaseController {
     /**
      * 用户登录
      *
-     * @param jsonParam
      * @return
      */
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public void login(@RequestParam("username") String username,@RequestParam("password") String password, HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
-//        JSONObject parseObject = JSON.parseObject(jsonParam);
         HttpSession session = SessionUtil.getSession();
-//        String username = HiStringUtil.getJsonStringByKey(parseObject, "username");
-//        String password = HiStringUtil.getJsonStringByKey(parseObject, "password");
         Map<String, String> param = new HashMap<>();
         param.put("username", username);
         param.put("password", Encryption.encrypByMD5(password));
@@ -149,15 +145,14 @@ public class UserController extends BaseController {
         if (null != user) {
             user.setPassword("");
             List<BaseRole> roleByUserId = roleMapper.getRoleByUserId(user.getUserId());
-
-            session.setMaxInactiveInterval(-1);
+            session.setMaxInactiveInterval(3600);
             session.setAttribute("loginUser", user);
             Cookie cookie=new Cookie("loginUser", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(user), "utf-8"), "utf-8"));
-            cookie.setMaxAge(60*60*1);
+            cookie.setMaxAge(3600);
             cookie.setPath("/");
             response.addCookie(cookie);
             Cookie cookie2=new Cookie("userRole", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(roleByUserId), "utf-8"), "utf-8"));
-            cookie2.setMaxAge(60*60*1);
+            cookie2.setMaxAge(3600);
             cookie2.setPath("/");
             response.addCookie(cookie2);
             try {
