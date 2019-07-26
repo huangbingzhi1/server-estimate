@@ -202,7 +202,7 @@
             html += "<td>" + new Date(entity.begindate).Format("yyyy-MM-dd")+ "</td>";
             html += "<td>" + entity.status+ "</td>";
             html += "<td>" + '<a onclick="viewExamProcess('+"'"+entity.examQid+"'"+')" href="#">评价过程</a><a onclick="viewExamResult('+"'"+entity.examQid+"'"+')" href="#">评价结果</a>'
-            if(window.parent.longinUser&&window.parent.longinUser.roleId=='admin'){
+            if(window.parent.loginUser&&window.parent.loginUser.roleId=='admin'){
                 html+='<a onclick="staticByServerCompany('+"'"+entity.examQid+"'"+')" href="#">评价汇总</a>';
                 html +='<a onclick="editExamBtn('+"'"+entity.mainId+"'"+')" href="#">编辑</a><a onclick="deleteExamBtn('+"'"+entity.examQid+"'"+')" href="#">删除</a>'
             }
