@@ -12,8 +12,7 @@ function initUser() {
         async: true,
         success: function (result) {
             user=result;
-            window.parent.longinUser=user;
-            console.log(user)
+            // window.parent.longinUser=user;
             $("#usernameSpan").html(user.truename);
         },
         error: function (result) {

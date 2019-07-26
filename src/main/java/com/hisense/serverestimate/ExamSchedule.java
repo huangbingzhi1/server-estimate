@@ -2,6 +2,7 @@ package com.hisense.serverestimate;
 
 import com.hisense.serverestimate.controller.ApiEnterpriseController;
 import com.hisense.serverestimate.controller.ExamController;
+import com.hisense.serverestimate.mapper.XsAccountMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -22,6 +23,8 @@ public class ExamSchedule {
     @Autowired
     private ExamController examController;
     @Autowired
+    private XsAccountMapper xsAccountMapper;
+    @Autowired
     private ApiEnterpriseController apiEnterpriseController;
     /**
      *  每隔1小时执行一次拉取和更新问卷任务
@@ -32,11 +35,18 @@ public class ExamSchedule {
         examController.synchronizeExam();
     }
     /**
-     *  每隔1天执行一次拉取和更新问卷任务
+     *  每天2点执行一次拉取和更新问卷任务
      */
     @Scheduled(cron = "0 0 02 * * ?")
     private void xsAccount() {
         apiEnterpriseController.getAccountRel();
+    }
+    /**
+     *  每天2点执行一次拉取和更新问卷任务
+     */
+    @Scheduled(cron = "0 0 02 * * ?")
+    private void clearAccountPassword() {
+        xsAccountMapper.clearAccountPassword();
     }
 
 }

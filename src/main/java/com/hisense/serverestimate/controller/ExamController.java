@@ -3,10 +3,7 @@ package com.hisense.serverestimate.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hisense.serverestimate.entity.*;
-import com.hisense.serverestimate.mapper.ErrorExamDetailMapper;
-import com.hisense.serverestimate.mapper.ExamDetailMapper;
-import com.hisense.serverestimate.mapper.ExamMainMapper;
-import com.hisense.serverestimate.mapper.ExamTitleMapper;
+import com.hisense.serverestimate.mapper.*;
 import com.hisense.serverestimate.service.ExamService;
 import com.hisense.serverestimate.service.ServerService;
 import com.hisense.serverestimate.service.impl.UserServiceImpl;
@@ -69,6 +66,8 @@ public class ExamController extends BaseController {
     private ExamService examService;
     @Autowired
     private ServerService serverService;
+    @Autowired
+    private XsAccountMapper xsAccountMapper;
 
     @RequestMapping(value = "getExamList", method = RequestMethod.GET)
     @ResponseBody
@@ -475,6 +474,25 @@ public class ExamController extends BaseController {
         }
         List<Map<String, Object>> examResult = examDetailMapper.staticByServerCompany(param);
         examService.staticByServerCompany(response, examResult);
+    }
+    /**
+     * 给信商账号新增一个密码
+     *
+     */
+    @RequestMapping(value = "dealCis", method = RequestMethod.GET)
+    @ResponseBody
+    public XsAccount dealCis(@RequestParam("account") String account, HttpServletRequest request, HttpServletResponse response) {
+        Map<String,Object> result=new HashMap<>(5);
+        XsAccount xsAccount = xsAccountMapper.selectByAccount(account);
+        if(null!=xsAccount){
+            xsAccount.setPassword(get6RandomNumber());
+            xsAccountMapper.setPassword(xsAccount.getAid(),xsAccount.getPassword());
+        }
+        return xsAccount;
+    }
+    private  String get6RandomNumber(){
+        int newNum = (int)((Math.random()*9+1)*100000);
+        return String.valueOf(newNum);
     }
 }
 

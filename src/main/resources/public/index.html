@@ -37,9 +37,6 @@
         loginUser=eval('(' + decodeURIComponent(decodeURIComponent(getCookie("loginUser"))) + ')');
         // roles=decodeURIComponent(decodeURIComponent(getCookie("userRole")));
         roles = eval('(' + decodeURIComponent(decodeURIComponent(getCookie("userRole"))) + ')');
-        console.log(loginUser);
-        console.log(roles);
-        console.log("---");
       $.ajax({
         type: "get",
         url: "/serverestimate/userController/getUserRole",

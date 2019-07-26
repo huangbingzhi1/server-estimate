@@ -20,6 +20,8 @@ public class XsAccount implements Serializable {
 
     private String fullName;
 
+    private String password;
+
     private Date createDate;
 
     private static final long serialVersionUID = 1L;
@@ -94,6 +96,14 @@ public class XsAccount implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

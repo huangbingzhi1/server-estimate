@@ -115,7 +115,30 @@ public class UserController extends BaseController {
             logger.error(e.toString());
         }
     }
+    /**
+     * 本系统的单点登录
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "cisLogin", method = RequestMethod.GET)
+    public void cisLogin(@RequestParam("account")String account,@RequestParam("password")String password, HttpServletRequest request,HttpServletResponse response) throws IOException {
 
+        HttpSession session = SessionUtil.getSession();
+        if(StringUtils.isEmpty(account)||StringUtils.isEmpty(password)){
+            response.sendRedirect("../login.html");
+        }else{
+            XsAccount xsAccount= xsAccountMapper.selectByAccount(account);
+            if(xsAccount!=null&&xsAccount.getPassword().equals(password)){
+                BaseUser user=new BaseUser(xsAccount.getAid(),xsAccount.getCisCode(),xsAccount.getFullName(),"temp",xsAccount.getFullName(),"enterprise");
+                session.setMaxInactiveInterval(-1);
+                session.setAttribute("loginUser", user);
+                session.setAttribute("account",xsAccount);
+                logger.error("user:[{}]", user.toString());
+                toExamPage(request, response);
+            }
+        }
+    }
     private void toExamPage(HttpServletRequest request,HttpServletResponse response) {
         try {
             String examDetailListByLoginAccount = examController.getExamDetailListByLoginAccount(null,request);

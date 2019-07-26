@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#okBtn").click(function () {
+                if(!$("#accountTxt").val()){
+                    return;
+                }
+                $.ajax({
+                    type: "get",
+                    url: "/serverestimate/examController/dealCis",
+                    data: {account: $("#accountTxt").val()},
+                    async: true,
+                    success: function (data) {
+                        console.log(data)
+                        console.log("--")
+                        if(!data){
+                            alert("没有找到该账户")
+                        }else{
+                            $("h3").show();
+                            var temp="http://103.94.200.182/serverestimate/userController/cisLogin?account="+data.account+"&password="+data.password;
+                            // var temp="http://localhost/serverestimate/userController/cisLogin?account="+data.account+"&password="+data.password;
+                            $("#accountDiv").html(temp)
+                        }
+                    },
+                    error: function (result) {
+                        console.log("failed")
+                    }
+                });
+            })
+        })
+    </script>
+</head>
+<body>
+    <div>
+        <span>信商登录账号：</span><input id="accountTxt" type="text"/><input id="okBtn" type="button" value="处理"/>
+    </div>
+    <br>
+    <h3 hidden="hidden">临时登录链接：</h3>
+    <div id="accountDiv">
+
+    </div>
+</body>
+</html>

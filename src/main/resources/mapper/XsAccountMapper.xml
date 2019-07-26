@@ -10,6 +10,7 @@
     <result column="email" property="email" jdbcType="VARCHAR" />
     <result column="username" property="username" jdbcType="VARCHAR" />
     <result column="full_name" property="fullName" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
     <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
@@ -36,6 +37,7 @@
       username = #{username,jdbcType=VARCHAR},
       full_name = #{fullName,jdbcType=VARCHAR},
       create_date = #{createDate,jdbcType=TIMESTAMP}
+      password=#{password,jdbcType=VARCHAR}
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -44,13 +46,25 @@
     where aid = #{aid,jdbcType=VARCHAR}
   </select>
   <select id="selectByAccount" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
+    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date,password
     from xs_account
     where account = #{account,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByCis" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
+    from xs_account
+    where cis_code = #{cis,jdbcType=VARCHAR}
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap" >
     select aid, cis_code, mdm_code, account, mobile, email, username, full_name, create_date
     from xs_account
   </select>
+    <update id="setPassword" parameterType="java.lang.String">
+        update xs_account set password=#{password,jdbcType=VARCHAR} where aid=#{aid,jdbcType=VARCHAR}
+    </update>
+    <update id="clearAccountPassword">
+        update xs_account set password=''
+    </update>
 </mapper>
