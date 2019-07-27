@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.mail.Session;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -166,10 +167,9 @@ public class UserController extends BaseController {
         param.put("password", Encryption.encrypByMD5(password));
         BaseUser user = userMapper.getUserByNamePassword(param);
         if (null != user) {
+            String truePassword=user.getPassword();
             user.setPassword("");
             List<BaseRole> roleByUserId = roleMapper.getRoleByUserId(user.getUserId());
-            session.setMaxInactiveInterval(3600);
-            session.setAttribute("loginUser", user);
             Cookie cookie=new Cookie("loginUser", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(user), "utf-8"), "utf-8"));
             cookie.setMaxAge(3600);
             cookie.setPath("/");
@@ -177,6 +177,9 @@ public class UserController extends BaseController {
             Cookie cookie2=new Cookie("userRole", URLEncoder.encode(URLEncoder.encode(JSON.toJSONString(roleByUserId), "utf-8"), "utf-8"));
             cookie2.setMaxAge(3600);
             cookie2.setPath("/");
+            user.setPassword(truePassword);
+            session.setMaxInactiveInterval(3600);
+            session.setAttribute("loginUser", user);
             response.addCookie(cookie2);
             try {
                 response.sendRedirect("../index.html");
@@ -275,6 +278,8 @@ public class UserController extends BaseController {
                 }else{
                     return FAILED;
                 }
+                loginUser.setPassword(Encryption.encrypByMD5(newPassword));
+                request.getSession().setAttribute("loginUser",loginUser);
             }else{
                 return FAILED;
             }
