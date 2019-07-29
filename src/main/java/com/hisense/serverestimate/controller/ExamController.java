@@ -195,7 +195,6 @@ public class ExamController extends BaseController {
             XsAccount account=null;
             Map<String, Object> param = new HashMap<>();
             HttpSession session = request.getSession();
-
             if(null!=session.getAttribute("account")){
                 account = (XsAccount) session.getAttribute("account");
                 param.put("cis", account.getCisCode());

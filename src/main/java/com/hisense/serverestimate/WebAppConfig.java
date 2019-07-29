@@ -19,7 +19,7 @@ public class WebAppConfig implements WebMvcConfigurer {
         //addPathPattern后跟拦截地址，excludePathPatterns后跟排除拦截地址
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/files/notLogin.html","/cislogin.html","/login.html","/images/**","/js/**","/css/**","/examController/receiveExamResult","/userController/login","/userController/ssoLogin");
+                .excludePathPatterns("/userController/cisLogin","/files/notLogin.html","/cislogin.html","/login.html","/images/**","/js/**","/css/**","/examController/receiveExamResult","/userController/login","/userController/ssoLogin");
     }
 
 }

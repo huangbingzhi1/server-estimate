@@ -130,7 +130,7 @@ public class UserController extends BaseController {
             response.sendRedirect("../login.html");
         }else{
             XsAccount xsAccount= xsAccountMapper.selectByAccount(account);
-            if(xsAccount!=null&&xsAccount.getPassword().equals(password)){
+            if(xsAccount!=null&&password.equals(xsAccount.getPassword())){
                 BaseUser user=new BaseUser(xsAccount.getAid(),xsAccount.getCisCode(),xsAccount.getFullName(),"temp",xsAccount.getFullName(),"enterprise");
                 session.setMaxInactiveInterval(-1);
                 session.setAttribute("loginUser", user);
