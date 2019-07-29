@@ -20,11 +20,11 @@
   <insert id="insert" parameterType="com.hisense.serverestimate.entity.XsAccount" >
     insert into xs_account (aid, cis_code, mdm_code, 
       account, mobile, email, 
-      username, full_name, create_date
+      username, full_name, create_date,password
       )
     values (#{aid,jdbcType=VARCHAR}, #{cisCode,jdbcType=VARCHAR}, #{mdmCode,jdbcType=VARCHAR}, 
       #{account,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{username,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}
+      #{username,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{password,jdbcType=TIMESTAMP}
       )
   </insert>
   <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.XsAccount" >

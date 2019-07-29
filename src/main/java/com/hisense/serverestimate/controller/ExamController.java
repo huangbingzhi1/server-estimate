@@ -27,10 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author Huang.bingzhi
@@ -483,9 +480,18 @@ public class ExamController extends BaseController {
     public XsAccount dealCis(@RequestParam("account") String account, HttpServletRequest request, HttpServletResponse response) {
         Map<String,Object> result=new HashMap<>(5);
         XsAccount xsAccount = xsAccountMapper.selectByAccount(account);
+
         if(null!=xsAccount){
             xsAccount.setPassword(get6RandomNumber());
             xsAccountMapper.setPassword(xsAccount.getAid(),xsAccount.getPassword());
+        }else{
+            xsAccount=new XsAccount();
+            xsAccount.setPassword(get6RandomNumber());
+            xsAccount.setCisCode(account);
+            xsAccount.setAccount(account);
+            xsAccount.setAid(UUID.randomUUID().toString());
+            xsAccount.setEmail("this account is insert by fwpjxt");
+            xsAccountMapper.insert(xsAccount);
         }
         return xsAccount;
     }
