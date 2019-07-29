@@ -124,7 +124,6 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "cisLogin", method = RequestMethod.GET)
     public void cisLogin(@RequestParam("account")String account,@RequestParam("password")String password, HttpServletRequest request,HttpServletResponse response) throws IOException {
-
         HttpSession session = SessionUtil.getSession();
         if(StringUtils.isEmpty(account)||StringUtils.isEmpty(password)){
             response.sendRedirect("../login.html");

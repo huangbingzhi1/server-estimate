@@ -479,7 +479,7 @@ public class ExamController extends BaseController {
     @ResponseBody
     public XsAccount dealCis(@RequestParam("account") String account, HttpServletRequest request, HttpServletResponse response) {
         Map<String,Object> result=new HashMap<>(5);
-        XsAccount xsAccount = xsAccountMapper.selectByAccount(account);
+        XsAccount xsAccount = xsAccountMapper.selectByAccount("fwpjxt"+account);
 
         if(null!=xsAccount){
             xsAccount.setPassword(get6RandomNumber());
@@ -488,7 +488,7 @@ public class ExamController extends BaseController {
             xsAccount=new XsAccount();
             xsAccount.setPassword(get6RandomNumber());
             xsAccount.setCisCode(account);
-            xsAccount.setAccount(account);
+            xsAccount.setAccount("fwpjxt"+account);
             xsAccount.setAid(UUID.randomUUID().toString());
             xsAccount.setEmail("this account is insert by fwpjxt");
             xsAccountMapper.insert(xsAccount);
