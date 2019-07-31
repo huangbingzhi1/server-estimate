@@ -280,16 +280,38 @@
   </delete>
     <select id="staticByServerCompany" resultType="map" parameterType="map">
         SELECT
-          s.company_name AS server_company_name,
-          COUNT(s.company_name) AS totalnum,
-          COUNT(d.mean_score) AS postednum,
-          FORMAT(IFNULL(AVG(d.mean_score ),0) ,2)AS avgscore
+          a.*,
+          b.enterprise_count AS postednum
         FROM
-          exam_detail d
-          LEFT JOIN base_server s
-            ON s.server_code = d.server_code
-        WHERE d.main_qid = #{qid,jdbcType=VARCHAR}
-        GROUP BY s.company_name
-        ORDER BY AVG(d.mean_score) DESC
+          (SELECT
+            s.company_name AS server_company_name,
+            COUNT(s.company_name) AS totalnum,
+            FORMAT(IFNULL(AVG(d.mean_score), 0), 2) AS avgscore
+          FROM
+            (SELECT DISTINCT
+              t.server_code,
+              t.mean_score
+            FROM
+              exam_detail t
+            WHERE t.main_qid = #{qid,jdbcType=VARCHAR}) d
+            LEFT JOIN base_server s
+              ON s.server_code = d.server_code
+          GROUP BY s.company_name
+          ORDER BY AVG(d.mean_score) DESC) a
+          LEFT JOIN
+            (SELECT
+              company_name,
+              COUNT(enterprise_cis) AS enterprise_count
+            FROM
+              (SELECT DISTINCT
+                s.company_name,
+                t.enterprise_cis
+              FROM
+                exam_detail t
+                LEFT JOIN base_server s
+                  ON s.server_code = t.server_code
+              WHERE t.main_qid = #{qid,jdbcType=VARCHAR}) z
+            GROUP BY z.company_name) b
+            ON a.server_company_name = b.company_name
     </select>
 </mapper>
