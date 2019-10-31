@@ -77,13 +77,15 @@ public class ExamServiceImpl implements ExamService {
         createCellStyle(workbook);
 //        int rowIndex=2;
         int rowIndexStart=2;
+        int totalRowIndexStart=2;
         Map<String,Integer> rowIndexMap=new HashMap<>(100);
         String scoreTypeIndexs = main.getScoreTypeIndexs();
         String textTypeIndexs = main.getTextTypeIndexs();
         String[] scoreTypeIndexArr = scoreTypeIndexs.split(",");
         String[] textTypeIndexArr = textTypeIndexs.split(",");
 
-
+        Sheet totalSheet = workbook.createSheet("总计");
+        createSheetTitle(totalSheet,scoreTypeIndexArr,textTypeIndexArr,titles);
         for (Map<String, Object> detail:examResult){
             String companyName = detail.get("company_name").toString();
             Sheet currSheet = workbook.getSheet(companyName);
@@ -91,13 +93,13 @@ public class ExamServiceImpl implements ExamService {
                 rowIndexMap.put(companyName,rowIndexStart);
                 currSheet = workbook.createSheet(companyName);
                 createSheetTitle(currSheet,scoreTypeIndexArr,textTypeIndexArr,titles);
-//                createSheetTitle(currSheet,textTypeIndexArr,textTypeIndexArr,titles);
             }
             String  scoreStr = detail.getOrDefault("score_array","").toString();
             String[] scoreArr = scoreStr.split(",");
             String  textStr = detail.getOrDefault("text_array","").toString();
             String[] textArr = textStr.split(",");
             int cellIndex=0;
+            int totalCellIndex=0;
             Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
             rowIndexMap.put(companyName,rowIndexMap.get(companyName)+1);
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("server_company_name","").toString());
@@ -130,6 +132,39 @@ public class ExamServiceImpl implements ExamService {
             currRow.createCell(cellIndex++).setCellValue(detail.getOrDefault("mean_score","").toString());
             for (int i = 0; i < cellIndex; i++) {
                 currRow.getCell(i).setCellStyle(normalCellStyle);
+            }
+
+            Row totalRow = totalSheet.createRow(totalRowIndexStart++);
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("server_company_name","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("server_name","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("server_code","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("server_type","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("manager","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("province","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("city","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("district","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("company_name","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("office","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("enterprise_name","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("enterprise_cis","").toString());
+            for (int i = 0; i < scoreTypeIndexArr.length; i++) {
+                if(i<scoreArr.length){
+                    totalRow.createCell(totalCellIndex++).setCellValue(scoreArr[i]);
+                }else{
+                    totalRow.createCell(totalCellIndex++);
+                }
+            }
+            for (int i = 0; i < textTypeIndexArr.length; i++) {
+                if(i<textArr.length){
+                    totalRow.createCell(totalCellIndex++).setCellValue(textArr[i]);
+                }else{
+                    totalRow.createCell(totalCellIndex++);
+                }
+            }
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("totle_score","").toString());
+            totalRow.createCell(totalCellIndex++).setCellValue(detail.getOrDefault("mean_score","").toString());
+            for (int i = 0; i < totalCellIndex; i++) {
+                totalRow.getCell(i).setCellStyle(normalCellStyle);
             }
         }
 

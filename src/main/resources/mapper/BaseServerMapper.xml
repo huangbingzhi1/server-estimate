@@ -45,7 +45,7 @@
       #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{district,jdbcType=VARCHAR}
       )
   </insert>
-  <update id="updateByPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseServer" >
+  <update id="updateBycisPageManagerPrimaryKey" parameterType="com.hisense.serverestimate.entity.BaseServer" >
     update base_server
     set server_code = #{serverCode,jdbcType=VARCHAR},
       `server_name` = #{serverName,jdbcType=VARCHAR},
