@@ -41,5 +41,7 @@ public interface ExamDetailMapper {
     List<Map<String, Object>> getAllExamProcess(Map<String, Object> param);
 
     List<Map<String, Object>> staticByServerCompany(Map<String, Object> param);
+    //汇总2
+    List<Map<String, Object>> collection2(Map<String, Object> param);
 
 }

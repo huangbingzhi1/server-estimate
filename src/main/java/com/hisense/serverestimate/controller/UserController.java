@@ -52,6 +52,7 @@ public class UserController extends BaseController {
     @Value("${xinshang.checkSsoLoginTokenUrl}")
     public String checkSsoLoginTokenUrl;
 
+
     @Autowired
     private BaseUserMapper userMapper;
     @Autowired

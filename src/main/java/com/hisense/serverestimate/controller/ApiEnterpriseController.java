@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -102,6 +103,7 @@ public class ApiEnterpriseController<main> extends BaseController {
             List<XsAccount> xsAccounts = JSON.parseArray(msgData, XsAccount.class);
             for (int i = 0; i < xsAccounts.size(); i++) {
                 xsAccounts.get(i).setAid(HiStringUtil.getRandomUUID());
+                xsAccounts.get(i).setCreateDate(new Date());
                 int insert = xsAccountMapper.insert(xsAccounts.get(i));
                 System.out.println(insert);
             }

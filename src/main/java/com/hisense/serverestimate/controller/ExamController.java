@@ -468,8 +468,10 @@ public class ExamController extends BaseController {
         if (!"admin".equals(loginUser.getRoleId())) {
             return;
         }
-        List<Map<String, Object>> examResult = examDetailMapper.staticByServerCompany(param);
-        examService.staticByServerCompany(response, examResult);
+//        List<Map<String, Object>> examResult = examDetailMapper.staticByServerCompany(param);
+//        examService.staticByServerCompany(response, examResult);
+        List<Map<String, Object>> examResult = examDetailMapper.collection2(param);
+        examService.staticByServerCompany2(response, examResult);
     }
     /**
      * 给信商账号新增一个密码

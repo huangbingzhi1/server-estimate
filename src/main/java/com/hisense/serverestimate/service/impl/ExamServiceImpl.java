@@ -1,5 +1,6 @@
 package com.hisense.serverestimate.service.impl;
 
+import com.hisense.serverestimate.controller.ExamController;
 import com.hisense.serverestimate.entity.ExamMain;
 import com.hisense.serverestimate.entity.ExamTitle;
 import com.hisense.serverestimate.service.ExamService;
@@ -295,7 +296,103 @@ public class ExamServiceImpl implements ExamService {
 
         }
     }
+    @Override
+    public void staticByServerCompany2(HttpServletResponse response, List<Map<String, Object>> examResult) {
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        String fileName="汇总.xlsx";
+        String sheetName="汇总";
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=\""+new String(fileName.getBytes("gb2312"),"ISO8859-1"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        OutputStream out = null;
+        try {
+            out = response.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Workbook workbook =  new XSSFWorkbook() ;
+        Sheet sheet = workbook.createSheet(sheetName);
+        createCellStyle(workbook);
+        long totalAllNum=0;
+        long totalPostedNum=0;
+        float totalScore=0.0f;
+        int rowIndexStart=2;
+        if(!CollectionUtils.isEmpty(examResult)&&sheet!=null){
+            final String[] scoreArrays = examResult.get(0).get("scoreArray").toString().split(",");
+            createStaticTitle2(sheet,scoreArrays.length);
+            Map<String,ExamCollectionVO> companyCollection=new HashMap<>(100);
+            for (Map<String,Object> detail:examResult) {
+                final String companyName = detail.get("companyName").toString();
+                if (companyCollection.containsKey(companyName)) {
+                    companyCollection.get(companyName).addItem(detail);
+                } else {
+                    companyCollection.put(companyName, new ExamCollectionVO(detail));
+                }
+            }
+            if(!CollectionUtils.isEmpty(companyCollection)) {
+                for(ExamCollectionVO vo:companyCollection.values()){
+                    int cellIndex=0;
+                    Row currRow = sheet.createRow(rowIndexStart++);
+                    currRow.createCell(cellIndex++).setCellValue(rowIndexStart-2);
+                    currRow.createCell(cellIndex++).setCellValue(vo.getCompany());
+                    currRow.createCell(cellIndex++).setCellValue(vo.getServerNum());
+                    currRow.createCell(cellIndex++).setCellValue(vo.getCisNum());
+                    for (String temp:vo.getMeanScoreByNoList()){
+                        currRow.createCell(cellIndex++).setCellValue(temp);
+                    }
+                    final double sum = vo.getMeanScoreByNoList().stream().mapToDouble(s -> Double.valueOf(s)).sum();
+                    currRow.createCell(cellIndex++).setCellValue(sum);
+                }
+            }
+//            Row currRow = sheet.createRow(rowIndexStart);
+//            int cellIndex=0;
+//            currRow.createCell(cellIndex++).setCellValue("");
+//            currRow.createCell(cellIndex++).setCellValue("总计");
+//            currRow.createCell(cellIndex++).setCellValue(totalAllNum);
+//            currRow.createCell(cellIndex++).setCellValue(totalPostedNum);
+//            if(totalPostedNum==0){
+//                currRow.createCell(cellIndex++).setCellValue(0);
+//            }else{
+//                currRow.createCell(cellIndex++).setCellValue(totalScore/totalPostedNum);
+//            }
+//            for (int i = 0; i < cellIndex; i++) {
+//                currRow.getCell(i).setCellStyle(normalCellStyle);
+//            }
+            try {
+                workbook.write(out);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+        }
+    }
+    private void createStaticTitle2(Sheet sheet,int qNum) {
+        Row newRow = sheet.createRow(0);
+        for (int i = 0; i < 5+qNum; i++) {
+            Cell cell = newRow.createCell(0);
+            cell.setCellStyle(titleCellStyle);
+        }
+        int index=0;
+        newRow.getCell(0).setCellValue("服务商评价得分");
+        newRow = sheet.createRow(1);
+        newRow.createCell(index++).setCellValue("序号");
+        newRow.createCell(index++).setCellValue("分公司");
+        newRow.createCell(index++).setCellValue("服务商数量");
+        newRow.createCell(index++).setCellValue("评价商家数量");
+        for (int i=0;i<qNum;i++){
+            newRow.createCell(index++).setCellValue("题目"+(i+1)+"(平均分)");
+        }
+        newRow.createCell(index++).setCellValue("总分（平均）");
+        for (int i = 0; i < index; i++) {
+            newRow.getCell(i).setCellStyle(titleCellStyle);
+            sheet.setColumnWidth(i, 20 * 256);
+        }
+        CellRangeAddress region = new CellRangeAddress(0, 0, 0, 4+qNum);
+        sheet.addMergedRegion(region);
+    }
     private void createStaticTitle(Sheet sheet) {
         Row newRow = sheet.createRow(0);
         for (int i = 0; i < 5; i++) {

@@ -102,6 +102,10 @@
         $(document).ready(function () {
             stateA = 1;
             queryexamlist();
+            var iframe = document.getElementById('mainFrame');
+            iframe.onload = function() {
+                refreshWindow();
+            }
         });
         $(window).resize(function () {
             resize();
@@ -173,21 +177,10 @@
 </ul>
 </div>
 <div id="mainDiv" style="width:70%;float: left;">
-    <h1>2019年度综合所得收入超过12万元且需要补税金额超过400元的asdfsa</h1>
-    <input type="number" required
-           min="0"
-           max="10"
-           step="1"
-           value="10">
-    <h1>2019年度综合所得收入超过12万元且需要补税金额超过400元的</h1>
-    <input type="number" required
-           min="0"
-           max="10"
-           step="1"
-           value="10">
-    <textarea></textarea>
-    <button>提交</button>
-
+    <iframe id="mainFrame" style="border:0px" width="800px" height="100%;" onload="resize()"
+            src="">
+        <div id="innerDiv"></div>
+    </iframe>
 </div>
 </body>
 </html>
