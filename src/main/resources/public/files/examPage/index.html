@@ -86,7 +86,10 @@
                                     // donothing;
                                     // alert("此问卷你已经提交过了 !!");
                                 }else{
-                                    $("#mainFrame").attr("src",($(this).attr("value")));
+                                    // $("#mainFrame").attr("src",($(this).attr("value")));
+                                    var examUrl="exam.html?paramStr="+$(this).attr("value")
+                                    console.log(examUrl)
+                                    $("#mainFrame").attr("src",examUrl);
                                 }
                                 // start
                                 stateA = 0;
@@ -173,21 +176,10 @@
 </ul>
 </div>
 <div id="mainDiv" style="width:70%;float: left;">
-    <h1>2019年度综合所得收入超过12万元且需要补税金额超过400元的asdfsa</h1>
-    <input type="number" required
-           min="0"
-           max="10"
-           step="1"
-           value="10">
-    <h1>2019年度综合所得收入超过12万元且需要补税金额超过400元的</h1>
-    <input type="number" required
-           min="0"
-           max="10"
-           step="1"
-           value="10">
-    <textarea></textarea>
-    <button>提交</button>
-
+    <iframe id="mainFrame" style="border:0px" width="800px" height="100%;" onload="resize()"
+            src="">
+        <div id="innerDiv"></div>
+    </iframe>
 </div>
 </body>
 </html>

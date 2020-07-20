@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="axios.min.js"></script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="FormMaking.css">
+</head>
+<body>
+<div id="app" style="margin:50px">
+    <div style="margin-bottom: 20px;color:red;font-weight: bold">
+        *填写注意事项：
+        评价分为六项（100分）：工作配合及时性（20分）、用户投诉处理及时性（20分）、用户投诉处理质量（20分）、安装维修服务及时性（20分）、样机修复及时性（10分）、退换机鉴定及时性（10分），对服务商的不满意项可以详细描述。
+    </div>
+    <fm-generate-form :data="jsonData" :remote="remoteFuncs" :value="editData" ref="generateForm">
+
+    </fm-generate-form>
+    <el-button type="primary" @click="handleSubmit">提交</el-button>
+</div>
+<script src="vue.js"></script>
+<script src="index.js"></script>
+<script src="FormMaking.umd.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            jsonData: {
+                "list": [{
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 20,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第1题：工作配合及时性(20)",
+                    "key": "1593268386000_85371",
+                    "model": "q1",
+                    "rules": [{"required": true, "message": "第1题：工作配合及时性(20)必须填写"}]
+                }, {
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 20,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "100",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第2题：用户投诉处理及时性(20)",
+                    "key": "1593268442000_12778",
+                    "model": "q2",
+                    "rules": [{"required": true, "message": "第2题：用户投诉处理及时性(20)必须填写"}]
+                }, {
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 20,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "100",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第3题：用户投诉处理质量(20)",
+                    "key": "1593268462000_83206",
+                    "model": "q3",
+                    "rules": [{"required": true, "message": "第3题：用户投诉处理质量(20)必须填写"}]
+                }, {
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 20,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "100",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第4题：安装维修服务及时性(20)",
+                    "key": "1593268464000_96337",
+                    "model": "q4",
+                    "rules": [{"required": true, "message": "第4题：安装维修服务及时性(20)必须填写"}]
+                }, {
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 10,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "100",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第5题：样机修复及时性(10)",
+                    "key": "1593268520000_80243",
+                    "model": "q5",
+                    "rules": [{"required": true, "message": "第5题：样机修复及时性(10)必须填写"}]
+                }, {
+                    "type": "slider",
+                    "icon": "icon-slider",
+                    "options": {
+                        "defaultValue": 0,
+                        "disabled": false,
+                        "required": true,
+                        "min": 0,
+                        "max": 10,
+                        "step": 1,
+                        "showInput": true,
+                        "range": false,
+                        "width": "100",
+                        "remoteFunc": "func_1593268367000_74869"
+                    },
+                    "name": "第6题：退换机鉴定及时性(10)",
+                    "key": "1593268533000_87245",
+                    "model": "q6",
+                    "rules": [{"required": true, "message": "第6题：退换机鉴定及时性(10)必须填写"}]
+                }, {
+                    "type": "textarea",
+                    "icon": "icon-diy-com-textarea",
+                    "options": {
+                        "width": "100%",
+                        "defaultValue": "",
+                        "required": false,
+                        "disabled": false,
+                        "pattern": "",
+                        "placeholder": "",
+                        "remoteFunc": "func_1593268566000_64447"
+                    },
+                    "name": "第7题：请针对评价过程中的不满意项，描述具体原因",
+                    "key": "1593268566000_64447",
+                    "model": "q7",
+                    "rules": []
+                }], "config": {"labelWidth": 100, "labelPosition": "top", "size": "small"}
+            },
+            editData: {
+                q1: -1
+            },
+            remoteFuncs: {}
+        },
+        methods: {
+            getRealTime(str){
+                if(str < 10){
+                    return '0'+str;
+                }
+                return str;
+            },
+            toDateString(now){
+                var Y = now.getFullYear();
+                var m = this.getRealTime(now.getMonth()+1);
+                var d = this.getRealTime(now.getDate());
+                var H = this.getRealTime(now.getHours());
+                var i = this.getRealTime(now.getMinutes());
+                var s = this.getRealTime(now.getSeconds());
+                var nowString = Y +'-'+ m +'-'+ d +' '+ H +':'+ i +':'+ s;
+                return nowString
+            },
+            getQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]);
+                return null;
+            },
+            handleSubmit() {
+                var self=this
+
+
+                this.$refs.generateForm.getData().then(data => {
+                    self.editData = data
+                    if(data.q1 == 0 || data.q2 == 0 || data.q3 == 0
+                        || data.q4 == 0 || data.q5 == 0 || data.q6 == 0){
+                    this.$confirm('有选项分数为0，提交后无法修改。是否确定提交?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        self.submitExam()
+                    }).catch(() => {
+                        return false
+                    });
+                    }else{
+                        self.submitExam()
+                    }
+
+                }).catch(e => {})
+            },
+            submitExam(){
+                console.log(111)
+                this.editData.submittime=this.toDateString(new Date())
+
+                var examInfo=this.getQueryString("paramStr")
+                if(examInfo && examInfo.indexOf(".aspx?sojumpparm=")>0){
+                    var splitArr=examInfo.split(".aspx?sojumpparm=")
+                    if(splitArr.length==2){
+                        this.editData.activity=splitArr[0]
+                        this.editData.sojumpparm=splitArr[1]
+                        this.editData.q1=this.editData.q1+""
+                        this.editData.q2=this.editData.q2+""
+                        this.editData.q3=this.editData.q3+""
+                        this.editData.q4=this.editData.q4+""
+                        this.editData.q5=this.editData.q5+""
+                        this.editData.q6=this.editData.q6+""
+                        var jsonParam = JSON.stringify(this.editData);
+                        axios
+                            .post('/serverestimate/examController/sendExamResult',{"jsonParam":jsonParam})
+                            .then(response => {
+                                if(response && 'success'==response.data){
+                                    this.$message({
+                                        showClose: true,
+                                        message: '提交成功！',
+                                        type: 'success'
+                                    });
+                                }
+                        }).catch(function (error) { // 请求失败处理
+                            this.$message({
+                                showClose: true,
+                                message: '提交失败',
+                                type: 'error'
+                            });
+                        });
+                    }
+
+                }
+                console.log(jsonParam)
+            }
+        }
+    })
+</script>
+</body>
+</html>

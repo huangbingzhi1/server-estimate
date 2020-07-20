@@ -357,6 +357,114 @@ public class ExamController extends BaseController {
             errorExamDetailMapper.addErrorExamDetail(e.toString().substring(0,99),jsonParam);
         }
     }
+    /**
+     * 接收用户提交的问卷答案
+     */
+    @RequestMapping(value = "sendExamResult", method = RequestMethod.POST)
+    @ResponseBody
+    public String sendExamResult(@RequestBody String jsonParam,HttpServletRequest request, HttpServletResponse response) {
+        StringBuilder stringBuilder=new StringBuilder();
+        try {
+            errorExamDetailMapper.addErrorExamDetail("received",jsonParam);
+            logger.error("------------------");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            jsonParam="{'activity':'41943184','sojumpparm':'242076AC66EC61FF9E348218E3995C4F','name':'问卷名称','parteruser':'15581018823','parterjoiner':'test4','timetaken':'528','submittime':'2016-08-23 10:01:59', 'q1':'50','q2': '7','q3':'13','q4':'9','q5':'2','q6':'878787','q7':'似的sss发射点发射点',joinid:'101812480275','totalvalue':'15'}";
+            JSONObject parseObject = JSON.parseObject(jsonParam);
+            parseObject = JSON.parseObject(parseObject.getString("jsonParam").toString());
+            jsonParam=parseObject.toJSONString();
+            String qid = HiStringUtil.getJsonStringByKey(parseObject, "activity");
+            String sojumpparm = HiStringUtil.getJsonStringByKey(parseObject, "sojumpparm");
+            Map<String, String> cisServerCodeMd5Map = serverService.getCisServerCodeMd5Map();
+            if (cisServerCodeMd5Map.containsKey(sojumpparm)) {
+                sojumpparm = cisServerCodeMd5Map.get(sojumpparm);
+            } else {
+                errorExamDetailMapper.addErrorExamDetail("sojumpparm错误",jsonParam);
+                logger.error("sojumpparm错误");
+                return "error";
+            }
+            String cis = null;
+            String serverCode = null;
+            if (!StringUtils.isEmpty(sojumpparm)) {
+                String[] split = sojumpparm.split(",");
+                if (split.length == 2) {
+                    cis = split[0];
+                    serverCode = split[1];
+                }
+            }
+            if (StringUtils.isEmpty(cis) || StringUtils.isEmpty(serverCode)) {
+                errorExamDetailMapper.addErrorExamDetail("缺少cis或者服务商编码",jsonParam);
+                logger.error("缺少cis或者服务商编码");
+                return "error";
+            }
+            if (StringUtils.isEmpty(qid)) {
+                return "error";
+            }
+            ExamMain examMain = examMainMapper.selectByQid(qid);
+            Map<String, String> param = new HashMap<>();
+            param.put("qid", qid);
+            param.put("serverCode", serverCode);
+            param.put("cis", cis);
+            ExamDetail examDetail = examDetailMapper.selectByQidCisServerCode(param);
+            if (null == examMain || null == examDetail) {
+                errorExamDetailMapper.addErrorExamDetail("查不到相关问卷",jsonParam);
+                logger.error("查不到相关问卷");
+                return "error";
+            }
+            int timetaken = HiStringUtil.getJsonIntByKey(parseObject, "timetaken");
+            Date submittime = new Date();
+            String submittimeStr = HiStringUtil.getJsonStringByKey(parseObject, "submittime");
+            if (StringUtils.isEmpty(submittimeStr)) {
+                submittime = sdf.parse(submittimeStr);
+            }
+            String scoreTypeIndexs = examMain.getScoreTypeIndexs();
+            String textTypeIndexs = examMain.getTextTypeIndexs();
+            String[] scoreTypeQuestionNo = null;
+            String[] textTypeQuestionNo = null;
+            StringBuilder scoreStringBuilder = new StringBuilder();
+            StringBuilder textStringBuilder = new StringBuilder();
+            int totalScore = 0;
+            if (!StringUtils.isEmpty(scoreTypeIndexs)) {
+                scoreTypeQuestionNo = scoreTypeIndexs.split(",");
+            }
+            if (!StringUtils.isEmpty(textTypeIndexs)) {
+                textTypeQuestionNo = textTypeIndexs.split(",");
+            }
+            if (null != scoreTypeQuestionNo) {
+                for (int i = 0; i < scoreTypeQuestionNo.length; i++) {
+                    int jsonIntByKey = HiStringUtil.getJsonIntByKey(parseObject, "q" + scoreTypeQuestionNo[i]);
+                    if (i != 0) {
+                        scoreStringBuilder.append(',');
+                    }
+                    scoreStringBuilder.append(jsonIntByKey);
+                    totalScore += jsonIntByKey;
+                }
+            }
+            if (null != textTypeQuestionNo) {
+                for (int i = 0; i < textTypeQuestionNo.length; i++) {
+                    String jsonStringByKey = HiStringUtil.getJsonStringByKey(parseObject, "q" + textTypeQuestionNo[i]);
+                    if (i != 0) {
+                        scoreStringBuilder.append(',');
+                    }
+                    textStringBuilder.append(jsonStringByKey);
+                }
+
+            }
+            examDetail.setSubmittime(submittime);
+            examDetail.setTimetaken(0);
+            examDetail.setTotleScore(totalScore);
+            examDetail.setScoreArray(scoreStringBuilder.toString());
+            examDetail.setTextArray(textStringBuilder.toString());
+            examDetail.setSourceData(jsonParam);
+            examDetailMapper.updateByPrimaryKey(examDetail);
+            examDetailMapper.updateMeanScoreByQidCis(param);
+            logger.error("---------success-----------");
+            return "success";
+        } catch (Exception e) {
+            logger.error(e.toString());
+            errorExamDetailMapper.addErrorExamDetail(e.toString().substring(0,99),jsonParam);
+            return "error";
+        }
+    }
 
     /**
      * 下载问卷结果
