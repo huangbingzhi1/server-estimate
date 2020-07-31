@@ -363,7 +363,6 @@ public class ExamController extends BaseController {
     @RequestMapping(value = "sendExamResult", method = RequestMethod.POST)
     @ResponseBody
     public String sendExamResult(@RequestBody String jsonParam,HttpServletRequest request, HttpServletResponse response) {
-        StringBuilder stringBuilder=new StringBuilder();
         try {
             errorExamDetailMapper.addErrorExamDetail("received",jsonParam);
             logger.error("------------------");
@@ -413,7 +412,7 @@ public class ExamController extends BaseController {
             int timetaken = HiStringUtil.getJsonIntByKey(parseObject, "timetaken");
             Date submittime = new Date();
             String submittimeStr = HiStringUtil.getJsonStringByKey(parseObject, "submittime");
-            if (StringUtils.isEmpty(submittimeStr)) {
+            if (!StringUtils.isEmpty(submittimeStr)) {
                 submittime = sdf.parse(submittimeStr);
             }
             String scoreTypeIndexs = examMain.getScoreTypeIndexs();
@@ -608,6 +607,18 @@ public class ExamController extends BaseController {
     private  String get6RandomNumber(){
         int newNum = (int)((Math.random()*9+1)*100000);
         return String.valueOf(newNum);
+    }
+    @GetMapping("examInfo")
+    public Result<List<ExamInfo>> getExamInfo(@RequestParam("account") String account){
+        List<ExamInfo> result=new ArrayList<>(1);
+        if(StringUtils.isEmpty(account)){
+            return Result.error("参数不能为空");
+        }
+        XsAccount xsAccount= xsAccountMapper.selectByAccount(account);
+        if(xsAccount==null){
+            return Result.error("该账号为空");
+        }
+        return Result.success(examService.getExamInfo(xsAccount));
     }
 }
 

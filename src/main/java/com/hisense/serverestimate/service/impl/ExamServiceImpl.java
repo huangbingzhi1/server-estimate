@@ -1,22 +1,30 @@
 package com.hisense.serverestimate.service.impl;
 
 import com.hisense.serverestimate.controller.ExamController;
-import com.hisense.serverestimate.entity.ExamMain;
-import com.hisense.serverestimate.entity.ExamTitle;
+import com.hisense.serverestimate.entity.*;
+import com.hisense.serverestimate.mapper.ExamDetailMapper;
+import com.hisense.serverestimate.mapper.ExamMainMapper;
+import com.hisense.serverestimate.mapper.ExamTitleMapper;
 import com.hisense.serverestimate.service.ExamService;
+import com.hisense.serverestimate.utils.Encryption;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Author Huang.bingzhi
@@ -25,6 +33,12 @@ import java.util.Map;
  */
 @Service
 public class ExamServiceImpl implements ExamService {
+    @Resource
+    private ExamMainMapper mainMapper;
+    @Autowired
+    private ExamDetailMapper detailMapper;
+    @Autowired
+    private ExamTitleMapper titleMapper;
     public static final int LINE_START_ENTERPRISE=2;
 
     private CellStyle normalCellStyle;
@@ -369,6 +383,7 @@ public class ExamServiceImpl implements ExamService {
 
         }
     }
+
     private void createStaticTitle2(Sheet sheet,int qNum) {
         Row newRow = sheet.createRow(0);
         for (int i = 0; i < 5+qNum; i++) {
@@ -478,5 +493,36 @@ public class ExamServiceImpl implements ExamService {
         }
         row2.getCell(cellIndex++).setCellValue("合计分值");
         row2.getCell(cellIndex++).setCellValue("最终得分（平均分）");
+    }
+
+    @Override
+    public List<ExamInfo> getExamInfo(XsAccount xsAccount) {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<ExamInfo> result=new ArrayList<>(1);
+        List<ExamDetail> details=detailMapper.listExamDetailByCis(xsAccount.getCisCode());
+//        Map<String, ExamDetail> soVOMap = details.stream().collect(Collectors.toMap(ExamDetail::getMainQid, Function.identity()));
+        final List<String> mainQids=details.stream().map(ExamDetail::getMainQid).distinct().collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(mainQids)) {
+            mainQids.forEach(qid -> {
+                ExamInfo temp=new ExamInfo();
+                temp.setId(qid);
+                temp.setDetails(details.stream().filter(item -> item.getMainQid().equals(qid)).collect(Collectors.toList()));
+                List<ExamDetail> detailsByQid=details.stream().filter(item -> item.getMainQid().equals(qid)).collect(Collectors.toList());
+                detailsByQid.forEach(item->{
+                    stringBuilder.setLength(0);
+                    stringBuilder.append(item.getEnterpriseCis())
+                            .append(",")
+                            .append(item.getServerCode());
+                    item.setEnterpriseCis(Encryption.encrypByMD5(stringBuilder.toString()));
+
+                });
+                final List<ExamTitle> examTitles=titleMapper.selectByQid(qid);
+                if (!CollectionUtils.isEmpty(examTitles)) {
+                    temp.setDesc(examTitles);
+                }
+                result.add(temp);
+            });
+        }
+        return result;
     }
 }

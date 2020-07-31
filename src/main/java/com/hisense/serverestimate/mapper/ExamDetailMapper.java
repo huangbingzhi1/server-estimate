@@ -44,4 +44,10 @@ public interface ExamDetailMapper {
     //汇总2
     List<Map<String, Object>> collection2(Map<String, Object> param);
 
+    /**
+     * 根据商家ciscode，获取评价详情
+     * @param cisCode
+     * @return
+     */
+    List<ExamDetail> listExamDetailByCis(String cisCode);
 }
