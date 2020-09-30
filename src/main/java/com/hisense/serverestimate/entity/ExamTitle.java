@@ -14,6 +14,8 @@ public class ExamTitle implements Serializable {
 
     private String titleName;
 
+    private String titleType;
+
     private static final long serialVersionUID = 1L;
 
     public String getTitleId() {
@@ -48,18 +50,22 @@ public class ExamTitle implements Serializable {
         this.titleName = titleName == null ? null : titleName.trim();
     }
 
+    public String getTitleType() {
+        return titleType;
+    }
+
+    public void setTitleType(String titleType) {
+        this.titleType=titleType;
+    }
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", titleId=").append(titleId);
-        sb.append(", qid=").append(qid);
-        sb.append(", titleNo=").append(titleNo);
-        sb.append(", titleName=").append(titleName);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return "ExamTitle{" +
+                "titleId='" + titleId + '\'' +
+                ", qid='" + qid + '\'' +
+                ", titleNo='" + titleNo + '\'' +
+                ", titleName='" + titleName + '\'' +
+                ", titleType='" + titleType + '\'' +
+                '}';
     }
 }

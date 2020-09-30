@@ -40,7 +40,7 @@
     from exam_title
   </select>
   <select id="selectByQid" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select title_id, qid, title_no, title_name
+    select title_id, qid, title_no, title_name,title_type
     from exam_title
     where qid=#{qid,jdbcType=VARCHAR}
     order by title_no
