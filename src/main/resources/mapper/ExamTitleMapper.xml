@@ -6,6 +6,7 @@
     <result column="qid" property="qid" jdbcType="VARCHAR" />
     <result column="title_no" property="titleNo" jdbcType="VARCHAR" />
     <result column="title_name" property="titleName" jdbcType="VARCHAR" />
+    <result column="title_type" property="titleType" jdbcType="VARCHAR" />
   </resultMap>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from exam_title
