@@ -29,7 +29,7 @@ public class ExamSchedule {
     /**
      *  每隔1小时执行一次拉取和更新问卷任务
      */
-    @Scheduled(cron = "0 0 0/1 * * ?")
+//    @Scheduled(cron = "0 0 0/1 * * ?")
     private void configureTasks() {
 
         examController.synchronizeExam();
