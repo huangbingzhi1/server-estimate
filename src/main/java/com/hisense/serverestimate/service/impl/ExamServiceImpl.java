@@ -112,7 +112,7 @@ public class ExamServiceImpl implements ExamService {
             String  scoreStr = detail.getOrDefault("score_array","").toString();
             String[] scoreArr = scoreStr.split(",");
             String  textStr = detail.getOrDefault("text_array","").toString();
-            String[] textArr = textStr.split(",");
+            String[] textArr = textStr.split("#-hisense-#");
             int cellIndex=0;
             int totalCellIndex=0;
             Row currRow = currSheet.createRow(rowIndexMap.get(companyName));
@@ -513,7 +513,8 @@ public class ExamServiceImpl implements ExamService {
                     stringBuilder.append(item.getEnterpriseCis())
                             .append(",")
                             .append(item.getServerCode());
-                    item.setEnterpriseCis(Encryption.encrypByMD5(stringBuilder.toString()));
+//                    item.setEnterpriseCis(Encryption.encrypByMD5(stringBuilder.toString()));
+                    item.setEnterpriseCis((stringBuilder.toString()));
 
                 });
                 final List<ExamTitle> examTitles=titleMapper.selectByQid(qid);

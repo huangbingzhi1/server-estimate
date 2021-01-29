@@ -228,7 +228,8 @@ public class ExamController extends BaseController {
             for (int i = 0; i < examInfoByCisList.size(); i++) {
                 Map<String, Object> exams = examInfoByCisList.get(i);
                 StringBuilder stringBuilder = new StringBuilder(exams.get("url").toString());
-                stringBuilder.append(Encryption.encrypByMD5(param.get("cis").toString().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
+//                stringBuilder.append(Encryption.encrypByMD5(param.get("cis").toString().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
+                stringBuilder.append((param.get("cis").toString().concat(",").concat(exams.getOrDefault("server_code", "").toString())));
                 exams.put("url", stringBuilder.toString());
             }
             return JSON.toJSONString(examInfoByCisList);
@@ -337,7 +338,7 @@ public class ExamController extends BaseController {
                 for (int i = 0; i < textTypeQuestionNo.length; i++) {
                     String jsonStringByKey = HiStringUtil.getJsonStringByKey(parseObject, "q" + textTypeQuestionNo[i]);
                     if (i != 0) {
-                        scoreStringBuilder.append(',');
+                        textStringBuilder.append("-##serverestimate##-");
                     }
                     textStringBuilder.append(jsonStringByKey);
                 }
@@ -373,14 +374,14 @@ public class ExamController extends BaseController {
             jsonParam=parseObject.toJSONString();
             String qid = HiStringUtil.getJsonStringByKey(parseObject, "activity");
             String sojumpparm = HiStringUtil.getJsonStringByKey(parseObject, "sojumpparm");
-            Map<String, String> cisServerCodeMd5Map = serverService.getCisServerCodeMd5Map();
-            if (cisServerCodeMd5Map.containsKey(sojumpparm)) {
+//            Map<String, String> cisServerCodeMd5Map = serverService.getCisServerCodeMd5Map();
+           /* if (cisServerCodeMd5Map.containsKey(sojumpparm)) {
                 sojumpparm = cisServerCodeMd5Map.get(sojumpparm);
             } else {
                 errorExamDetailMapper.addErrorExamDetail("sojumpparm错误",jsonParam);
                 logger.error("sojumpparm错误");
                 return "error";
-            }
+            }*/
             String cis = null;
             String serverCode = null;
             if (!StringUtils.isEmpty(sojumpparm)) {
@@ -442,7 +443,7 @@ public class ExamController extends BaseController {
                 for (int i = 0; i < textTypeQuestionNo.length; i++) {
                     String jsonStringByKey = HiStringUtil.getJsonStringByKey(parseObject, "q" + textTypeQuestionNo[i]);
                     if (i != 0) {
-                        scoreStringBuilder.append(',');
+                        textStringBuilder.append("#-hisense-#");
                     }
                     textStringBuilder.append(jsonStringByKey);
                 }
@@ -587,6 +588,10 @@ public class ExamController extends BaseController {
     @RequestMapping(value = "dealCis", method = RequestMethod.GET)
     @ResponseBody
     public XsAccount dealCis(@RequestParam("account") String account, HttpServletRequest request, HttpServletResponse response) {
+        BaseUser loginUser = SessionUtil.getLoginUser();
+        if(!loginUser.getRoleId().equals("admin")){
+            return null;
+        }
         Map<String,Object> result=new HashMap<>(5);
         XsAccount xsAccount = xsAccountMapper.selectByAccount("fwpjxt"+account);
 

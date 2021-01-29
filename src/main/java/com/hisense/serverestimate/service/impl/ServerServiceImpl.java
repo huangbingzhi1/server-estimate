@@ -146,7 +146,8 @@ public class ServerServiceImpl implements ServerService {
         for (int i = 0; i < serverEnterpriseRels.size(); i++) {
             ServerEnterpriseRel rel = serverEnterpriseRels.get(i);
             String relStr = rel.getEnterpriseCis().concat(",").concat(rel.getServerCode());
-            String md5 = Encryption.encrypByMD5(relStr);
+//            String md5 = Encryption.encrypByMD5(relStr);
+            String md5 = (relStr);
             result.put(md5, relStr);
         }
         return result;
